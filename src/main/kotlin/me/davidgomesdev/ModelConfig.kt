@@ -32,7 +32,7 @@ class ModelConfig {
     @ApplicationScoped
     fun contentRetriever(): ContentRetriever {
         val documents = FileSystemDocumentLoader.loadDocument(
-            "sample.md",
+            "assets/sample.md",
             MarkdownDocumentParser()
         )
 

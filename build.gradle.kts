@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "2.2.20"
     kotlin("plugin.allopen") version "2.2.20"
+    kotlin("plugin.serialization") version "2.2.21"
     id("io.quarkus")
 }
 
@@ -12,12 +13,14 @@ repositories {
 val quarkusPlatformGroupId: String by project
 val quarkusPlatformArtifactId: String by project
 val quarkusPlatformVersion: String by project
-val webBundlerVersion = "1.8.0-beta15"
+val webBundlerVersion = "1.9.3"
 val langchainMarkdownVersion = "1.8.0-beta15"
+val kotlinxSerializationJson = "1.9.0"
 
 dependencies {
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:quarkus-langchain4j-bom:${quarkusPlatformVersion}"))
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationJson")
     implementation("io.quarkus:quarkus-kotlin")
     implementation("io.quarkus:quarkus-config-yaml")
     implementation("io.quarkus:quarkus-rest-jackson")
