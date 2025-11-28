@@ -3,14 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <title>Pessoa a Falar</title>
+    <style>
+        textarea {
+            width: 300px;
+            height: 100px;
+        }
+    </style>
 </head>
 <body>
 <h1>Pensa a Falar</h1>
 <img alt="Fernando Pessoa" src="https://www.portaldaliteratura.com/assets/files_autores/339.webp"/>
 <br><br>
 <label for="inputField">
-    <input type="text" id="inputField" placeholder="Type something..."
-           onkeydown="if (event.keyCode == 13) document.getElementById('send').click()">
+    <textarea id="inputField" placeholder="Type something..."
+              onkeydown="if (event.keyCode == 13) document.getElementById('send').click()"
+              style=""></textarea>
 </label>
 <button id="send" onclick="sendRequest()">Send</button>
 <p id="output"></p>
