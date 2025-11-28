@@ -12,6 +12,7 @@ repositories {
 val quarkusPlatformGroupId: String by project
 val quarkusPlatformArtifactId: String by project
 val quarkusPlatformVersion: String by project
+val langchainMarkdownVersion = "1.8.0-beta15"
 
 dependencies {
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
@@ -20,7 +21,7 @@ dependencies {
     implementation("io.quarkus:quarkus-config-yaml")
     implementation("io.quarkiverse.langchain4j:quarkus-langchain4j-core")
     implementation("io.quarkiverse.langchain4j:quarkus-langchain4j-ollama")
-    implementation("io.quarkiverse.langchain4j:quarkus-langchain4j-pgvector")
+    implementation("dev.langchain4j:langchain4j-document-parser-markdown:$langchainMarkdownVersion")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("io.quarkus:quarkus-arc")
     testImplementation("io.quarkus:quarkus-junit5")
