@@ -12,6 +12,7 @@ repositories {
 val quarkusPlatformGroupId: String by project
 val quarkusPlatformArtifactId: String by project
 val quarkusPlatformVersion: String by project
+val webBundlerVersion = "1.8.0-beta15"
 val langchainMarkdownVersion = "1.8.0-beta15"
 
 dependencies {
@@ -19,6 +20,8 @@ dependencies {
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:quarkus-langchain4j-bom:${quarkusPlatformVersion}"))
     implementation("io.quarkus:quarkus-kotlin")
     implementation("io.quarkus:quarkus-config-yaml")
+    implementation("io.quarkus:quarkus-rest-jackson")
+    implementation("io.quarkiverse.web-bundler:quarkus-web-bundler:$webBundlerVersion")
     implementation("io.quarkiverse.langchain4j:quarkus-langchain4j-core")
     implementation("io.quarkiverse.langchain4j:quarkus-langchain4j-ollama")
     implementation("dev.langchain4j:langchain4j-document-parser-markdown:$langchainMarkdownVersion")

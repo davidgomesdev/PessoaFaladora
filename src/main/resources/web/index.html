@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Pessoa a Falar</title>
+</head>
+<body>
+<h1>Pensa a Falar</h1>
+<img alt="Fernando Pessoa" src="https://www.portaldaliteratura.com/assets/files_autores/339.webp"/>
+<br><br>
+<label for="inputField">
+    <input type="text" id="inputField" placeholder="Type something..."
+           onkeydown="if (event.keyCode == 13) document.getElementById('send').click()">
+</label>
+<button id="send" onclick="sendRequest()">Send</button>
+<p id="output"></p>
+
+<script>
+    async function sendRequest() {
+      const inputValue = document.getElementById("inputField").value;
+
+      const payload = { input: inputValue };
+
+      try {
+        const response = await fetch("http://127.0.0.1:8080/pensa", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+        document.getElementById("output").innerText = data.response ?? "(no response field)";
+      } catch (err) {
+        document.getElementById("output").innerText = "Error: " + err;
+      }
+    }
+</script>
+</body>
+</html>
