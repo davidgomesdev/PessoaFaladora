@@ -27,6 +27,7 @@ dependencies {
     implementation("io.quarkiverse.web-bundler:quarkus-web-bundler:$webBundlerVersion")
     implementation("io.quarkiverse.langchain4j:quarkus-langchain4j-core")
     implementation("io.quarkiverse.langchain4j:quarkus-langchain4j-ollama")
+    implementation("io.quarkiverse.langchain4j:quarkus-langchain4j-pgvector")
     implementation("dev.langchain4j:langchain4j-document-parser-markdown:$langchainMarkdownVersion")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("io.quarkus:quarkus-arc")

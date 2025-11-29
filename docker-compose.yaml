@@ -1,0 +1,17 @@
+name: pessoa-faladora
+services:
+  db:
+    image: pgvector/pgvector:pg17 # PostgreSQL with pgvector support
+    container_name: db
+    environment:
+      POSTGRES_USER: ricardo-reis
+      POSTGRES_PASSWORD: isThisNotAVerySecurePassword
+      POSTGRES_DB: pessoa_faladora
+    ports:
+      - "15432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgres/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
+volumes:
+  pgdata:

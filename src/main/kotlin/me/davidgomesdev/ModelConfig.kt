@@ -12,34 +12,57 @@ import dev.langchain4j.rag.content.injector.DefaultContentInjector
 import dev.langchain4j.rag.content.retriever.ContentRetriever
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever
 import dev.langchain4j.rag.query.router.DefaultQueryRouter
+import dev.langchain4j.rag.query.transformer.DefaultQueryTransformer
 import dev.langchain4j.service.AiServices
+import dev.langchain4j.store.embedding.EmbeddingStore
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor
-import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore
 import io.quarkiverse.langchain4j.jaxrsclient.JaxRsHttpClientBuilder
 import io.quarkiverse.langchain4j.ollama.OllamaEmbeddingModel
+import io.quarkiverse.langchain4j.pgvector.PgVectorEmbeddingStore
 import jakarta.enterprise.context.ApplicationScoped
+import jakarta.inject.Singleton
+import org.jboss.logging.Logger
+import java.time.Duration
+import kotlin.time.measureTime
+
 
 @ApplicationScoped
 class ModelConfig {
+
+    val log: Logger = Logger.getLogger(this::class.java)
 
     @ApplicationScoped
     fun chatModel(): ChatModel =
         OllamaChatModel.builder().baseUrl("http://127.0.0.1:11434")
             .modelName("qwen3:1.7b")
             .httpClientBuilder(JaxRsHttpClientBuilder())
+            .timeout(Duration.ofMinutes(1))
             .build()
 
-    @ApplicationScoped
+    @Singleton
     fun contentRetriever(): ContentRetriever {
-        val documents = FileSystemDocumentLoader.loadDocument(
-            "assets/sample.md",
+        val documentFileName = System.getenv("DOCUMENT_FILE_NAME") ?: "alberto_caeiro"
+        val document = FileSystemDocumentLoader.loadDocument(
+            "assets/$documentFileName.md",
             MarkdownDocumentParser()
         )
 
-        val embeddingStore = InMemoryEmbeddingStore<TextSegment>()
+        val embeddingModel =
+            OllamaEmbeddingModel.builder().baseUrl("http://127.0.0.1:11434")
+                .timeout(Duration.ofMinutes(15))
+                .model("embeddinggemma")
+                .build()
 
-        val embeddingModel = OllamaEmbeddingModel.builder().baseUrl("http://127.0.0.1:11434")
-            .model("embeddinggemma")
+        log.info("Creating Embedding store")
+
+        val embeddingStore: EmbeddingStore<TextSegment> = PgVectorEmbeddingStore.builder()
+            .host("127.0.0.1")
+            .port(15432)
+            .database("pessoa_faladora")
+            .user("ricardo-reis")
+            .password("isThisNotAVerySecurePassword")
+            .table("${documentFileName}_embeddings")
+            .dimension(embeddingModel.dimension())
             .build()
 
         val contentRetriever = EmbeddingStoreContentRetriever.builder()
@@ -47,29 +70,40 @@ class ModelConfig {
             .embeddingModel(embeddingModel)
             .build()
 
-        EmbeddingStoreIngestor.builder()
-            .embeddingStore(embeddingStore)
-            .embeddingModel(embeddingModel)
-            .build()
-            .ingest(documents)
+        log.info("Ingesting documents")
+        val timeSpent = measureTime {
+                EmbeddingStoreIngestor.builder()
+
+                    .embeddingStore(embeddingStore)
+                    .embeddingModel(embeddingModel)
+                    .build()
+                    .ingest(document)
+            }
+        log.info("Documents ingested (took $timeSpent)")
 
         return contentRetriever
     }
 
-    @ApplicationScoped
+    @Singleton
     fun augmentor(contentRetriever: ContentRetriever): RetrievalAugmentor = DefaultRetrievalAugmentor.builder()
         .queryRouter(DefaultQueryRouter(contentRetriever))
+        .queryTransformer {
+            log.info("Getting $it")
+            DefaultQueryTransformer().transform(it)
+        }
         .contentInjector(
             DefaultContentInjector.builder()
-                .promptTemplate(PromptTemplate.from("Responde diretamente\n{{userMessage}}\n{{contents}}"))
+                .promptTemplate(PromptTemplate.from("Responde diretamente e em Português de Portugal.\n{{userMessage}}\n{{contents}}"))
                 .build()
         )
         .build()
 
-    @ApplicationScoped
-    fun assistant(chatModel: ChatModel, retrievalAugmentor: RetrievalAugmentor): Assistant =
-        AiServices.builder(Assistant::class.java)
+    @Singleton
+    fun assistant(chatModel: ChatModel, retrievalAugmentor: RetrievalAugmentor): Assistant {
+        log.info("Creating Assistant")
+        return AiServices.builder(Assistant::class.java)
             .chatModel(chatModel)
             .retrievalAugmentor(retrievalAugmentor)
             .build()
+    }
 }

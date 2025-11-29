@@ -4,9 +4,11 @@ import io.quarkus.runtime.Quarkus
 import io.quarkus.runtime.annotations.QuarkusMain
 
 @QuarkusMain
-object JavaMain {
-    @JvmStatic
-    fun main(args: Array<String>) {
-        Quarkus.run(*args)
+class JavaMain {
+    companion object {
+        @JvmStatic
+        fun main(args: Array<String>) {
+            Quarkus.run(*args)
+        }
     }
 }
