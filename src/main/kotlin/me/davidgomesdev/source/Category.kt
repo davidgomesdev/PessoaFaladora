@@ -1,4 +1,4 @@
-package me.davidgomesdev
+package me.davidgomesdev.source
 
 import kotlinx.serialization.Serializable
 

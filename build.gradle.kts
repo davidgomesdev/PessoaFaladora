@@ -2,6 +2,7 @@ plugins {
     kotlin("jvm") version "2.2.20"
     kotlin("plugin.allopen") version "2.2.20"
     kotlin("plugin.serialization") version "2.2.21"
+    kotlin("plugin.jpa") version "2.2.21"
     id("io.quarkus")
 }
 
@@ -24,6 +25,9 @@ dependencies {
     implementation("io.quarkus:quarkus-kotlin")
     implementation("io.quarkus:quarkus-config-yaml")
     implementation("io.quarkus:quarkus-rest-jackson")
+    implementation("io.quarkus:quarkus-jdbc-postgresql")
+//    implementation("io.quarkus:quarkus-hibernate-orm")
+    implementation("io.quarkus:quarkus-hibernate-orm-panache-kotlin")
     implementation("io.quarkiverse.web-bundler:quarkus-web-bundler:$webBundlerVersion")
     implementation("io.quarkiverse.langchain4j:quarkus-langchain4j-core")
     implementation("io.quarkiverse.langchain4j:quarkus-langchain4j-ollama")

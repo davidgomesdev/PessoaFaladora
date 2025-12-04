@@ -1,8 +1,4 @@
-# 1. Poemas de Alberto Caeiro
-
-## O GUARDADOR DE REBANHOS
-
-### Estas quatro canções, escrevi-as estando doente.
+# Estas quatro canções, escrevi-as estando doente.
 
 [XVa]
 
@@ -17,7 +13,8 @@ O defeito dos homens não é serem doentes:
 E por isso não buscarem a cura
 Nem realmente saberem o que é saúde e doença.
 
-### I - Eu nunca guardei rebanhos,
+---
+# I - Eu nunca guardei rebanhos,
 
 I
 
@@ -94,7 +91,8 @@ Se sentavam com um baque, cansados de brincar,
 E limpavam o suor da testa quente
 Com a manga do bibe riscado.
 
-### II - O meu olhar é nítido como um girassol.
+---
+# II - O meu olhar é nítido como um girassol.
 
 II
 
@@ -127,7 +125,8 @@ Nem sabe porque ama, nem o que é amar...
 Amar é a eterna inocência,
 E a única inocência é não pensar...
 
-### III - Ao entardecer, debruçado pela janela,
+---
+# III - Ao entardecer, debruçado pela janela,
 
 III
 
@@ -151,7 +150,8 @@ Mas andava na cidade como quem anda no campo
 E triste como esmagar flores em livros
 E pôr plantas em jarros...
 
-### IV - Esta tarde a trovoada caiu
+---
+# IV - Esta tarde a trovoada caiu
 
 IV
 
@@ -209,7 +209,8 @@ Fiquei sombrio e adoecido e soturno
 Como um dia em que todo o dia a trovoada ameaça
 E nem sequer de noite chega...
 
-### IX - Sou um guardador de rebanhos.
+---
+# IX - Sou um guardador de rebanhos.
 
 IX
 
@@ -229,7 +230,8 @@ E fecho os olhos quentes,
 Sinto todo o meu corpo deitado na realidade,
 Sei a verdade e sou feliz.
 
-### Rimo quando calha
+---
+# Rimo quando calha
 
 [XIVa]
 
@@ -240,7 +242,8 @@ Copio a Natureza e não a interrogo.
 Nem tudo é terreno plano,
 Por isso muitas vezes não rimo...
 
-### V - Há metafísica bastante em não pensar em nada.
+---
+# V - Há metafísica bastante em não pensar em nada.
 
 V
 
@@ -331,7 +334,8 @@ E amo-o sem pensar nele,
 E penso-o vendo e ouvindo,
 E ando com ele a toda a hora.
 
-### VI - Pensar em Deus é desobedecer a Deus,
+---
+# VI - Pensar em Deus é desobedecer a Deus,
 
 VI
 
@@ -346,7 +350,8 @@ Belos como as árvores e os regatos,
 E dar-nos-á verdor na sua primavera,
 E um rio aonde ir ter quando acabemos!...
 
-### VII - Da minha aldeia vejo quanto da terra se pode ver do Universo…
+---
+# VII - Da minha aldeia vejo quanto da terra se pode ver do Universo…
 
 VII
 
@@ -362,7 +367,8 @@ Escondem o horizonte, empurram o nosso olhar para longe de todo o céu,
 Tornam-nos pequenos porque nos tiram o que os nossos olhos nos podem dar,
 E tornam-nos pobres porque a nossa única riqueza é ver.
 
-### VIII - Num meio-dia de fim de Primavera
+---
+# VIII - Num meio-dia de fim de Primavera
 
 VIII
 
@@ -550,7 +556,8 @@ Não há-de ser ela mais verdadeira
 Que tudo quanto os filósofos pensam
 E tudo quanto as religiões ensinam?
 
-### X - «Olá, guardador de rebanhos,
+---
+# X - «Olá, guardador de rebanhos,
 
 X
 
@@ -573,7 +580,8 @@ O vento só fala do vento.
 O que lhe ouviste foi mentira,
 E a mentira está em ti.»
 
-### XI - Aquela senhora tem um piano
+---
+# XI - Aquela senhora tem um piano
 
 XI
 
@@ -585,7 +593,8 @@ Para que é preciso ter um piano?
 O melhor é ter ouvidos
 E amar a Natureza.
 
-### XII - Os pastores de Virgílio tocavam avenas e outras coisas
+---
+# XII - Os pastores de Virgílio tocavam avenas e outras coisas
 
 XII
 
@@ -597,7 +606,8 @@ Para que o havia eu de ler?)
 Mas os pastores de Virgílio, coitados, são Virgílio,
 E a Natureza é bela e antiga.
 
-### XIII - Leve, leve, muito leve,
+---
+# XIII - Leve, leve, muito leve,
 
 XIII
 
@@ -607,7 +617,8 @@ E vai-se, sempre muito leve.
 E eu não sei o que penso
 Nem procuro sabê-lo.
 
-### XIV - Não me importo com as rimas. Raras vezes
+---
+# XIV - Não me importo com as rimas. Raras vezes
 
 XIV
 
@@ -622,7 +633,8 @@ Olho e comovo-me,
 Comovo-me como a água corre quando o chão é inclinado,
 E a minha poesia é natural como o levantar-se o vento...
 
-### XIX - O luar quando bate na relva
+---
+# XIX - O luar quando bate na relva
 
 XIX
 
@@ -637,7 +649,8 @@ Socorrendo as crianças maltratadas...
 Se eu já não posso crer que isso é verdade
 Para que bate o luar na relva?
 
-### XL - Passa uma borboleta por diante de mim
+---
+# XL - Passa uma borboleta por diante de mim
 
 XL
 
@@ -651,7 +664,8 @@ O perfume é que tem perfume no perfume da flor.
 A borboleta é apenas borboleta
 E a flor é apenas flor.
 
-### XLI - No entardecer dos dias de Verão, às vezes,
+---
+# XLI - No entardecer dos dias de Verão, às vezes,
 
 XLI
 
@@ -677,7 +691,8 @@ Se não houvesse imperfeição, havia uma coisa a menos,
 E deve haver muita coisa
 Para termos muito que ver e ouvir...
 
-### XLII - Passou a diligência pela estrada, e foi-se;
+---
+# XLII - Passou a diligência pela estrada, e foi-se;
 
 XLII
 
@@ -687,7 +702,8 @@ Assim é a acção humana pelo mundo fora.
 Nada tiramos e nada pomos; passamos e esquecemos;
 E o Sol é sempre pontual todos os dias.
 
-### XLIII - Antes o voo da ave, que passa e não deixa rasto,
+---
+# XLIII - Antes o voo da ave, que passa e não deixa rasto,
 
 XLIII
 
@@ -703,7 +719,8 @@ O que foi não é nada, e lembrar é não ver.
 
 Passa, ave, passa, e ensina-me a passar!
 
-### XLIV - Acordo de noite subitamente
+---
+# XLIV - Acordo de noite subitamente
 
 XLIV
 
@@ -724,7 +741,8 @@ Com a sua pequenez...
 E esta sensação é curiosa porque só para mim é que ele enche a noite
 Com a sua pequenez...
 
-### XLIX - Meto-me para dentro, e fecho a janela.
+---
+# XLIX - Meto-me para dentro, e fecho a janela.
 
 XLIX
 
@@ -742,7 +760,8 @@ Sem ler nada, sem pensar em nada, nem dormir,
 Sentir a vida correr por mim como um rio por seu leito,
 E lá fora um grande silêncio como um deus que dorme.
 
-### XLV - Um renque de árvores lá longe, lá para a encosta.
+---
+# XLV - Um renque de árvores lá longe, lá para a encosta.
 
 XLV
 
@@ -756,7 +775,8 @@ Que põem letreiros com nomes nas árvores absolutamente reais,
 E desenham paralelos de latitude e longitude
 Sobre a própria terra inocente e mais verde e florida do que isso!
 
-### XLVI - Deste modo ou daquele modo,
+---
+# XLVI - Deste modo ou daquele modo,
 
 XLVI
 
@@ -808,7 +828,8 @@ Ainda assim já se lhe vêem as pontas dos dedos
 Agarrando o cimo do muro
 Do horizonte cheio de montes baixos.
 
-### XLVII - Num dia excessivamente nítido,
+---
+# XLVII - Num dia excessivamente nítido,
 
 XLVII
 
@@ -836,7 +857,8 @@ Acertei que devia ser a verdade
 Que todos andam a achar e que não acham,
 E que só eu, porque a não fui achar, achei.
 
-### XLVIII - Da mais alta janela da minha casa
+---
+# XLVIII - Da mais alta janela da minha casa
 
 XLVIII
 
@@ -872,7 +894,8 @@ Corre o rio e entra no mar e a sua água é sempre a que foi sua.
 
 Passo e fico, como o Universo.
 
-### XV - As quatro canções que seguem
+---
+# XV - As quatro canções que seguem
 
 XV
 
@@ -900,7 +923,8 @@ Não são capazes de me renegar
 E são a paisagem da minha alma de noite,
 A mesma ao contrário...
 
-### XVI - Quem me dera que a minha vida fosse um carro de bois
+---
+# XVI - Quem me dera que a minha vida fosse um carro de bois
 
 XVI
 
@@ -919,7 +943,8 @@ E eu não sabia nada do que de mim faziam...
 Mas eu não sou um carro, sou diferente
 Mas em que sou realmente diferente nunca me diriam.
 
-### XVII - No meu prato que mistura de Natureza!
+---
+# XVII - No meu prato que mistura de Natureza!
 
 XVII
 
@@ -942,7 +967,8 @@ Verde e alagado surgiu
 E no ar por onde a pomba apareceu
 O arco-íris se esbateu...
 
-### XX - O Tejo é mais belo que o rio que corre pela minha aldeia,
+---
+# XX - O Tejo é mais belo que o rio que corre pela minha aldeia,
 
 XX
 
@@ -973,7 +999,8 @@ Do rio da minha aldeia.
 O rio da minha aldeia não faz pensar em nada
 Quem está ao pé dele está só ao pé dele.
 
-### XXI - Se eu pudesse trincar a terra toda
+---
+# XXI - Se eu pudesse trincar a terra toda
 
 XXI
 
@@ -1000,7 +1027,8 @@ E quando se vai morrer, lembrar-se de que o dia morre,
 E que o poente é belo e é bela a noite que fica...
 Assim é e assim seja...
 
-### XXII - Como quem num dia de Verão abre a porta de casa
+---
+# XXII - Como quem num dia de Verão abre a porta de casa
 
 XXII
 
@@ -1021,7 +1049,8 @@ Ou que sentir desagrado porque é quente,
 E de qualquer maneira que eu o sinta,
 Assim, porque assim o sinto, é que é meu dever senti-lo...
 
-### XXIII - O meu olhar azul como o céu
+---
+# XXIII - O meu olhar azul como o céu
 
 XXIII
 
@@ -1041,7 +1070,8 @@ Porque tudo é como é e assim é que é,
 E eu aceito, e nem agradeço,
 Para não parecer que penso nisso…)
 
-### XXIV - O que nós vemos das coisas são as coisas.
+---
+# XXIV - O que nós vemos das coisas são as coisas.
 
 XXIV
 
@@ -1066,7 +1096,8 @@ Mas onde afinal as estrelas não são senão estrelas
 Nem as flores senão flores,
 Sendo por isso que lhes chamamos estrelas e flores.
 
-### XXIX - Nem sempre sou igual no que digo e escrevo.
+---
+# XXIX - Nem sempre sou igual no que digo e escrevo.
 
 XXIX
 
@@ -1087,7 +1118,8 @@ O mesmo sempre, graças ao céu e à terra
 E aos meus olhos e ouvidos atentos
 E à minha clara simplicidade de alma...
 
-### XXV - As bolas de sabão que esta criança
+---
+# XXV - As bolas de sabão que esta criança
 
 XXV
 
@@ -1108,7 +1140,8 @@ E que só sabemos que passa
 Porque qualquer coisa se aligeira em nós
 E aceita tudo mais nitidamente.
 
-### XXVI - Às vezes, em dias de luz perfeita e exacta,
+---
+# XXVI - Às vezes, em dias de luz perfeita e exacta,
 
 XXVI
 
@@ -1134,7 +1167,8 @@ Perante as coisas que simplesmente existem.
 
 Que difícil ser próprio e não ver senão o visível!
 
-### XXVII - Só a Natureza é divina, e ela não é divina...
+---
+# XXVII - Só a Natureza é divina, e ela não é divina...
 
 XXVII
 
@@ -1152,7 +1186,8 @@ E o nosso coração do tamanho de um punho fechado...
 Bendito seja eu por tudo quanto não sei.
 Gozo tudo isso como quem sabe que há o sol.
 
-### XXVIII - Li hoje quase duas páginas
+---
+# XXVIII - Li hoje quase duas páginas
 
 XXVIII
 
@@ -1188,7 +1223,8 @@ E não a compreendo por dentro
 Porque a Natureza não tem dentro;
 Senão não era a Natureza.
 
-### XXVIII - Quem me dera que eu fosse o pó da estrada
+---
+# XXVIII - Quem me dera que eu fosse o pó da estrada
 
 XXVIII
 
@@ -1207,7 +1243,8 @@ E que ele me batesse e me estimasse...
 Antes isso que ser o que atravessa a vida
 Olhando para trás de si e tendo pena...
 
-### XXX - Se quiserem que eu tenha um misticismo, está bem, tenho-o.
+---
+# XXX - Se quiserem que eu tenha um misticismo, está bem, tenho-o.
 
 XXX
 
@@ -1223,7 +1260,8 @@ Vivo no cimo dum outeiro
 Numa casa caiada e sozinha,
 E essa é a minha definição.
 
-### XXXI - Se às vezes digo que as flores sorriem
+---
+# XXXI - Se às vezes digo que as flores sorriem
 
 XXXI
 
@@ -1241,7 +1279,8 @@ Porque só sou essa coisa séria, um intérprete da Natureza,
 Porque há homens que não percebem a sua linguagem,
 Por ela não ser linguagem nenhuma.
 
-### XXXII - Ontem à tarde um homem das cidades
+---
+# XXXII - Ontem à tarde um homem das cidades
 
 XXXII
 
@@ -1288,7 +1327,8 @@ E saber fazê-lo sem pensar nisso.)
 E o homem calara-se, olhando o poente.
 Mas que tem com o poente quem odeia e ama?
 
-### XXXIII - Pobres das flores nos canteiros dos jardins regulares.
+---
+# XXXIII - Pobres das flores nos canteiros dos jardins regulares.
 
 XXXIII
 
@@ -1300,7 +1340,8 @@ Que tiveram para o primeiro olhar do primeiro homem
 Que as viu aparecidas e lhes tocou levemente
 Para ver se elas falavam...
 
-### XXXIV - Acho tão natural que não se pense
+---
+# XXXIV - Acho tão natural que não se pense
 
 XXXIV
 
@@ -1327,7 +1368,8 @@ Para ver só os meus pensamentos...
 Entristecia e ficava às escuras.
 E assim, sem pensar, tenho a Terra e o Céu.
 
-### XXXIX - O mistério das coisas, onde está ele?
+---
+# XXXIX - O mistério das coisas, onde está ele?
 
 XXXIX
 
@@ -1351,7 +1393,8 @@ Sim, eis o que os meus sentidos aprenderam sozinhos: —
 As coisas não têm significação: têm existência.
 As coisas são o único sentido oculto das coisas.
 
-### XXXV - O luar através dos altos ramos,
+---
+# XXXV - O luar através dos altos ramos,
 
 XXXV
 
@@ -1366,7 +1409,8 @@ O luar através dos altos ramos,
 É não ser mais
 Que o luar através dos altos ramos.
 
-### XXXVI - E há poetas que são artistas
+---
+# XXXVI - E há poetas que são artistas
 
 XXXVI
 
@@ -1391,7 +1435,8 @@ E levar ao colo pelas Estações contentes
 E deixar que o vento cante para adormecermos
 E não termos sonhos no nosso sono.
 
-### XXXVII - Como um grande borrão de fogo sujo
+---
+# XXXVII - Como um grande borrão de fogo sujo
 
 XXXVII
 
@@ -1411,7 +1456,8 @@ E não têm sentido nenhum
 Salvo serem bolhas de água
 Que nascem e se desmancham.
 
-### XXXVIII - Bendito seja o mesmo sol de outras terras
+---
+# XXXVIII - Bendito seja o mesmo sol de outras terras
 
 XXXVIII
 
@@ -1428,9 +1474,8 @@ Porque isso é natural — mais natural
 Que adorar o ouro e Deus
 E a arte e a moral...
 
-## O PASTOR AMOROSO
-
-### Agora que sinto amor
+---
+# Agora que sinto amor
 
 Agora que sinto amor
 Tenho interesse no que cheira.
@@ -1442,7 +1487,8 @@ Mas agora sei com a respiração da parte de trás da cabeça.
 Hoje as flores sabem-me bem num paladar que se cheira.
 Hoje às vezes acordo e cheiro antes de ver.
 
-### O amor é uma companhia
+---
+# O amor é uma companhia
 
 O amor é uma companhia.
 Já não sei andar só pelos caminhos,
@@ -1457,7 +1503,8 @@ Mas se a vejo tremo, não sei o que é feito do que sinto na ausência dela.
 Todo eu sou qualquer força que me abandona.
 Toda a realidade olha para mim como um girassol com a cara dela no meio.
 
-### O pastor amoroso perdeu o cajado,
+---
+# O pastor amoroso perdeu o cajado,
 
 O pastor amoroso perdeu o cajado,
 E as ovelhas tresmalharam-se pela encosta,
@@ -1473,7 +1520,8 @@ A realidade toda, com o céu e o ar e os campos que existem, estão presentes.
 (E de novo o ar, que lhe faltara tanto tempo, lhe entrou fresco nos pulmões)
 E sentiu que de novo o ar lhe abria, mas com dor, uma liberdade no peito.
 
-### Passei toda a noite, sem dormir, vendo, sem espaço, a figura dela,
+---
+# Passei toda a noite, sem dormir, vendo, sem espaço, a figura dela,
 
 Passei toda a noite, sem dormir, vendo, sem espaço, a figura dela,
 E vendo-a sempre de maneiras diferentes do que a encontro a ela.
@@ -1490,7 +1538,8 @@ Não sei bem o que quero, nem quero saber o que quero. Quero só
 Pensar nela.
 Não peço nada a ninguém, nem a ela, senão pensar.
 
-### Quando eu não te tinha
+---
+# Quando eu não te tinha
 
 Quando eu não te tinha
 Amava a Natureza como um monge calmo a Cristo...
@@ -1512,7 +1561,8 @@ Sobre todas as coisas.
 Não me arrependo do que fui outrora
 Porque ainda o sou.
 
-### Quando eu não te tinha
+---
+# Quando eu não te tinha
 
 Quando eu não te tinha
 Amava a Natureza como um monge calmo a Cristo...
@@ -1535,7 +1585,8 @@ Sobre todas as coisas.
 Não me arrependo do que fui outrora
 Porque ainda o sou.
 
-### Talvez quem vê bem não sirva para sentir
+---
+# Talvez quem vê bem não sirva para sentir
 
 Talvez quem vê bem não sirva para sentir
 E não agrada por estar muito antes das maneiras.
@@ -1561,7 +1612,8 @@ Tem o cabelo de um louro amarelo de trigo ao sol claro,
 E a boca quando fala diz coisas que não só as palavras.
 Sorri, e os dentes são limpos como pedras do rio.
 
-### Todos dias agora acordo com alegria e pena.
+---
+# Todos dias agora acordo com alegria e pena.
 
 Todos dias agora acordo com alegria e pena.
 Antigamente acordava sem sensação nenhuma; acordava.
@@ -1574,7 +1626,8 @@ Quero que ela me diga qualquer coisa para eu acordar de novo.
 Quem ama é diferente de quem é
 É a mesma pessoa sem ninguém.
 
-### Vai alta no céu a lua da Primavera
+---
+# Vai alta no céu a lua da Primavera
 
 Vai alta no céu a lua da Primavera
 Penso em ti e dentro de mim estou completo.
@@ -1588,16 +1641,16 @@ Eu já te vejo amanhã a colher flores comigo pelos campos,
 Pois quando vieres amanhã e andares comigo no campo a colher flores,
 Isso será uma alegria e uma verdade para mim.
 
-## POEMAS INCONJUNTOS
-
-### A água chia no púcaro que elevo à boca.
+---
+# A água chia no púcaro que elevo à boca.
 
 A água chia no púcaro que elevo à boca.
 «É um som fresco» diz-me quem me dá a bebê-la.
 Sorrio. O som é só um som de chiar.
 Bebo a água sem ouvir nada com a minha garganta.
 
-### A criança que pensa em fadas e acredita nas fadas
+---
+# A criança que pensa em fadas e acredita nas fadas
 
 A criança que pensa em fadas e acredita nas fadas
 Age como um deus doente, mas como um deus.
@@ -1608,7 +1661,8 @@ Sabe que não há razão nenhuma para nada existir,
 Sabe que ser é estar em um ponto
 Só não sabe que o pensamento não é um ponto qualquer.
 
-### A espantosa realidade das coisas
+---
+# A espantosa realidade das coisas
 
 A espantosa realidade das coisas
 É a minha descoberta de todos os dias.
@@ -1648,7 +1702,8 @@ Se o que escrevo tem valor, não sou eu que o tenho:
 O valor está ali, nos meus versos.
 Tudo isso é absolutamente independente da minha vontade.
 
-### A guerra que aflige com os seus esquadrões o Mundo,
+---
+# A guerra que aflige com os seus esquadrões o Mundo,
 
 A guerra, que aflige com os seus esquadrões o Mundo,
 É o tipo perfeito do erro da filosofia.
@@ -1680,7 +1735,8 @@ Deixai existir o mundo exterior e a humanidade natural!
 Paz a todas as coisas pré-humanas, mesmo no homem,
 Paz à essência inteiramente exterior do Universo!
 
-### A manhã raia. Não: a manhã não raia.
+---
+# A manhã raia. Não: a manhã não raia.
 
 A manhã raia. Não: a manhã não raia.
 A manhã é uma coisa abstracta, está, não é uma coisa.
@@ -1691,7 +1747,8 @@ Como o é se lhe chamarmos a manhã,
 Por isso se não há vantagem em por nomes errados às coisas,
 Devemos nunca lhes por nomes alguns.
 
-### A neve pôs uma toalha calada sobre tudo.
+---
+# A neve pôs uma toalha calada sobre tudo.
 
 A neve pôs uma toalha calada sobre tudo.
 Não se sente senão o que se passa dentro de casa.
@@ -1699,7 +1756,8 @@ Embrulho-me num cobertor e não penso sequer em pensar.
 Sinto um gozo de animal e vagamente penso,
 E adormeço sem menos utilidade que todas as acções do mundo.
 
-### A noite desce, o calor soçobra um pouco.
+---
+# A noite desce, o calor soçobra um pouco.
 
 A noite desce, o calor soçobra um pouco.
 Estou lúcido como se nunca tivesse pensado
@@ -1710,7 +1768,8 @@ E m'aproximo das estrelas e de coisas distantes —
 Erro: porque o distante não é o próximo,
 E aproximá-lo é enganar-se.
 
-### Aceita o universo
+---
+# Aceita o universo
 
 Aceita o universo
 Como to deram os deuses.
@@ -1720,7 +1779,8 @@ Ter-to-iam dado.
 Se há outras matérias e outros mundos
 Haja.
 
-### Ah querem uma luz melhor que a do sol!
+---
+# Ah querem uma luz melhor que a do sol!
 
 Ah querem uma luz melhor que a do sol!
 Querem campos mais verdes que estes!
@@ -1747,7 +1807,8 @@ O absoluto corpo das coisas,
 A existência absolutamente real sem sombras nem erros
 A coincidência exacta (e inteira) de uma coisa consigo mesma.
 
-### Creio que irei morrer.
+---
+# Creio que irei morrer.
 
 Creio que irei morrer.
 Mas o sentido de morrer não me ocorre [?],
@@ -1759,7 +1820,8 @@ Tudo são termos nada se define. A única diferença é um contorno, uma paragem
 ...mas o Universo existe mesmo sem o Universo.
 Esta verdade capital é falsa só quando é dita.
 
-### Criança desconhecida e suja brincando à minha porta,
+---
+# Criança desconhecida e suja brincando à minha porta,
 
 Criança desconhecida e suja brincando à minha porta,
 Não te pergunto se me trazes um recado dos símbolos.
@@ -1778,7 +1840,8 @@ Sabes que te cabe na mão.
 Qual é a filosofia que chega a uma certeza maior?
 Nenhuma, e nenhuma pode vir brincar nunca à minha porta.
 
-### De longe vejo passar no rio um navio...
+---
+# De longe vejo passar no rio um navio...
 
 De longe vejo passar no rio um navio...
 Vai Tejo abaixo indiferentemente.
@@ -1789,7 +1852,8 @@ Exterior ao facto isoladamente navio
 De ir rio abaixo sem licença da metafísica...
 Rio abaixo até à realidade do mar.
 
-### Dizem que em cada coisa uma coisa oculta mora.
+---
+# Dizem que em cada coisa uma coisa oculta mora.
 
 Dizem que em cada coisa uma coisa oculta mora.
 Sim, é ela própria, a coisa sem ser oculta,
@@ -1826,7 +1890,8 @@ Cessarei assim? Não sei.
 Se tiver de cessar assim, ter pena de assim cessar,
 Não me tomará imortal.
 
-### Dizes-me: tu és mais alguma coisa
+---
+# Dizes-me: tu és mais alguma coisa
 
 Dizes-me: tu és mais alguma coisa
 Que uma pedra ou uma planta.
@@ -1867,7 +1932,8 @@ Digo da planta, «é uma planta»,
 Digo de mim «sou eu».
 E não digo mais nada. Que mais há a dizer?
 
-### É noite. A noite é muito escura. Numa casa a uma grande distância
+---
+# É noite. A noite é muito escura. Numa casa a uma grande distância
 
 É noite. A noite é muito escura. Numa casa a uma grande distância
 Brilha a luz duma janela.
@@ -1888,7 +1954,8 @@ Eu estou do lado de cá, a uma grande distância.
 A luz apagou-se.
 Que me importa que o homem continue a existir?
 
-### Entre o que vejo de um campo e o que vejo de outro campo
+---
+# Entre o que vejo de um campo e o que vejo de outro campo
 
 Entre o que vejo de um campo e o que vejo de outro campo
 Passa um momento uma figura de homem.
@@ -1901,7 +1968,8 @@ Que perfeito que é nele o que ele é—o seu corpo,
 A sua verdadeira realidade que não tem desejos nem esperanças,
 Mas músculos e a maneira certa e impessoal de os usar.
 
-### Estou doente. Meus pensamentos começam a estar confusos,
+---
+# Estou doente. Meus pensamentos começam a estar confusos,
 
 Estou doente. Meus pensamentos começam a estar confusos,
 Mas o meu corpo, tocando nas coisas, entra nelas.
@@ -1910,14 +1978,16 @@ E urna grande libertação começa a fazer-se em mim,
 Uma grande alegria solene como a de um acto heróico
 Pondo a vis no gesto sóbrio e escondido.
 
-### Eu queria ter o tempo e o sossego suficientes
+---
+# Eu queria ter o tempo e o sossego suficientes
 
 Eu queria ter o tempo e o sossego suficientes
 Para não pensar em coisa nenhuma,
 Para nem me sentir viver,
 Para só saber de mim nos olhos dos outros, reflectido.
 
-### Falas de civilização, e de não dever ser,
+---
+# Falas de civilização, e de não dever ser,
 
 Falas de civilização, e de não dever ser,
 Ou de não dever ser assim.
@@ -1933,7 +2003,8 @@ Se as coisas fossem como tu queres, seriam só como tu queres.
 Ai de ti e de todos que levam a vida
 A querer inventar a máquina de fazer felicidade!
 
-### Gozo os campos sem reparar para eles.
+---
+# Gozo os campos sem reparar para eles.
 
 Gozo os campos sem reparar para eles.
 Perguntas-me porque os gozo.
@@ -1948,7 +2019,8 @@ E alguma coisa dos ruídos indistintos das coisas a existir,
 E só uma sombra encarnada de luz me carrega levemente nas órbitas,
 E só um resto de vida ouve.
 
-### Hoje de manhã saí muito cedo,
+---
+# Hoje de manhã saí muito cedo,
 
 Hoje de manhã saí muito cedo,
 Por ter acordado ainda mais cedo
@@ -1963,7 +2035,8 @@ Assim quero que possa ser sempre —
 Vou onde o vento me leva e não me
 Sinto pensar.
 
-### LAST POEM
+---
+# LAST POEM
 
 LAST POEM
 (ditado pelo poeta no dia da sua morte)
@@ -1974,7 +2047,8 @@ Saudei o sol, levantando a mão direita,
 Mas não o saudei, para lhe dizer adeus.
 Fiz sinal de gostar de o ver ainda, mais nada.
 
-### Leram-me hoje S. Francisco de Assis.
+---
+# Leram-me hoje S. Francisco de Assis.
 
 Leram-me hoje S. Francisco de Assis.
 Leram-me e pasmei.
@@ -1993,7 +2067,8 @@ Ou, melhor ainda, não lhe chamar coisa nenhuma,
 Mas bebê-la, senti-la nos pulsos, olhar para ela
 E isto sem nome nenhum.
 
-### Não basta abrir a janela
+---
+# Não basta abrir a janela
 
 Não basta abrir a janela
 Para ver os campos e o rio.
@@ -2006,7 +2081,8 @@ Há só uma janela fechada, e todo o mundo lá fora;
 E um sonho do que se poderia ver se a janela se abrisse,
 Que nunca é o que se vê quando se abre a janela.
 
-### Não tenho pressa. Pressa de quê?
+---
+# Não tenho pressa. Pressa de quê?
 
 Não tenho pressa. Pressa de quê?
 Não têm pressa o sol e a lua: estão certos.
@@ -2022,7 +2098,8 @@ Mas o que faz rir a valer é que nós pensamos sempre noutra coisa,
 E vivemos vadios da nossa realidade.
 E estamos sempre fora dela porque estamos aqui.
 
-### Navio que partes para longe,
+---
+# Navio que partes para longe,
 
 Navio que partes para longe,
 Porque é que, ao contrário dos outros,
@@ -2032,7 +2109,8 @@ E se se tem saudades do que não existe,
 Sente-se em relação a coisa nenhuma,
 Não é do navio, é de nós, que sentimos saudades.
 
-### No dia brancamente nublado entristeço quase a medo
+---
+# No dia brancamente nublado entristeço quase a medo
 
 No dia brancamente nublado entristeço quase a medo
 E ponho-me a meditar nos problemas que finjo...
@@ -2081,7 +2159,8 @@ Na negação oposta de afirmarem qualquer coisa.
 A única afirmação é ser.
 E ser o oposto é o que não queria de mim...
 
-### Noite de S. João para além do muro do meu quintal.
+---
+# Noite de S. João para além do muro do meu quintal.
 
 Noite de S. João para além do muro do meu quintal.
 Do lado de cá, eu sem noite de S. João.
@@ -2090,13 +2169,15 @@ Para mim há uma sombra de luz de fogueiras na noite,
 Um ruído de gargalhadas, os baques dos saltos.
 E um grito casual de quem não sabe que eu existo.
 
-### Nunca sei como é que se pode achar um poente triste
+---
+# Nunca sei como é que se pode achar um poente triste
 
 Nunca sei como é que se pode achar um poente triste.
 Só se é por um poente não ser uma madrugada.
 Mas se ele é um poente, como é que ele havia de ser uma madrugada?
 
-### O PENÚLTIMO POEMA
+---
+# O PENÚLTIMO POEMA
 
 O PENÚLTIMO POEMA
 
@@ -2114,7 +2195,8 @@ Mas só corpo e são perfeitos.
 O corpo é que lhes é alma
 E têm a consciência na própria carne divina.
 
-### O que ouviu os meus versos disse-me: Que tem isso de novo?
+---
+# O que ouviu os meus versos disse-me: Que tem isso de novo?
 
 O que ouviu os meus versos disse-me: Que tem isso de novo?
 Todos sabem que uma flor é uma flor e uma árvore é uma árvore.
@@ -2124,7 +2206,8 @@ E todos amam as árvores por serem verdes e darem sombra, mas eu não.
 Eu amo as flores por serem flores, directamente.
 Eu amo as árvores por serem árvores, sem o meu pensamento.
 
-### O quê? Valho mais que uma flor
+---
+# O quê? Valho mais que uma flor
 
 O quê? Valho mais que uma flor
 Porque ela não sabe que tem cor e eu sei,
@@ -2151,7 +2234,8 @@ E só é o que nada mais é.
 Separa-a de todas as outras o facto de que é ela.
 (Tudo é nada sem outra coisa que não é).
 
-### Ontem o pregador de verdades dele
+---
+# Ontem o pregador de verdades dele
 
 Ontem o pregador de verdades dele
 Falou outra vez comigo.
@@ -2179,7 +2263,8 @@ E um sobreiro não ter nascido pinheiro ou carvalho.
 Cortei a laranja em duas, e as duas partes não podiam ficar iguais.
 Para qual fui injusto — eu, que as vou comer a ambas?
 
-### Para além da curva da estrada
+---
+# Para além da curva da estrada
 
 Para além da curva da estrada
 Talvez haja um poço, e talvez um castelo,
@@ -2200,7 +2285,8 @@ Por ora só sabemos que lá não estamos.
 Aqui há só a estrada antes da curva, e antes da curva
 Há a estrada sem curva nenhuma.
 
-### Pastor do monte, tão longe de mim com as tuas ovelhas
+---
+# Pastor do monte, tão longe de mim com as tuas ovelhas
 
 Pastor do monte, tão longe de mim com as tuas ovelhas —
 Que felicidade é essa que pareces ter—a tua ou a minha?
@@ -2213,7 +2299,8 @@ Ela é ela só, e cai sobre nós como o sol,
 Que te bate nas costas e te aquece, e tu pensas noutra coisa indiferentemente,
 E me bate na cara e me ofusca, e eu só penso no sol.
 
-### Pétala dobrada para trás da rosa que outros dizem de veludo.
+---
+# Pétala dobrada para trás da rosa que outros dizem de veludo.
 
 Pétala dobrada para trás da rosa que outros dizem de veludo.
 Apanho-te do chão e, de perto, contemplo-te de longe.
@@ -2224,7 +2311,8 @@ agora
 Agora estás aqui.
 O que foste não és tu, se não toda a rosa estava aqui.
 
-### Pouco a pouco o campo se alarga e se doura.
+---
+# Pouco a pouco o campo se alarga e se doura.
 
 Pouco a pouco o campo se alarga e se doura.
 A manhã extravia-se pelos irregulares da planície.
@@ -2232,12 +2320,14 @@ Sou alheio ao espectáculo que vejo: vejo-o.
 E exterior a mim. Nenhum sentimento me liga a ele,
 E é esse o sentimento que me liga à manhã que aparece.
 
-### Pouco me importa.
+---
+# Pouco me importa.
 
 Pouco me importa.
 Pouco me importa o quê? Não sei: pouco me importa.
 
-### Primeiro prenúncio de trovoada de depois de amanhã.
+---
+# Primeiro prenúncio de trovoada de depois de amanhã.
 
 Primeiro prenúncio de trovoada de depois de amanhã.
 As primeiras nuvens, brancas, pairam baixas no céu mortiço
@@ -2259,7 +2349,8 @@ O mundo será diferente —
 Haverá eu a menos —
 E a trovoada cairá num mundo diferente e não será a mesma trovoada.
 
-### Quando a erva crescer em cima da minha sepultura,
+---
+# Quando a erva crescer em cima da minha sepultura,
 
 Quando a erva crescer em cima da minha sepultura,
 Seja esse o sinal para me esquecerem de todo.
@@ -2267,7 +2358,8 @@ A Natureza nunca se recorda, e por isso é bela.
 E se tiverem a necessidade doentia de « interpretar» a erva verde sobre a minha sepultura,
 Digam que eu continuo a verdecer e a ser natural.
 
-### Quando está frio no tempo do frio, para mim é como se estivesse agradável,
+---
+# Quando está frio no tempo do frio, para mim é como se estivesse agradável,
 
 Quando está frio no tempo do frio, para mim é como se estivesse agradável,
 Porque para o meu ser adequado à existência das coisas
@@ -2295,7 +2387,8 @@ Nunca ao defeito de exigir do Mundo
 Que fosse qualquer coisa que não fosse o Mundo.
 
 
-### Quando tornar a vir a Primavera
+---
+# Quando tornar a vir a Primavera
 
 Quando tornar a vir a Primavera
 Talvez já não me encontre no mundo.
@@ -2309,7 +2402,8 @@ Há novas flores, novas folhas verdes.
 Há outros dias suaves.
 Nada torna, nada se repete, porque tudo é real.
 
-### Quando vier a Primavera,
+---
+# Quando vier a Primavera,
 
 Quando vier a Primavera,
 Se eu já estiver morto,
@@ -2334,7 +2428,8 @@ Se quiserem, podem dançar e cantar à roda dele.
 Não tenho preferências para quando já não puder ter preferências.
 O que for, quando for, é que será o que é.
 
-### Se eu morrer novo,
+---
+# Se eu morrer novo,
 
 Se eu morrer novo,
 Sem poder publicar livro nenhum,
@@ -2377,7 +2472,8 @@ Os campos, afinal, não são tão verdes para os que são amados
 Como para os que o não são.
 Sentir é estar distraído.
 
-### Se, depois de eu morrer, quiserem escrever a minha biografia,
+---
+# Se, depois de eu morrer, quiserem escrever a minha biografia,
 
 Se, depois de eu morrer, quiserem escrever a minha biografia,
 Não há nada mais simples.
@@ -2397,7 +2493,8 @@ Um dia deu-me o sono como a qualquer criança.
 Fechei os olhos e dormi.
 Além disso, fui o único poeta da Natureza.
 
-### Seja o que for que esteja no centro do Mundo,
+---
+# Seja o que for que esteja no centro do Mundo,
 
 Seja o que for que esteja no centro do Mundo,
 Deu-me o mundo exterior por exemplo de Realidade,
@@ -2459,7 +2556,8 @@ Mas isto como pode ser materialismo, se materialismo é uma filosofia,
 Se uma filosofia seria, pelo menos sendo minha, uma filosofia minha,
 Se isto nem sequer é meu, nem sequer sou eu?
 
-### Sempre que penso uma coisa, traio-a.
+---
+# Sempre que penso uma coisa, traio-a.
 
 Sempre que penso uma coisa, traio-a.
 Só tendo-a diante de mim devo pensar nela.
@@ -2472,7 +2570,8 @@ Só existe verdadeiramente para o pensamento e não para os olhos.
 Olho, e as coisas existem.
 Penso e existo só eu.
 
-### Sim, talvez tenham razão.
+---
+# Sim, talvez tenham razão.
 
 Sim, talvez tenham razão.
 Talvez em cada coisa uma coisa oculta more,
@@ -2508,7 +2607,8 @@ Entre quem são e quem são,
 E talvez não nos amem, nem nos queiram, nem nos apareçam
 Porque o que é perfeito não precisa de nada.
 
-### Sim: existo dentro do meu corpo.
+---
+# Sim: existo dentro do meu corpo.
 
 Sim: existo dentro do meu corpo.
 Não trago o sol nem a lua na algibeira.
@@ -2520,7 +2620,8 @@ Um momento no ar que não é para nós,
 E só contente quando os pés lhe batem outra vez na terra,
 Traz! na realidade que não falta!
 
-### Todas as opiniões que há sobre a Natureza
+---
+# Todas as opiniões que há sobre a Natureza
 
 Todas as opiniões que há sobre a Natureza
 Nunca fizeram crescer uma erva ou nascer uma flor.
@@ -2532,7 +2633,8 @@ Fecho os olhos e a terra dura sobre que me deito
 Tem uma realidade tão real que até as minhas costas a sentem.
 Não preciso de raciocínio onde tenho espáduas.
 
-### Todas as teorias, todos os poemas
+---
+# Todas as teorias, todos os poemas
 
 Todas as teorias, todos os poemas
 Duram mais que esta flor.
@@ -2544,7 +2646,8 @@ O que importa é a flor a durar e ter tamanho...
 (Se verdadeira dimensão é a realidade)
 Ser real é a única coisa verdadeira do mundo.
 
-### Tu, místico, vês uma significação em todas as coisas
+---
+# Tu, místico, vês uma significação em todas as coisas
 
 Tu, místico, vês uma significação em todas as coisas.
 Para ti tudo tem um sentido velado.
@@ -2556,7 +2659,8 @@ Eu vejo ausência de significação em todas as coisas;
 Vejo-o e amo-me, porque ser uma coisa é não significar nada.
 Ser uma coisa é não ser susceptível de interpretação.
 
-### Última estrela a desaparecer antes do dia,
+---
+# Última estrela a desaparecer antes do dia,
 
 Última estrela a desaparecer antes do dia,
 Pouso no teu trémulo azular branco os meus olhos calmos,
@@ -2566,12 +2670,14 @@ Sem «estado de alma» nenhum, senão ver-te.
 A tua beleza para mim está em existires.
 A tua grandeza está em existires inteiramente fora de mim.
 
-### Um dia de chuva é tão belo como um dia de sol.
+---
+# Um dia de chuva é tão belo como um dia de sol.
 
 Um dia de chuva é tão belo como um dia de sol.
 Ambos existem; cada um como é.
 
-### Uma gargalhada de rapariga soa do ar da estrada
+---
+# Uma gargalhada de rapariga soa do ar da estrada
 
 Uma gargalhada de raparigas soa do ar da estrada.
 Riu do que disse quem não vejo.
@@ -2580,7 +2686,8 @@ Mas se me falarem agora de uma gargalhada de rapariga da estrada,
 Direi: não, os montes, as terras ao sol, o Sol, a casa aqui,
 E eu que só oiço o ruído calado do sangue que há na minha vida dos dois lados da cabeça.
 
-### Verdade, mentira, certeza, incerteza…
+---
+# Verdade, mentira, certeza, incerteza…
 
 Verdade, mentira, certeza, incerteza…
 Aquele cego ali na estrada também conhece estas palavras.
@@ -2596,7 +2703,8 @@ O cego continua o seu caminho e eu não faço mais gestos.
 Já não é a mesma hora, nem a mesma gente, nem nada igual.
 Ser real é isto.
 
-### Vive, dizes, no presente;
+---
+# Vive, dizes, no presente;
 
 Vive, dizes, no presente;
 Vive só no presente.
@@ -2622,14 +2730,14 @@ Vê-las sem tempo, nem espaço,
 Ver podendo dispensar tudo menos o que se vê.
 É esta a ciência de ver, que não é nenhuma.
 
-## Fragmentos
-
-### Como uma criança, antes de a ensinarem a ser grande,
+---
+# Como uma criança, antes de a ensinarem a ser grande,
 
 Como uma criança antes de a ensinarem a ser grande,
 Fui verdadeiro e leal ao que vi e ouvi.
 
-### Deito-me ao comprido na erva.
+---
+# Deito-me ao comprido na erva.
 
 Deito-me ao comprido na erva.
 E esqueço do quanto me ensinaram.
@@ -2638,19 +2746,22 @@ O que me disseram que havia nunca me alterou a forma de uma coisa.
 O que me aprenderam a ver nunca tocou nos meus olhos.
 O que me apontaram nunca estava ali: estava ali só o que ali estava.
 
-### Falaram-me os homens em humanidade,
+---
+# Falaram-me os homens em humanidade,
 
 Falaram-me os homens em humanidade,
 Mas eu nunca vi homens nem vi humanidade.
 Vi vários homens assombrosamente diferentes entre si.
 Cada um separado do outro por um espaço sem homens.
 
-### Não sei o que é conhecer-me.
+---
+# Não sei o que é conhecer-me.
 
 Não sei o que é conhecer-me. Não vejo para dentro.
 Não acredito que eu exista por detrás de mim.
 
-### Não tenho pressa: não a têm o sol e a lua.
+---
+# Não tenho pressa: não a têm o sol e a lua.
 
 Não tenho pressa: não a têm o sol e a lua.
 Ninguém anda mais depressa do que as pernas que tem.
@@ -2680,14 +2791,16 @@ Mas o que faz rir a valer é que nós pensamos sempre noutra coisa,
 E somos vadios do nosso corpo.
 E estamos sempre fora dele porque estamos aqui.
 
-### Nunca busquei viver a minha vida
+---
+# Nunca busquei viver a minha vida
 
 Nunca busquei viver a minha vida
 A minha vida viveu-se sem que eu quisesse ou não quisesse.
 Só quis ver como se não tivesse alma
 Só quis ver como se fosse eterno.
 
-### Patriota? Não: só português.
+---
+## Patriota? Não: só português.
 
 Patriota? Não: só português.
 Nasci português como nasci louro e de olhos azuis.

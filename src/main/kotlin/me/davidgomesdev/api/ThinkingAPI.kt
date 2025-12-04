@@ -1,16 +1,16 @@
-package me.davidgomesdev
+package me.davidgomesdev.api
 
 import jakarta.ws.rs.POST
 import jakarta.ws.rs.PUT
 import jakarta.ws.rs.Path
 import kotlinx.serialization.json.Json
+import me.davidgomesdev.source.PessoaCategory
 import org.jboss.logging.Logger
 import java.io.File
 import java.nio.file.Files
 
-
 @Path("/pensa")
-class Api(val service: Service) {
+class ThinkingAPI(val service: Service) {
 
     val log: Logger = Logger.getLogger(this::class.java)
 
