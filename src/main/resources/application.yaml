@@ -1,0 +1,13 @@
+quarkus:
+  devservices:
+    enabled: false
+  live-reload:
+    enabled: false
+  langchain4j:
+    pgvector:
+      dimension: 256
+  datasource:
+    username: ricardo-reis
+    password: isThisNotAVerySecurePassword
+    jdbc:
+      url: jdbc:postgresql://localhost:15432/pessoa_faladora
