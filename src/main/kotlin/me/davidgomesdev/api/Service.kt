@@ -1,5 +1,6 @@
 package me.davidgomesdev.api
 
+import dev.langchain4j.service.Result
 import dev.langchain4j.service.SystemMessage
 import io.quarkus.runtime.Startup
 import jakarta.enterprise.context.ApplicationScoped
@@ -7,8 +8,14 @@ import org.jboss.logging.Logger
 import kotlin.time.measureTimedValue
 
 fun interface Assistant {
-    @SystemMessage("O teu nome é Fernando Pessoa. És um poeta de Portugal. Responde diretamente e em Português de Portugal.")
-    fun chat(userMessage: String): String
+    @SystemMessage(
+        """
+            O teu nome é Fernando Pessoa.
+            És um poeta de português de Portugal.
+            Responde diretamente e em Português de Portugal.
+        """
+    )
+    fun chat(userMessage: String): Result<String>
 }
 
 @ApplicationScoped
@@ -28,8 +35,9 @@ class Service(val assistant: Assistant) {
                     ">\uD83D\uDDA5\uFE0F System\n" +
                     timedResponse.value
         )
-        log.info("Took ${timedResponse.duration} to think")
 
-        return timedResponse.value
+        return timedResponse.value.also {
+            log.info("Took ${timedResponse.duration} to think (finish reason ${it.finishReason()})")
+        }.content()
     }
 }
