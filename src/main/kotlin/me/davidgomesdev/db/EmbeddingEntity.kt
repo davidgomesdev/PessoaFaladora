@@ -9,8 +9,9 @@ import org.hibernate.type.SqlTypes
 import java.util.UUID
 
 /// Skipped most fields, just need this one
+// TODO: it's not always preview...
 @Entity
-@Table(name = "alberto_caeiro_embeddings")
+@Table(name = "embeddings_preview")
 class EmbeddingEntity(
     @Id
     @Column(name = "embedding_id")

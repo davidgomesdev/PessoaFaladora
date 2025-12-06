@@ -44,7 +44,7 @@ class ModelConfig(
     val repository: EmbeddingRepository,
     @param:ConfigProperty(name = "preview-only", defaultValue = "false")
     val isPreviewOnly: Boolean,
-    @param:ConfigProperty(name = "recreate.embeddings")
+    @param:ConfigProperty(name = "recreate.embeddings", defaultValue = "false")
     val recreateEmbeddings: Boolean,
 ) {
 
@@ -98,7 +98,7 @@ class ModelConfig(
             .dimension(embeddingModel.dimension())
             .build()
 
-        if (System.getenv("RECREATE_EMBEDDINGS") == "true") {
+        if (recreateEmbeddings) {
             log.info("Recreating embeddings, deleting")
             repository.deleteAll()
         }
