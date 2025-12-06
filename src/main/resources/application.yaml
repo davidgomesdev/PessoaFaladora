@@ -11,3 +11,5 @@ quarkus:
     password: isThisNotAVerySecurePassword
     jdbc:
       url: jdbc:postgresql://localhost:15432/pessoa_faladora
+  transaction-manager:
+    default-transaction-timeout: 1000s

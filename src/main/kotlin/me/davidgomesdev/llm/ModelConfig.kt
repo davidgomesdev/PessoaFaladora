@@ -3,6 +3,7 @@ package me.davidgomesdev.llm
 import dev.langchain4j.data.document.Document
 import dev.langchain4j.data.document.Metadata
 import dev.langchain4j.data.document.splitter.DocumentByRegexSplitter
+import dev.langchain4j.data.document.splitter.DocumentBySentenceSplitter
 import dev.langchain4j.data.segment.TextSegment
 import dev.langchain4j.model.chat.ChatModel
 import dev.langchain4j.model.ollama.OllamaChatModel
@@ -36,8 +37,8 @@ import java.io.File
 import java.time.Duration
 import kotlin.time.measureTime
 
-// Poemas de Alberto Caeiro
-const val PREVIEW_CATEGORY_ID = 26
+// MENSAGEM
+const val PREVIEW_CATEGORY_ID = 34
 
 @ApplicationScoped
 class ModelConfig(
@@ -64,22 +65,25 @@ class ModelConfig(
         log.info("Preparing content retriever")
         if (isPreviewOnly) log.info("Running for preview ONLY")
 
-        val allTexts = getAllTexts()
-        val documents = allTexts
-            .filter { it.content != "" }
-            .map {
-                Document.document(
-                    it.content, Metadata.from(
-                        mapOf(
-                            "title" to it.title,
-                            "author" to it.author,
-                            "textId" to it.id
+        val allTextsByCategory = getAllTextsByCategory()
+        val documents = allTextsByCategory.map { category ->
+            category.value.filter { it.content != "" }
+                .map {
+                    Document.document(
+                        it.content, Metadata.from(
+                            mapOf(
+                                "title" to it.title,
+                                "author" to it.author,
+                                "textId" to it.id,
+                                "categoryId" to category.key.first,
+                                "categoryName" to category.key.second,
+                            )
                         )
                     )
-                )
-            }
+                }
+        }.flatten()
 
-        val splitter = DocumentByRegexSplitter("\n\n", "\n", 900, 0)
+        val splitter = DocumentByRegexSplitter("\n\n", "\n", 900, 0, DocumentBySentenceSplitter(300, 0))
 
         val embeddingModel =
             OllamaEmbeddingModel.builder().baseUrl("http://127.0.0.1:11434")
@@ -115,7 +119,7 @@ class ModelConfig(
             .build()
 
         if (ingestedDocuments == 0L) {
-            log.info("Ingesting documents")
+            log.info("Ingesting ${documents.size} documents")
             val timeSpent = measureTime {
                 EmbeddingStoreIngestor.builder()
                     .documentSplitter(splitter)
@@ -130,28 +134,32 @@ class ModelConfig(
         return contentRetriever
     }
 
-    fun getAllTexts(): List<PessoaText> {
+    fun getAllTextsByCategory(): Map<Pair<Int, String>, List<PessoaText>> {
         val rootCategories = Json.decodeFromString<List<PessoaCategory>>(File("assets/all_texts.json").readText())
 
-        val allTexts = mutableListOf<PessoaText>()
+        val allTexts = mutableMapOf<Pair<Int, String>, MutableList<PessoaText>>()
 
-        val categoriesToBeProcessed = if (isPreviewOnly) {
-            val previewCategory = rootCategories.first { it.id == PREVIEW_CATEGORY_ID }
-            previewCategory.subcategories.toMutableList()
-        } else {
-            rootCategories.toMutableList()
-        }
+        val categoriesToBeProcessed = rootCategories.toMutableList()
 
         while (categoriesToBeProcessed.isNotEmpty()) {
             val currentCategories = categoriesToBeProcessed.toList()
 
             categoriesToBeProcessed.clear()
 
-            currentCategories.forEach {
-                categoriesToBeProcessed.addAll(it.subcategories)
+            currentCategories.forEach { category ->
+                categoriesToBeProcessed.addAll(category.subcategories)
 
-                allTexts.addAll(it.texts ?: listOf())
+                val categoryTexts = allTexts.getOrPut(Pair(category.id, category.title)) { mutableListOf() }
+
+                if (category.texts != null)
+                    categoryTexts.addAll(category.texts)
             }
+        }
+
+        log.info("Total amount of texts ${allTexts.map { it.value.size }.sum()}")
+
+        if (isPreviewOnly) {
+            return allTexts.filter { it.key.first == PREVIEW_CATEGORY_ID }
         }
 
         return allTexts
