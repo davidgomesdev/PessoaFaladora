@@ -6,9 +6,11 @@ import dev.langchain4j.data.document.splitter.DocumentByRegexSplitter
 import dev.langchain4j.data.document.splitter.DocumentBySentenceSplitter
 import dev.langchain4j.data.segment.TextSegment
 import dev.langchain4j.model.chat.ChatModel
+import dev.langchain4j.model.input.PromptTemplate
 import dev.langchain4j.model.ollama.OllamaChatModel
 import dev.langchain4j.rag.DefaultRetrievalAugmentor
 import dev.langchain4j.rag.RetrievalAugmentor
+import dev.langchain4j.rag.content.injector.DefaultContentInjector
 import dev.langchain4j.rag.content.retriever.ContentRetriever
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever
 import dev.langchain4j.rag.query.router.DefaultQueryRouter
@@ -116,6 +118,7 @@ class ModelConfig(
         val contentRetriever = EmbeddingStoreContentRetriever.builder()
             .embeddingStore(embeddingStore)
             .embeddingModel(embeddingModel)
+            .maxResults(10)
             .build()
 
         if (ingestedDocuments == 0L) {
@@ -171,7 +174,18 @@ class ModelConfig(
         .queryTransformer {
             log.info("Querying '${it.text()}'")
             DefaultQueryTransformer().transform(it)
-        }
+        }.contentInjector(
+            DefaultContentInjector.builder()
+                .promptTemplate(PromptTemplate.from(
+                    """
+                    {{userMessage}}
+
+                    Responde tendo em conta estes textos teus:
+                    {{contents}}
+                    """.trimIndent()))
+                .metadataKeysToInclude(mutableListOf("author", "title", "categoryName"))
+                .build()
+        )
         .build()
 
     @Singleton

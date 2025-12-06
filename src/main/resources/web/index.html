@@ -4,22 +4,25 @@
     <meta charset="UTF-8">
     <title>Pessoa a Falar</title>
     <style>
-        textarea {
+        #inputField {
             width: 300px;
             height: 100px;
+        }
+        #output {
+            width: 400px;
         }
     </style>
 </head>
 <body>
-<h1>Pensa a Falar</h1>
+<h1>Pessoa a Falar</h1>
 <img alt="Fernando Pessoa" src="https://www.portaldaliteratura.com/assets/files_autores/339.webp"/>
 <br><br>
 <label for="inputField">
-    <textarea id="inputField" placeholder="Type something..."
+    <textarea id="inputField" placeholder="Escreve algo..."
               onkeydown="if (event.keyCode == 13) document.getElementById('send').click()"
               style=""></textarea>
 </label>
-<button id="send" onclick="sendRequest()">Send</button>
+<button id="send" onclick="sendRequest()">Enviar</button>
 <p id="output"></p>
 
 <script>
@@ -29,6 +32,8 @@
       const payload = { input: inputValue };
 
       try {
+        document.getElementById("output").innerText = "⌛";
+        document.getElementById("inputField").disabled = true;
         const response = await fetch("http://127.0.0.1:8080/pensa", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -37,6 +42,7 @@
 
         const data = await response.json();
         document.getElementById("output").innerText = data.response ?? "(no response field)";
+        document.getElementById("inputField").disabled = false;
       } catch (err) {
         document.getElementById("output").innerText = "Error: " + err;
       }
