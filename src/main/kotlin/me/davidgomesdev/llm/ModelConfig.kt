@@ -1,7 +1,7 @@
 package me.davidgomesdev.llm
 
-import dev.langchain4j.data.document.loader.FileSystemDocumentLoader
-import dev.langchain4j.data.document.parser.TextDocumentParser
+import dev.langchain4j.data.document.Document
+import dev.langchain4j.data.document.Metadata
 import dev.langchain4j.data.document.splitter.DocumentByRegexSplitter
 import dev.langchain4j.data.segment.TextSegment
 import dev.langchain4j.model.chat.ChatModel
@@ -20,6 +20,7 @@ import io.quarkiverse.langchain4j.ollama.OllamaEmbeddingModel
 import io.quarkiverse.langchain4j.pgvector.PgVectorEmbeddingStore
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Singleton
+import jakarta.transaction.Transactional
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -27,13 +28,24 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 import me.davidgomesdev.api.Assistant
 import me.davidgomesdev.db.EmbeddingRepository
+import me.davidgomesdev.source.PessoaCategory
+import me.davidgomesdev.source.PessoaText
+import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.jboss.logging.Logger
+import java.io.File
 import java.time.Duration
 import kotlin.time.measureTime
 
+// Poemas de Alberto Caeiro
+const val PREVIEW_CATEGORY_ID = 26
+
 @ApplicationScoped
 class ModelConfig(
-    val repository: EmbeddingRepository
+    val repository: EmbeddingRepository,
+    @param:ConfigProperty(name = "preview-only", defaultValue = "false")
+    val isPreviewOnly: Boolean,
+    @param:ConfigProperty(name = "recreate.embeddings")
+    val recreateEmbeddings: Boolean,
 ) {
 
     val log: Logger = Logger.getLogger(this::class.java)
@@ -47,38 +59,53 @@ class ModelConfig(
             .build()
 
     @Singleton
+    @Transactional
     fun contentRetriever(): ContentRetriever {
         log.info("Preparing content retriever")
+        if (isPreviewOnly) log.info("Running for preview ONLY")
 
-        val documentFileName = System.getenv("DOCUMENT_FILE_NAME") ?: "alberto_caeiro.md"
-        val document = FileSystemDocumentLoader.loadDocument(
-            "assets/$documentFileName",
-            TextDocumentParser()
-        )
+        val allTexts = getAllTexts()
+        val documents = allTexts
+            .filter { it.content != "" }
+            .map {
+                Document.document(
+                    it.content, Metadata.from(
+                        mapOf(
+                            "title" to it.title,
+                            "author" to it.author,
+                            "textId" to it.id
+                        )
+                    )
+                )
+            }
 
-        val splitter = DocumentByRegexSplitter("---", "\n", 500, 50, DocumentByRegexSplitter("\n\n", "\n", 900, 50))
+        val splitter = DocumentByRegexSplitter("\n\n", "\n", 900, 0)
 
         val embeddingModel =
             OllamaEmbeddingModel.builder().baseUrl("http://127.0.0.1:11434")
                 .timeout(Duration.ofMinutes(15))
                 .model("embeddinggemma")
                 .build()
+
+        val table = if (isPreviewOnly) "embeddings_preview" else "embeddings"
         val embeddingStore: EmbeddingStore<TextSegment> = PgVectorEmbeddingStore.builder()
             .host("127.0.0.1")
             .port(15432)
             .database("pessoa_faladora")
             .user("ricardo-reis")
             .password("isThisNotAVerySecurePassword")
-            .table("${documentFileName.removeSuffix(".md")}_embeddings")
+            .table(table)
             .dimension(embeddingModel.dimension())
             .build()
 
-        log.info("Querying")
+        if (System.getenv("RECREATE_EMBEDDINGS") == "true") {
+            log.info("Recreating embeddings, deleting")
+            repository.deleteAll()
+        }
 
-        val ingestedFiles =
-            repository.listAll().map { Json.decodeFromString<EmbeddingMetadata>(it.metadata).fileName }.distinct()
+        val ingestedDocuments = repository.count()
 
-        log.info("DB has '${ingestedFiles.joinToString(", ")}' file embeddings")
+        log.info("DB has $ingestedDocuments embeddings")
 
         log.info("Creating Embedding store")
 
@@ -87,7 +114,7 @@ class ModelConfig(
             .embeddingModel(embeddingModel)
             .build()
 
-        if (!ingestedFiles.contains(documentFileName)) {
+        if (ingestedDocuments == 0L) {
             log.info("Ingesting documents")
             val timeSpent = measureTime {
                 EmbeddingStoreIngestor.builder()
@@ -95,12 +122,39 @@ class ModelConfig(
                     .embeddingStore(embeddingStore)
                     .embeddingModel(embeddingModel)
                     .build()
-                    .ingest(document)
+                    .ingest(documents)
             }
             log.info("Documents ingested (took $timeSpent)")
         }
 
         return contentRetriever
+    }
+
+    fun getAllTexts(): List<PessoaText> {
+        val rootCategories = Json.decodeFromString<List<PessoaCategory>>(File("assets/all_texts.json").readText())
+
+        val allTexts = mutableListOf<PessoaText>()
+
+        val categoriesToBeProcessed = if (isPreviewOnly) {
+            val previewCategory = rootCategories.first { it.id == PREVIEW_CATEGORY_ID }
+            previewCategory.subcategories.toMutableList()
+        } else {
+            rootCategories.toMutableList()
+        }
+
+        while (categoriesToBeProcessed.isNotEmpty()) {
+            val currentCategories = categoriesToBeProcessed.toList()
+
+            categoriesToBeProcessed.clear()
+
+            currentCategories.forEach {
+                categoriesToBeProcessed.addAll(it.subcategories)
+
+                allTexts.addAll(it.texts ?: listOf())
+            }
+        }
+
+        return allTexts
     }
 
     @Singleton
