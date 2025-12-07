@@ -2,7 +2,7 @@ quarkus:
   devservices:
     enabled: false
   live-reload:
-    enabled: false
+    enabled: true
   langchain4j:
     pgvector:
       dimension: 256
