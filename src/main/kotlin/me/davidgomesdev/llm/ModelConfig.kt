@@ -44,6 +44,9 @@ import kotlin.time.measureTime
 // MENSAGEM
 const val PREVIEW_CATEGORY_ID = 34
 
+const val CHAT_MODEL = "qwen3:1.7b"
+const val EMBEDDING_MODEL = "embeddinggemma"
+
 typealias TextsByCategory = Map<Pair<Int, String>, List<PessoaText>>
 
 @ApplicationScoped
@@ -68,12 +71,11 @@ class ModelConfig(
     }
 
     @ApplicationScoped
-    fun chatModel(): ChatModel =
-        OllamaChatModel.builder().baseUrl("http://127.0.0.1:11434")
-            .modelName("qwen3:1.7b")
-            .httpClientBuilder(JaxRsHttpClientBuilder())
-            .timeout(Duration.ofMinutes(1))
-            .build()
+    fun chatModel(): ChatModel = OllamaChatModel.builder().baseUrl("http://127.0.0.1:11434")
+        .modelName(CHAT_MODEL)
+        .httpClientBuilder(JaxRsHttpClientBuilder())
+        .timeout(Duration.ofMinutes(1))
+        .build()
 
     @Singleton
     @Transactional
@@ -163,14 +165,11 @@ class ModelConfig(
     }
 
     @ApplicationScoped
-    fun embeddingModel(): OllamaEmbeddingModel? {
-        val embeddingModel =
-            OllamaEmbeddingModel.builder().baseUrl("http://127.0.0.1:11434")
-                .timeout(Duration.ofMinutes(15))
-                .model("embeddinggemma")
-                .build()
-        return embeddingModel
-    }
+    fun embeddingModel() = OllamaEmbeddingModel.builder()
+        .baseUrl("http://127.0.0.1:11434")
+        .timeout(Duration.ofMinutes(15))
+        .model(EMBEDDING_MODEL)
+        .build()
 
     @Named("PessoaDocuments")
     @ApplicationScoped
@@ -196,7 +195,6 @@ class ModelConfig(
     @ApplicationScoped
     fun allTextsByCategory(): TextsByCategory {
         val rootCategories = Json.decodeFromString<List<PessoaCategory>>(File("assets/all_texts.json").readText())
-
         val allTexts = mutableMapOf<Pair<Int, String>, MutableList<PessoaText>>()
 
         val categoriesToBeProcessed = rootCategories.toMutableList()
