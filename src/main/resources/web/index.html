@@ -8,10 +8,18 @@
             width: 300px;
             height: 100px;
         }
+        body {
+            font-family: "Lato", sans-serif;
+        }
         #output {
             width: 400px;
+            display: block;
         }
     </style>
+    <script type="module" src="https://md-block.verou.me/md-block.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Aldrich&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
 </head>
 <body>
 <h1>Pessoa a Falar</h1>
@@ -23,7 +31,8 @@
               style=""></textarea>
 </label>
 <button id="send" onclick="sendRequest()">Enviar</button>
-<p id="output"></p>
+<md-block id="output">
+</md-block>
 
 <script>
     async function sendRequest() {
@@ -32,7 +41,7 @@
       const payload = { input: inputValue };
 
       try {
-        document.getElementById("output").innerText = "⌛";
+        document.getElementById("output").mdContent = "⌛";
         document.getElementById("inputField").disabled = true;
         const response = await fetch("http://127.0.0.1:8080/pensa", {
           method: "PUT",
@@ -41,10 +50,10 @@
         });
 
         const data = await response.json();
-        document.getElementById("output").innerText = data.response ?? "(no response field)";
+        document.getElementById("output").mdContent = data.response ?? "(no response field)";
         document.getElementById("inputField").disabled = false;
       } catch (err) {
-        document.getElementById("output").innerText = "Error: " + err;
+        document.getElementById("output").mdContent = "**Error**: " + err;
       }
     }
 </script>
