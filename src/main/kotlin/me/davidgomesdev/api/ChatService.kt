@@ -1,11 +1,13 @@
 package me.davidgomesdev.api
 
 import dev.langchain4j.model.output.FinishReason
+import dev.langchain4j.rag.content.ContentMetadata
 import dev.langchain4j.service.Result
 import dev.langchain4j.service.SystemMessage
 import io.quarkus.runtime.Startup
 import jakarta.enterprise.context.ApplicationScoped
 import org.jboss.logging.Logger
+import kotlin.math.roundToInt
 import kotlin.time.measureTimedValue
 
 fun interface Assistant {
@@ -35,23 +37,35 @@ class Service(val assistant: Assistant) {
 
     val log: Logger = Logger.getLogger(this::class.java)
 
-    fun query(input: String): String {
+    fun query(input: String): QueryResponse {
         val timedResponse = measureTimedValue {
             assistant.chat(input)
         }
 
+        val sources = timedResponse.value.sources().map { source ->
+            val score = ((source.metadata()[ContentMetadata.SCORE] as Double) * 100).roundToInt()
+            val metadata = source.textSegment().metadata()
+
+            "Category: ${metadata.getString("categoryName") ?: ""}; " +
+                    "Title: ${metadata.getString("title")}; " +
+                    "Author ${
+                        metadata.getString("author")
+                    } " +
+                    "(score: $score%)"
+        }
+
         log.debug(
-            "> \uD83D\uDDE3\uFE0F User\n" +
-                    "$input\n" +
-                    ">\uD83D\uDDA5\uFE0F System\n" +
-                    timedResponse.value
+            "Used these sources:\n  " + sources.joinToString("  \n")
         )
 
-        return timedResponse.value.also {
-            if (it.finishReason() != FinishReason.STOP) {
-                log.warn("Finished due to: ${it.finishReason()} (instead of being completed)")
-            }
-            log.info("Took ${timedResponse.duration} to think")
-        }.content()
+        return QueryResponse(
+            timedResponse.value.also {
+                if (it.finishReason() != FinishReason.STOP) {
+                    log.warn("Finished due to: ${it.finishReason()} (instead of being completed)")
+                }
+                log.info("Took ${timedResponse.duration} to respond")
+            }.content(),
+            sources
+        )
     }
 }
