@@ -17,10 +17,10 @@ class ThinkingAPI(val service: Service) {
 
         log.info("Finished querying")
 
-        return QueryResponse(response)
+        return response
     }
 }
 
 data class QueryPayload(val input: String)
 
-data class QueryResponse(val response: String)
+data class QueryResponse(val response: String, val sources: List<String>)

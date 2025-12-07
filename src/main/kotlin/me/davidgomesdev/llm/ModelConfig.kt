@@ -109,7 +109,7 @@ class ModelConfig(
         val contentRetriever = EmbeddingStoreContentRetriever.builder()
             .embeddingStore(embeddingStore)
             .embeddingModel(embeddingModel)
-            .maxResults(10)
+            .maxResults(200)
             .build()
 
         return contentRetriever
