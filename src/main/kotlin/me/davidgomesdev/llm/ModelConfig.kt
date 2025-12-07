@@ -6,6 +6,7 @@ import dev.langchain4j.data.document.splitter.DocumentByRegexSplitter
 import dev.langchain4j.data.document.splitter.DocumentBySentenceSplitter
 import dev.langchain4j.data.segment.TextSegment
 import dev.langchain4j.model.chat.ChatModel
+import dev.langchain4j.model.embedding.EmbeddingModel
 import dev.langchain4j.model.input.PromptTemplate
 import dev.langchain4j.model.ollama.OllamaChatModel
 import dev.langchain4j.rag.DefaultRetrievalAugmentor
@@ -22,6 +23,7 @@ import io.quarkiverse.langchain4j.jaxrsclient.JaxRsHttpClientBuilder
 import io.quarkiverse.langchain4j.ollama.OllamaEmbeddingModel
 import io.quarkiverse.langchain4j.pgvector.PgVectorEmbeddingStore
 import jakarta.enterprise.context.ApplicationScoped
+import jakarta.inject.Named
 import jakarta.inject.Singleton
 import jakarta.transaction.Transactional
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -42,6 +44,8 @@ import kotlin.time.measureTime
 // MENSAGEM
 const val PREVIEW_CATEGORY_ID = 34
 
+typealias TextsByCategory = Map<Pair<Int, String>, List<PessoaText>>
+
 @ApplicationScoped
 class ModelConfig(
     val repository: EmbeddingRepository,
@@ -52,6 +56,16 @@ class ModelConfig(
 ) {
 
     val log: Logger = Logger.getLogger(this::class.java)
+    val splitter = DocumentByRegexSplitter("\n\n", "\n", 900, 0, DocumentBySentenceSplitter(300, 0))
+
+    @Singleton
+    fun assistant(chatModel: ChatModel, retrievalAugmentor: RetrievalAugmentor): Assistant {
+        log.info("Creating Assistant")
+        return AiServices.builder(Assistant::class.java)
+            .chatModel(chatModel)
+            .retrievalAugmentor(retrievalAugmentor)
+            .build()
+    }
 
     @ApplicationScoped
     fun chatModel(): ChatModel =
@@ -63,37 +77,73 @@ class ModelConfig(
 
     @Singleton
     @Transactional
-    fun contentRetriever(): ContentRetriever {
+    fun contentRetriever(
+        @Named("PessoaDocuments")
+        documents: List<Document>,
+        embeddingModel: EmbeddingModel,
+        @Named("PessoaTexts")
+        embeddingStore: EmbeddingStore<TextSegment>,
+    ): ContentRetriever {
         log.info("Preparing content retriever")
         if (isPreviewOnly) log.info("Running for preview ONLY")
 
-        val allTextsByCategory = getAllTextsByCategory()
-        val documents = allTextsByCategory.map { category ->
-            category.value.filter { it.content != "" }
-                .map {
-                    Document.document(
-                        it.content, Metadata.from(
-                            mapOf(
-                                "title" to it.title,
-                                "author" to it.author,
-                                "textId" to it.id,
-                                "categoryId" to category.key.first,
-                                "categoryName" to category.key.second,
-                            )
-                        )
+        val ingestedDocuments = repository.count()
+
+        log.info("DB has $ingestedDocuments embeddings")
+
+        if (ingestedDocuments == 0L) {
+            log.info("Ingesting ${documents.size} documents")
+            val timeSpent = measureTime {
+                EmbeddingStoreIngestor.builder()
+                    .documentSplitter(splitter)
+                    .embeddingStore(embeddingStore)
+                    .embeddingModel(embeddingModel)
+                    .build()
+                    .ingest(documents)
+            }
+            log.info("Documents ingested (took $timeSpent)")
+        }
+
+        val contentRetriever = EmbeddingStoreContentRetriever.builder()
+            .embeddingStore(embeddingStore)
+            .embeddingModel(embeddingModel)
+            .maxResults(10)
+            .build()
+
+        return contentRetriever
+    }
+
+    @Singleton
+    fun augmentor(contentRetriever: ContentRetriever): RetrievalAugmentor = DefaultRetrievalAugmentor.builder()
+        .queryRouter(DefaultQueryRouter(contentRetriever))
+        .queryTransformer {
+            log.info("Querying '${it.text()}'")
+            DefaultQueryTransformer().transform(it)
+        }
+        .contentInjector(
+            DefaultContentInjector.builder()
+                .promptTemplate(
+                    PromptTemplate.from(
+                        """
+                    {{userMessage}}
+
+                    Responde tendo em conta estes textos teus:
+                    {{contents}}
+                    """.trimIndent()
                     )
-                }
-        }.flatten()
-
-        val splitter = DocumentByRegexSplitter("\n\n", "\n", 900, 0, DocumentBySentenceSplitter(300, 0))
-
-        val embeddingModel =
-            OllamaEmbeddingModel.builder().baseUrl("http://127.0.0.1:11434")
-                .timeout(Duration.ofMinutes(15))
-                .model("embeddinggemma")
+                )
+                .metadataKeysToInclude(mutableListOf("author", "title", "categoryName"))
                 .build()
+        )
+        .build()
+
+    @Named("PessoaTexts")
+    @ApplicationScoped
+    fun embeddingStore(embeddingModel: EmbeddingModel): EmbeddingStore<TextSegment> {
+        log.info("Creating Embedding store")
 
         val table = if (isPreviewOnly) "embeddings_preview" else "embeddings"
+        // TODO: get from config
         val embeddingStore: EmbeddingStore<TextSegment> = PgVectorEmbeddingStore.builder()
             .host("127.0.0.1")
             .port(15432)
@@ -109,35 +159,42 @@ class ModelConfig(
             repository.deleteAll()
         }
 
-        val ingestedDocuments = repository.count()
-
-        log.info("DB has $ingestedDocuments embeddings")
-
-        log.info("Creating Embedding store")
-
-        val contentRetriever = EmbeddingStoreContentRetriever.builder()
-            .embeddingStore(embeddingStore)
-            .embeddingModel(embeddingModel)
-            .maxResults(10)
-            .build()
-
-        if (ingestedDocuments == 0L) {
-            log.info("Ingesting ${documents.size} documents")
-            val timeSpent = measureTime {
-                EmbeddingStoreIngestor.builder()
-                    .documentSplitter(splitter)
-                    .embeddingStore(embeddingStore)
-                    .embeddingModel(embeddingModel)
-                    .build()
-                    .ingest(documents)
-            }
-            log.info("Documents ingested (took $timeSpent)")
-        }
-
-        return contentRetriever
+        return embeddingStore
     }
 
-    fun getAllTextsByCategory(): Map<Pair<Int, String>, List<PessoaText>> {
+    @ApplicationScoped
+    fun embeddingModel(): OllamaEmbeddingModel? {
+        val embeddingModel =
+            OllamaEmbeddingModel.builder().baseUrl("http://127.0.0.1:11434")
+                .timeout(Duration.ofMinutes(15))
+                .model("embeddinggemma")
+                .build()
+        return embeddingModel
+    }
+
+    @Named("PessoaDocuments")
+    @ApplicationScoped
+    fun documents(allTextsByCategory: TextsByCategory): List<Document> {
+        return allTextsByCategory.map { category ->
+            category.value.filter { it.content != "" }
+                .map {
+                    Document.document(
+                        it.content, Metadata.from(
+                            mapOf(
+                                "title" to it.title,
+                                "author" to it.author,
+                                "textId" to it.id,
+                                "categoryId" to category.key.first,
+                                "categoryName" to category.key.second,
+                            )
+                        )
+                    )
+                }
+        }.flatten()
+    }
+
+    @ApplicationScoped
+    fun allTextsByCategory(): TextsByCategory {
         val rootCategories = Json.decodeFromString<List<PessoaCategory>>(File("assets/all_texts.json").readText())
 
         val allTexts = mutableMapOf<Pair<Int, String>, MutableList<PessoaText>>()
@@ -166,35 +223,6 @@ class ModelConfig(
         }
 
         return allTexts
-    }
-
-    @Singleton
-    fun augmentor(contentRetriever: ContentRetriever): RetrievalAugmentor = DefaultRetrievalAugmentor.builder()
-        .queryRouter(DefaultQueryRouter(contentRetriever))
-        .queryTransformer {
-            log.info("Querying '${it.text()}'")
-            DefaultQueryTransformer().transform(it)
-        }.contentInjector(
-            DefaultContentInjector.builder()
-                .promptTemplate(PromptTemplate.from(
-                    """
-                    {{userMessage}}
-
-                    Responde tendo em conta estes textos teus:
-                    {{contents}}
-                    """.trimIndent()))
-                .metadataKeysToInclude(mutableListOf("author", "title", "categoryName"))
-                .build()
-        )
-        .build()
-
-    @Singleton
-    fun assistant(chatModel: ChatModel, retrievalAugmentor: RetrievalAugmentor): Assistant {
-        log.info("Creating Assistant")
-        return AiServices.builder(Assistant::class.java)
-            .chatModel(chatModel)
-            .retrievalAugmentor(retrievalAugmentor)
-            .build()
     }
 }
 
