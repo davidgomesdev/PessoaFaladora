@@ -52,11 +52,11 @@
 
         const data = await response.json();
         document.getElementById("output").mdContent = data.response ?? "(no response field)";
-        document.getElementById("inputField").disabled = false;
         console.log('Sources used: ' + data.sources);
       } catch (err) {
         document.getElementById("output").mdContent = "**Error**: " + err;
       }
+      document.getElementById("inputField").disabled = false;
     }
 </script>
 </body>
