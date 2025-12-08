@@ -33,7 +33,7 @@ fun interface Assistant {
 
 @ApplicationScoped
 @Startup
-class Service(val assistant: Assistant) {
+class ChatService(val assistant: Assistant) {
 
     val log: Logger = Logger.getLogger(this::class.java)
 

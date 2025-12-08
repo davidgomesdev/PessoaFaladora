@@ -109,7 +109,7 @@ class ModelConfig(
         val contentRetriever = EmbeddingStoreContentRetriever.builder()
             .embeddingStore(embeddingStore)
             .embeddingModel(embeddingModel)
-            .maxResults(200)
+            .maxResults(5)
             .build()
 
         return contentRetriever
@@ -140,7 +140,8 @@ class ModelConfig(
         .build()
 
     @Named("PessoaTexts")
-    @ApplicationScoped
+    @Singleton
+    @Transactional
     fun embeddingStore(embeddingModel: EmbeddingModel): EmbeddingStore<TextSegment> {
         log.info("Creating Embedding store")
 
