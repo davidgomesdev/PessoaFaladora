@@ -5,7 +5,7 @@ import jakarta.ws.rs.Path
 import org.jboss.logging.Logger
 
 @Path("/pensa")
-class ThinkingAPI(val service: Service) {
+class ThinkingAPI(val chatService: ChatService) {
 
     val log: Logger = Logger.getLogger(this::class.java)
 
@@ -13,7 +13,7 @@ class ThinkingAPI(val service: Service) {
     fun queryModel(body: QueryPayload): QueryResponse {
         log.info("Querying model")
 
-        val response = service.query(body.input)
+        val response = chatService.query(body.input)
 
         log.info("Finished querying")
 
