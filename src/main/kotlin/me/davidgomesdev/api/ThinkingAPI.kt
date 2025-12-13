@@ -1,5 +1,7 @@
 package me.davidgomesdev.api
 
+import io.smallrye.common.annotation.Blocking
+import io.smallrye.mutiny.Multi
 import jakarta.ws.rs.PUT
 import jakarta.ws.rs.Path
 import org.jboss.logging.Logger
@@ -10,12 +12,11 @@ class ThinkingAPI(val chatService: ChatService) {
     val log: Logger = Logger.getLogger(this::class.java)
 
     @PUT
-    fun queryModel(body: QueryPayload): QueryResponse {
+    @Blocking
+    fun queryModel(body: QueryPayload): Multi<String> {
         log.info("Querying model")
 
         val response = chatService.query(body.input)
-
-        log.info("Finished querying")
 
         return response
     }

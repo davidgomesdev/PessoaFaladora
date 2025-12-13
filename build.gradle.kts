@@ -17,6 +17,7 @@ val quarkusPlatformVersion: String by project
 val webBundlerVersion = "1.9.3"
 val langchainMarkdownVersion = "1.8.0-beta15"
 val kotlinxSerializationJson = "1.9.0"
+val mutinyVersion = "2.0.0"
 
 dependencies {
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
@@ -24,6 +25,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationJson")
     implementation("io.quarkus:quarkus-kotlin")
     implementation("io.quarkus:quarkus-config-yaml")
+    implementation("io.quarkus:quarkus-rest")
     implementation("io.quarkus:quarkus-rest-jackson")
     implementation("io.quarkus:quarkus-jdbc-postgresql")
     implementation("io.quarkus:quarkus-hibernate-orm-panache-kotlin")
@@ -32,6 +34,7 @@ dependencies {
     implementation("io.quarkiverse.langchain4j:quarkus-langchain4j-ollama")
     implementation("io.quarkiverse.langchain4j:quarkus-langchain4j-pgvector")
     implementation("dev.langchain4j:langchain4j-document-parser-markdown:$langchainMarkdownVersion")
+    implementation("io.smallrye.reactive:mutiny-kotlin:$mutinyVersion")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("io.quarkus:quarkus-arc")
     testImplementation("io.quarkus:quarkus-junit5")
