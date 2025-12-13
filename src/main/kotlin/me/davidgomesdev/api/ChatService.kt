@@ -1,6 +1,5 @@
 package me.davidgomesdev.api
 
-import dev.langchain4j.model.output.FinishReason
 import dev.langchain4j.rag.content.Content
 import dev.langchain4j.rag.content.ContentMetadata
 import dev.langchain4j.service.SystemMessage
@@ -54,17 +53,18 @@ class ChatService(val assistant: Assistant) {
                         .toString(DurationUnit.SECONDS, 2)
                     val tokensUsed = response.tokenUsage().totalTokenCount()
 
-                    if (response.finishReason() == FinishReason.STOP) {
-                        log.info(
-                            "Took $timeTaken to respond (used $tokensUsed tokens in total)"
-                        )
-                    } else {
-                        log.warn(
-                            "Took $timeTaken to finish, but due to: ${
-                                response.finishReason()
-                            } instead of being completed (used $tokensUsed tokens in total)"
-                        )
-                    }
+                    // It's always returning null - bug ref: https://github.com/ollama/ollama/issues/7547
+//                    if (response.finishReason() != FinishReason.STOP) {
+//                        log.warn(
+//                            "Took $timeTaken to finish, but due to: ${
+//                                response.finishReason()
+//                            } instead of being completed (used $tokensUsed tokens in total)"
+//                        )
+//                    }
+
+                    log.info(
+                        "Took $timeTaken to respond (used $tokensUsed tokens in total)"
+                    )
 
                     stream.complete()
                 }
