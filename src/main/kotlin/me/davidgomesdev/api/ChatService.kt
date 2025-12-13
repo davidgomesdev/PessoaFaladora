@@ -1,14 +1,17 @@
 package me.davidgomesdev.api
 
 import dev.langchain4j.model.output.FinishReason
+import dev.langchain4j.rag.content.Content
 import dev.langchain4j.rag.content.ContentMetadata
-import dev.langchain4j.service.Result
 import dev.langchain4j.service.SystemMessage
+import dev.langchain4j.service.TokenStream
 import io.quarkus.runtime.Startup
+import io.smallrye.mutiny.Multi
 import jakarta.enterprise.context.ApplicationScoped
 import org.jboss.logging.Logger
 import kotlin.math.roundToInt
-import kotlin.time.measureTimedValue
+import kotlin.time.DurationUnit
+import kotlin.time.TimeSource
 
 fun interface Assistant {
     @SystemMessage(
@@ -28,7 +31,7 @@ fun interface Assistant {
             Responde sempre diretamente e em Português de Portugal.
         """
     )
-    fun chat(userMessage: String): Result<String>
+    fun chat(userMessage: String): TokenStream
 }
 
 @ApplicationScoped
@@ -37,35 +40,64 @@ class ChatService(val assistant: Assistant) {
 
     val log: Logger = Logger.getLogger(this::class.java)
 
-    fun query(input: String): QueryResponse {
-        val timedResponse = measureTimedValue {
-            assistant.chat(input)
-        }
+    fun query(input: String): Multi<String> {
+        val chatStream = assistant.chat(input)
 
-        val sources = timedResponse.value.sources().map { source ->
-            val score = ((source.metadata()[ContentMetadata.SCORE] as Double) * 100).roundToInt()
-            val metadata = source.textSegment().metadata()
+        val timeSource = TimeSource.Monotonic
+        val startTime = timeSource.markNow()
 
-            "Category: ${metadata.getString("categoryName") ?: ""}; " +
-                    "Title: ${metadata.getString("title")}; " +
-                    "Author ${
-                        metadata.getString("author")
-                    } " +
-                    "(score: $score%)"
-        }
+        val response = Multi.createFrom().emitter<String> { stream ->
+            chatStream
+                .onPartialResponse { partialResponse -> stream.emit(partialResponse); }
+                .onCompleteResponse { response ->
+                    val timeTaken = (timeSource.markNow() - startTime)
+                        .toString(DurationUnit.SECONDS, 2)
+                    val tokensUsed = response.tokenUsage().totalTokenCount()
 
-        log.debug(
-            "Used these sources:\n  " + sources.joinToString("  \n")
-        )
+                    if (response.finishReason() == FinishReason.STOP) {
+                        log.info(
+                            "Took $timeTaken to respond (used $tokensUsed tokens in total)"
+                        )
+                    } else {
+                        log.warn(
+                            "Took $timeTaken to finish, but due to: ${
+                                response.finishReason()
+                            } instead of being completed (used $tokensUsed tokens in total)"
+                        )
+                    }
 
-        return QueryResponse(
-            timedResponse.value.also {
-                if (it.finishReason() != FinishReason.STOP) {
-                    log.warn("Finished due to: ${it.finishReason()} (instead of being completed)")
+                    stream.complete()
                 }
-                log.info("Took ${timedResponse.duration} to respond")
-            }.content(),
-            sources
-        )
+                .onRetrieved { contents ->
+                    val sources = contents.joinToString(
+                        prefix = "<sources>",
+                        separator = "\n",
+                        transform = ::mergeSources,
+                        postfix = "</sources>"
+                    )
+
+                    stream.emit(sources)
+                }
+                .onError {
+                    stream.fail(it)
+                    log.error("There was a problem with the assistant!", it)
+                }
+                .start()
+        }
+
+
+        return response
+    }
+
+    private fun mergeSources(source: Content): String {
+        val score = ((source.metadata()[ContentMetadata.SCORE] as Double) * 100).roundToInt()
+        val metadata = source.textSegment().metadata()
+
+        return "Category: ${metadata.getString("categoryName") ?: ""}; " +
+                "Title: ${metadata.getString("title")}; " +
+                "Author ${
+                    metadata.getString("author")
+                } " +
+                "(score: $score%)"
     }
 }

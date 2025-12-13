@@ -19,7 +19,8 @@
     <script type="module" src="https://md-block.verou.me/md-block.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Aldrich&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Aldrich&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap"
+          rel="stylesheet">
     <link rel="icon" type="image/png" href="static/favicon.png">
 </head>
 <body>
@@ -36,27 +37,73 @@
 </md-block>
 
 <script>
-    async function sendRequest() {
-      const inputValue = document.getElementById("inputField").value;
+    const inputField = document.getElementById("inputField");
+    const sendButton = document.getElementById("send");
 
-      const payload = { input: inputValue };
+    async function fetchStreamedText(url, onChunk) {
+        const inputValue = inputField.value;
 
-      try {
-        document.getElementById("output").mdContent = "⌛";
-        document.getElementById("inputField").disabled = true;
-        const response = await fetch("http://127.0.0.1:8080/pensa", {
+        const payload = { input: inputValue };
+        const response = await fetch(url, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         });
 
-        const data = await response.json();
-        document.getElementById("output").mdContent = data.response ?? "(no response field)";
-        console.log('Sources used: ' + data.sources);
-      } catch (err) {
-        document.getElementById("output").mdContent = "**Error**: " + err;
-      }
-      document.getElementById("inputField").disabled = false;
+        if (!response.body) {
+            onChunk("Ocorreu um erro.");
+            throw new Error("ReadableStream not supported or response has no body");
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+        let partial = "";
+
+        while (true) {
+            const { done, value } = await reader.read();
+
+            if (done) break;
+
+            const currentChunk = decoder.decode(value, { stream: true });
+
+            if (currentChunk.startsWith("<sources>")) {
+                console.log("Used sources: " + currentChunk.replace("<sources>", "").replace("</sources>", ""));
+                continue;
+            }
+
+            partial += currentChunk;
+
+            let words = partial.split(" ");
+            partial = words.pop();
+
+            for (const word of words) {
+                if (word.trim()) {
+                    onChunk(word);
+                }
+            }
+        }
+
+        // Process any remaining partial data
+        if (partial.trim()) {
+            onChunk(partial);
+        }
+
+        inputField.disabled = false;
+        sendButton.disabled = false;
+        sendButton.value = "Enviar";
+    }
+
+    const outputElement = document.getElementById("output");
+
+    async function sendRequest() {
+        sendButton.value = "⌛";
+        outputElement.mdContent = "";
+        inputField.disabled = true;
+        sendButton.disabled = true;
+
+        fetchStreamedText("http://127.0.0.1:8080/pensa", (word) => {
+            outputElement.mdContent += " " + word;
+        });
     }
 </script>
 </body>
