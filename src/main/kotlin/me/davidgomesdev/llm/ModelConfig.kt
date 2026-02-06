@@ -15,7 +15,7 @@ import dev.langchain4j.rag.content.injector.DefaultContentInjector
 import dev.langchain4j.rag.content.retriever.ContentRetriever
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever
 import dev.langchain4j.rag.query.router.DefaultQueryRouter
-import dev.langchain4j.rag.query.transformer.DefaultQueryTransformer
+import dev.langchain4j.rag.query.transformer.ExpandingQueryTransformer
 import dev.langchain4j.service.AiServices
 import dev.langchain4j.store.embedding.EmbeddingStore
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor
@@ -27,8 +27,8 @@ import jakarta.inject.Named
 import jakarta.inject.Singleton
 import jakarta.transaction.Transactional
 import kotlinx.serialization.json.Json
-import me.davidgomesdev.service.Assistant
 import me.davidgomesdev.db.EmbeddingRepository
+import me.davidgomesdev.service.Assistant
 import me.davidgomesdev.source.PessoaCategory
 import me.davidgomesdev.source.PessoaText
 import org.eclipse.microprofile.config.inject.ConfigProperty
@@ -42,6 +42,26 @@ const val PREVIEW_CATEGORY_ID = 33
 
 const val CHAT_MODEL = "qwen3:1.7b"
 const val EMBEDDING_MODEL = "embeddinggemma"
+
+val EXPANDING_QUERY_TEMPLATE: PromptTemplate = PromptTemplate.from(
+    """
+    Gera {{n}} versões diferentes EM PORTUGUÊS DE PORTUGAL de uma dada pergunta do utilizador.
+    Cada versão deve ser redigida de forma diferente, usando sinónimos ou estruturas de frase alternativas,
+    mas todas devem manter o significado original.
+    Estas versões serão usadas para recuperar documentos relevantes.
+    É muito importante fornecer cada versão da query em uma linha separada,
+    sem enumerações, hífens ou qualquer formatação adicional!
+    Pergunta do utilizador: {{query}}"
+    """.trimIndent()
+)
+val CONTENT_INJECTOR_TEMPLATE: PromptTemplate = PromptTemplate.from(
+    """
+    {{userMessage}}
+    
+    Responde tendo em conta estes textos teus:
+    {{contents}}
+    """.trimIndent()
+)
 
 typealias TextsByCategory = Map<Pair<Int, String>, List<PessoaText>>
 
@@ -105,35 +125,40 @@ class ModelConfig(
         val contentRetriever = EmbeddingStoreContentRetriever.builder()
             .embeddingStore(embeddingStore)
             .embeddingModel(embeddingModel)
-            .maxResults(5)
+            .maxResults(3)
+            .minScore(0.70)
             .build()
 
         return contentRetriever
     }
 
     @Singleton
-    fun augmentor(contentRetriever: ContentRetriever): RetrievalAugmentor = DefaultRetrievalAugmentor.builder()
-        .queryRouter(DefaultQueryRouter(contentRetriever))
-        .queryTransformer {
-            log.info("Querying '${it.text()}'")
-            DefaultQueryTransformer().transform(it)
-        }
-        .contentInjector(
-            DefaultContentInjector.builder()
-                .promptTemplate(
-                    PromptTemplate.from(
-                        """
-                    {{userMessage}}
-
-                    Responde tendo em conta estes textos teus:
-                    {{contents}}
-                    """.trimIndent()
+    fun augmentor(chatModel: ChatModel, contentRetriever: ContentRetriever): RetrievalAugmentor =
+        DefaultRetrievalAugmentor.builder()
+            .queryRouter(DefaultQueryRouter(contentRetriever))
+            .queryTransformer { originalQuery ->
+                ExpandingQueryTransformer(chatModel, EXPANDING_QUERY_TEMPLATE).transform(originalQuery)
+                    .also { transformedQuery ->
+                        log.info(
+                            "Transformed original query '${originalQuery.text()}' to '${
+                                transformedQuery.joinToString(
+                                    "\n",
+                                    prefix = "[\n",
+                                    postfix = "]"
+                                ) { "'" + it.text() + "'" }
+                            }'"
+                        )
+                    }
+            }
+            .contentInjector(
+                DefaultContentInjector.builder()
+                    .promptTemplate(
+                        CONTENT_INJECTOR_TEMPLATE
                     )
-                )
-                .metadataKeysToInclude(mutableListOf("author", "title", "categoryName"))
-                .build()
-        )
-        .build()
+                    .metadataKeysToInclude(mutableListOf("author", "title", "categoryName"))
+                    .build()
+            )
+            .build()
 
     @Named("PessoaTexts")
     @Singleton
@@ -142,7 +167,6 @@ class ModelConfig(
         log.info("Creating Embedding store")
 
         val table = if (isPreviewOnly) "embeddings_preview" else "embeddings"
-        // TODO: get from config
         val embeddingStore: EmbeddingStore<TextSegment> = PgVectorEmbeddingStore.builder()
             .host("127.0.0.1")
             .port(15432)
