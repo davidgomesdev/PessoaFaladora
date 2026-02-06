@@ -26,12 +26,8 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Named
 import jakarta.inject.Singleton
 import jakarta.transaction.Transactional
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonIgnoreUnknownKeys
-import me.davidgomesdev.api.Assistant
+import me.davidgomesdev.service.Assistant
 import me.davidgomesdev.db.EmbeddingRepository
 import me.davidgomesdev.source.PessoaCategory
 import me.davidgomesdev.source.PessoaText
@@ -41,8 +37,8 @@ import java.io.File
 import java.time.Duration
 import kotlin.time.measureTime
 
-// MENSAGEM
-const val PREVIEW_CATEGORY_ID = 34
+// Livro do Desassossego
+const val PREVIEW_CATEGORY_ID = 33
 
 const val CHAT_MODEL = "qwen3:1.7b"
 const val EMBEDDING_MODEL = "embeddinggemma"
@@ -224,8 +220,3 @@ class ModelConfig(
         return allTexts
     }
 }
-
-@OptIn(ExperimentalSerializationApi::class)
-@Serializable
-@JsonIgnoreUnknownKeys
-data class EmbeddingMetadata(@SerialName("file_name") val fileName: String)

@@ -1,9 +1,10 @@
-package me.davidgomesdev.api
+package me.davidgomesdev.web
 
 import io.smallrye.common.annotation.Blocking
 import io.smallrye.mutiny.Multi
 import jakarta.ws.rs.PUT
 import jakarta.ws.rs.Path
+import me.davidgomesdev.service.ChatService
 import org.jboss.logging.Logger
 
 @Path("/pensa")
