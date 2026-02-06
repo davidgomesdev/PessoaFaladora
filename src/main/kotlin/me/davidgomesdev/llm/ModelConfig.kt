@@ -15,7 +15,9 @@ import dev.langchain4j.rag.content.injector.DefaultContentInjector
 import dev.langchain4j.rag.content.retriever.ContentRetriever
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever
 import dev.langchain4j.rag.query.router.DefaultQueryRouter
+import dev.langchain4j.rag.query.transformer.DefaultQueryTransformer
 import dev.langchain4j.rag.query.transformer.ExpandingQueryTransformer
+import dev.langchain4j.rag.query.transformer.QueryTransformer
 import dev.langchain4j.service.AiServices
 import dev.langchain4j.store.embedding.EmbeddingStore
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor
@@ -133,11 +135,12 @@ class ModelConfig(
     }
 
     @Singleton
-    fun augmentor(chatModel: ChatModel, contentRetriever: ContentRetriever): RetrievalAugmentor =
+    fun augmentor(contentRetriever: ContentRetriever, queryTransformer: QueryTransformer): RetrievalAugmentor =
         DefaultRetrievalAugmentor.builder()
             .queryRouter(DefaultQueryRouter(contentRetriever))
             .queryTransformer { originalQuery ->
-                ExpandingQueryTransformer(chatModel, EXPANDING_QUERY_TEMPLATE).transform(originalQuery)
+                queryTransformer
+                    .transform(originalQuery)
                     .also { transformedQuery ->
                         log.info(
                             "Transformed original query '${originalQuery.text()}' to '${
@@ -159,6 +162,15 @@ class ModelConfig(
                     .build()
             )
             .build()
+
+    @Singleton
+    fun queryTransformer(chatModel: ChatModel): QueryTransformer {
+        if (isPreviewOnly) {
+            log.info("Using simple query transformer for preview")
+            return DefaultQueryTransformer()
+        }
+        return ExpandingQueryTransformer(chatModel, EXPANDING_QUERY_TEMPLATE)
+    }
 
     @Named("PessoaTexts")
     @Singleton

@@ -15,3 +15,5 @@ quarkus:
     default-transaction-timeout: 1000s
   hibernate-orm:
     physical-naming-strategy: me.davidgomesdev.db.RepositoryNaming
+  http:
+    host: 0.0.0.0

@@ -3,37 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <title>Pessoa a Falar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <style>
-        #inputField {
-            width: 300px;
-            height: 100px;
-        }
         body {
-            font-family: "Lato", sans-serif;
+            font-family: "Roboto", "Lato", sans-serif;
+            background: #111;
+            color: #e0e0e0;
+            margin: 0;
+            min-height: 100vh;
         }
-        #output {
-            width: 400px;
-            display: block;
-            overflow-anchor: none;
+        h1 {
+            color: #fff;
+            letter-spacing: 1px;
+            font-weight: 400;
+            margin-bottom: 16px;
         }
-        #mainContainer {
+        #pageContent {
             display: flex;
             flex-direction: column;
-            gap: 24px;
-        }
-        #inputContainer {
-            display: flex;
-            flex-direction: column;
-            min-width: 320px;
-        }
-        #outputContainer {
-            min-width: 420px;
-            max-width: 600px;
+            align-items: center;
+            width: 100%;
         }
         #rowContainer {
             display: flex;
             align-items: flex-start;
             gap: 32px;
+            margin-top: 32px;
+            width: max-content;
+        }
+        #mainContainer {
+            display: flex;
+            flex-direction: column;
+            background: rgba(255,255,255,0.07);
+            border-radius: 18px;
+            padding: 32px 24px;
+            box-shadow: 0 4px 24px 0 rgba(0,0,0,0.25);
+            max-width: 700px;
+            margin-left: 16px;
+            margin-right: 16px;
+        }
+        #inputContainer {
+            display: flex;
+            flex-direction: column;
+            min-width: 320px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        #outputContainer {
+            min-width: 420px;
+            max-width: 600px;
+            font-weight: 400;
+        }
+        #inputField {
+            font-family: "Roboto", "Lato", sans-serif;
+            width: 100%;
+            height: 100px;
+            background: rgba(255,255,255,0.07);
+            color: #fff;
+            border: 1.5px solid #444;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 1.1em;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px 0 rgba(0,0,0,0.12);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+        }
+        #inputField:focus {
+            outline: none;
+            border-color: #fff;
+            box-shadow: 0 0 0 2px #fff2;
+        }
+        #send {
+            padding: 12px 0;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(90deg, #fff 10%, #e0e0e0 90%);
+            color: #222;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 8px 0 rgba(0,0,0,0.18);
+            transition: background 0.2s, box-shadow 0.2s;
+            display: block;
+            margin: 8px auto 20px auto;
+        }
+        #send:hover {
+            background: linear-gradient(90deg, #e0e0e0 10%, #fff 90%);
+            box-shadow: 0 4px 16px 0 rgba(0,0,0,0.28);
+        }
+        #output {
+            display: block;
+            overflow-anchor: none;
+            background: rgba(255,255,255,0.07);
+            color: #fff;
+            border-radius: 12px;
+            padding: 4px 24px;
+            font-size: 1.1em;
+            min-height: 120px;
+            box-shadow: 0 2px 8px 0 rgba(0,0,0,0.12);
+        }
+        img {
+            border-radius: 16px;
+            box-shadow: 0 2px 16px 0 rgba(0,0,0,0.18);
+        }
+        @media (max-width: 700px) {
+            #rowContainer {
+                flex-direction: column;
+                align-items: center;
+                gap: 16px;
+                width: 100%;
+            }
+            #mainContainer, #outputContainer, #inputContainer {
+                min-width: 0;
+                min-width: 90%;
+                padding: 16px 8px;
+                box-sizing: border-box;
+            }
+            #output {
+                padding: 8px 8px;
+            }
+            img {
+                width: 90vw;
+                max-width: 180px;
+                height: auto;
+            }
         }
     </style>
     <script type="module" src="https://md-block.verou.me/md-block.js"></script>
@@ -44,21 +139,22 @@
     <link rel="icon" type="image/png" href="static/favicon.png">
 </head>
 <body>
-<h1>Pessoa a Falar</h1>
-<div id="rowContainer">
-    <img alt="Fernando Pessoa" src="https://www.portaldaliteratura.com/assets/files_autores/339.webp"/>
-    <div id="mainContainer">
-        <div id="inputContainer">
-            <label for="inputField">
-                <textarea id="inputField" placeholder="Escreve algo..."
-                          onkeydown="if (event.keyCode == 13) document.getElementById('send').click()"
-                          style=""></textarea>
-            </label>
-            <button id="send" onclick="sendRequest()" style="margin-top: 8px; width: 100px;">Enviar</button>
-        </div>
-        <div id="outputContainer">
-            <md-block id="output">
-            </md-block>
+<div id="pageContent" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+    <h1>Pessoa Faladora</h1>
+    <div id="rowContainer">
+        <img alt="Fernando Pessoa" src="https://www.portaldaliteratura.com/assets/files_autores/339.webp"/>
+        <div id="mainContainer">
+            <div id="inputContainer">
+                <label for="inputField">
+                    <textarea id="inputField" placeholder="Escreve o que te inquieta a alma..."
+                              onkeydown="if (event.keyCode == 13) document.getElementById('send').click()"
+                              style=""></textarea>
+                </label>
+                <button id="send" onclick="sendRequest()" style="width: 100px;">Pensar</button>
+            </div>
+            <div id="outputContainer">
+                <md-block id="output"></md-block>
+            </div>
         </div>
     </div>
 </div>
@@ -117,7 +213,7 @@
 
         inputField.disabled = false;
         sendButton.disabled = false;
-        sendButton.innerHTML = "Enviar";
+        sendButton.innerHTML = "Pensar";
     }
 
     const outputElement = document.getElementById("output");
@@ -128,7 +224,8 @@
         inputField.disabled = true;
         sendButton.disabled = true;
 
-        fetchStreamedText("http://127.0.0.1:8080/pensa", (word) => {
+        const apiUrl = window.location.origin + "/pensa";
+        fetchStreamedText(apiUrl, (word) => {
             outputElement.mdContent += " " + word;
         });
     }
