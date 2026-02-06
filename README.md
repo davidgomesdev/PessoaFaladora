@@ -5,8 +5,11 @@
 Install Ollama.
 
 Run:
-- `ollama pull qwen3:4b`
-- `ollama pull embeddinggemma`
+
+```shell
+ollama pull qwen3:4b
+ollama pull embeddinggemma
+```
 
 ## Run docker compose
 

@@ -16,6 +16,25 @@
             display: block;
             overflow-anchor: none;
         }
+        #mainContainer {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        #inputContainer {
+            display: flex;
+            flex-direction: column;
+            min-width: 320px;
+        }
+        #outputContainer {
+            min-width: 420px;
+            max-width: 600px;
+        }
+        #rowContainer {
+            display: flex;
+            align-items: flex-start;
+            gap: 32px;
+        }
     </style>
     <script type="module" src="https://md-block.verou.me/md-block.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,17 +45,24 @@
 </head>
 <body>
 <h1>Pessoa a Falar</h1>
-<img alt="Fernando Pessoa" src="https://www.portaldaliteratura.com/assets/files_autores/339.webp"/>
+<div id="rowContainer">
+    <img alt="Fernando Pessoa" src="https://www.portaldaliteratura.com/assets/files_autores/339.webp"/>
+    <div id="mainContainer">
+        <div id="inputContainer">
+            <label for="inputField">
+                <textarea id="inputField" placeholder="Escreve algo..."
+                          onkeydown="if (event.keyCode == 13) document.getElementById('send').click()"
+                          style=""></textarea>
+            </label>
+            <button id="send" onclick="sendRequest()" style="margin-top: 8px; width: 100px;">Enviar</button>
+        </div>
+        <div id="outputContainer">
+            <md-block id="output">
+            </md-block>
+        </div>
+    </div>
+</div>
 <br><br>
-<label for="inputField">
-    <textarea id="inputField" placeholder="Escreve algo..."
-              onkeydown="if (event.keyCode == 13) document.getElementById('send').click()"
-              style=""></textarea>
-</label>
-<button id="send" onclick="sendRequest()">Enviar</button>
-<md-block id="output">
-</md-block>
-
 <script>
     const inputField = document.getElementById("inputField");
     const sendButton = document.getElementById("send");
