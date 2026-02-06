@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 if [ "$(basename "$PWD")" == "scripts" ]; then
   cd ..
 fi
