@@ -24,7 +24,7 @@ function start_ollama() {
 
 start_ollama
 
-# Switch to Java 21 on Linux Amd64 and MacOS
+# Switch to Java 21 on Linux AMD64 and MacOS
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   export JAVA_HOME="/usr/lib/jvm/java-21-openjdk-amd64"
 else
@@ -33,4 +33,4 @@ else
 fi
 
 docker compose up -d
-./gradlew quarkusDev
+tmux new-session -d -s PessoaFaladora "./gradlew quarkusDev"
