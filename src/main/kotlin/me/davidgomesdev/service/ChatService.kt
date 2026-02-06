@@ -1,4 +1,4 @@
-package me.davidgomesdev.api
+package me.davidgomesdev.service
 
 import dev.langchain4j.rag.content.Content
 import dev.langchain4j.rag.content.ContentMetadata

@@ -1,7 +1,6 @@
 package me.davidgomesdev.db
 
 import jakarta.enterprise.context.ApplicationScoped
-import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.hibernate.boot.model.naming.Identifier
 import org.hibernate.boot.model.naming.PhysicalNamingStrategy
 import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment
