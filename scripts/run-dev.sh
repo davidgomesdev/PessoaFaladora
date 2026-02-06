@@ -24,9 +24,13 @@ function start_ollama() {
 
 start_ollama
 
-# switch to java 21
-JAVA_HOME="$(/usr/libexec/java_home -v 21)"
-export JAVA_HOME
+# Switch to Java 21 on Linux Amd64 and MacOS
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  export JAVA_HOME="/usr/lib/jvm/java-21-openjdk-amd64"
+else
+  JAVA_HOME="$(/usr/libexec/java_home -v 21)"
+  export JAVA_HOME
+fi
 
 docker compose up -d
 ./gradlew quarkusDev
