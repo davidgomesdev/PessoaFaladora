@@ -7,19 +7,11 @@ if [ "$(basename "$PWD")" == "scripts" ]; then
 fi
 
 function start_ollama() {
-    if ! pgrep -x "ollama" > /dev/null; then
-    echo "Starting Ollama server..."
-    tmux new-session -d -s Ollama "ollama serve"
-    # wait for ollama to start
-    sleep 5
-    # curl ollama to check until it's running
-    until curl -s http://localhost:11434/v1/models > /dev/null; do
-      echo "Waiting for Ollama server to start..."
-      sleep 2
-    done
-  else
-    echo "Ollama server is already running."
-  fi
+  # Ollama runs on a service, no need to launch
+  until curl -s http://localhost:11434/v1/models > /dev/null; do
+    echo "Waiting for Ollama server to start..."
+    sleep 2
+  done
 }
 
 start_ollama
