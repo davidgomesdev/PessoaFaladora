@@ -33,4 +33,4 @@ else
 fi
 
 docker compose up -d
-tmux new-session -d -s PessoaFaladora "./gradlew quarkusDev"
+tmux new-session -d -s PessoaFaladora "PREVIEW_ONLY=\"$PREVIEW_ONLY\" ./gradlew quarkusDev"
