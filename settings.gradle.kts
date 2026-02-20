@@ -10,4 +10,4 @@ pluginManagement {
         id(quarkusPluginId) version quarkusPluginVersion
     }
 }
-rootProject.name="pessoa-faladora"
+rootProject.name="PessoaFaladora"

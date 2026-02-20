@@ -1,4 +1,4 @@
-# pessoa-faladora
+# PessoaFaladora
 
 ## Set up Ollama
 
