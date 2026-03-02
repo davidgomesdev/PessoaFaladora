@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="All texts" type="QuarkusRunConfiguration" factoryName="QuarkusRunConfiguration">
+    <module name="pessoa-faladora.main" />
+    <option name="profile" />
+    <method v="2" />
+  </configuration>
+</component>

@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Preview only" type="QuarkusRunConfiguration" factoryName="QuarkusRunConfiguration">
+    <option name="env">
+      <map>
+        <entry key="PREVIEW_ONLY" value="true" />
+      </map>
+    </option>
+    <module name="pessoa-faladora.main" />
+    <option name="profile" />
+    <method v="2" />
+  </configuration>
+</component>
