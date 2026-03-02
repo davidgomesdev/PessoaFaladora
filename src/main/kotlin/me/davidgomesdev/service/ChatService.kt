@@ -64,7 +64,7 @@ class ChatService(val assistant: Assistant) {
             chatStream
                 .onPartialResponse { partialResponse -> stream.emit(partialResponse); }
                 .onCompleteResponse { response ->
-                    val timeTaken = (timeSource.markNow() - startTime)
+                    val timeTaken = (startTime.elapsedNow())
                         .toString(DurationUnit.SECONDS, 2)
                     val tokensUsed = response.tokenUsage().totalTokenCount()
 

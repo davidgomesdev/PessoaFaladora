@@ -11,7 +11,6 @@ import dev.langchain4j.model.input.PromptTemplate
 import dev.langchain4j.model.ollama.OllamaChatModel
 import dev.langchain4j.rag.DefaultRetrievalAugmentor
 import dev.langchain4j.rag.RetrievalAugmentor
-import dev.langchain4j.rag.content.injector.DefaultContentInjector
 import dev.langchain4j.rag.content.retriever.ContentRetriever
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever
 import dev.langchain4j.rag.query.router.DefaultQueryRouter
@@ -135,7 +134,11 @@ class ModelConfig(
     }
 
     @Singleton
-    fun augmentor(contentRetriever: ContentRetriever, queryTransformer: QueryTransformer): RetrievalAugmentor =
+    fun augmentor(
+        contentRetriever: ContentRetriever,
+        queryTransformer: QueryTransformer,
+        contentInjector: TextsContentInjector
+    ): RetrievalAugmentor =
         DefaultRetrievalAugmentor.builder()
             .queryRouter(DefaultQueryRouter(contentRetriever))
             .queryTransformer { originalQuery ->
@@ -153,14 +156,7 @@ class ModelConfig(
                         )
                     }
             }
-            .contentInjector(
-                DefaultContentInjector.builder()
-                    .promptTemplate(
-                        CONTENT_INJECTOR_TEMPLATE
-                    )
-                    .metadataKeysToInclude(mutableListOf("author", "title", "categoryName"))
-                    .build()
-            )
+            .contentInjector(contentInjector)
             .build()
 
     @Singleton
@@ -256,3 +252,4 @@ class ModelConfig(
         return allTexts
     }
 }
+
