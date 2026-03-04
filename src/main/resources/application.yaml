@@ -3,6 +3,14 @@ quarkus:
     enabled: false
   live-reload:
     enabled: true
+  otel:
+    logs:
+      enabled: true
+    traces:
+      enabled: true
+    exporter:
+      otlp:
+        endpoint: http://localhost:14317
   langchain4j:
     ollama:
       base-url: http://127.0.0.1:11434

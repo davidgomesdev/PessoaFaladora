@@ -18,6 +18,7 @@ val webBundlerVersion = "1.9.3"
 val langchainMarkdownVersion = "1.8.0-beta15"
 val kotlinxSerializationJson = "1.9.0"
 val mutinyVersion = "2.0.0"
+val otelExtension = "1.59.0"
 
 dependencies {
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
@@ -37,6 +38,8 @@ dependencies {
     implementation("io.smallrye.reactive:mutiny-kotlin:$mutinyVersion")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("io.quarkus:quarkus-arc")
+    implementation("io.quarkus:quarkus-opentelemetry")
+    implementation("io.opentelemetry:opentelemetry-extension-kotlin:$otelExtension")
     testImplementation("io.quarkus:quarkus-junit5")
 }
 
@@ -52,6 +55,7 @@ tasks.withType<Test> {
     systemProperty("java.util.logging.manager", "org.jboss.logmanager.LogManager")
     jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
 }
+
 allOpen {
     annotation("jakarta.ws.rs.Path")
     annotation("jakarta.enterprise.context.ApplicationScoped")

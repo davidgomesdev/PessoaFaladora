@@ -13,5 +13,16 @@ services:
       - pgdata:/var/lib/postgresql/data
       - ./postgres/schema.sql:/docker-entrypoint-initdb.d/schema.sql
 
+  jaeger:
+    image: jaegertracing/jaeger:latest
+    container_name: jaeger
+    ports:
+      - "6831:6831/udp"
+      - "16686:16686"  # Jaeger UI
+      - "14317:4317"
+      - "14318:4318"
+    environment:
+      COLLECTOR_JAEGER_ENABLED: "true"
+
 volumes:
   pgdata:
