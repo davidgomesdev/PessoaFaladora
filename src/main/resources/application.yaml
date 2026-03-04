@@ -7,8 +7,6 @@ quarkus:
     ollama:
       base-url: http://127.0.0.1:11434
       timeout: 60s
-      log-requests: true
-      log-responses: true
       chat-model:
         model-id: qwen3:1.7b
         temperature: 0.7

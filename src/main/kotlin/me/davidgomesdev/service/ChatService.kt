@@ -66,32 +66,20 @@ class ChatService(val assistant: Assistant) {
                 .onCompleteResponse { response ->
                     val timeTaken = (startTime.elapsedNow())
                         .toString(DurationUnit.SECONDS, 2)
-                    val tokensUsed = response.tokenUsage().totalTokenCount()
-
-                    // Ollama is always returning null - bug ref: https://github.com/ollama/ollama/issues/7547
-//                    if (response.finishReason() != FinishReason.STOP) {
-//                        log.warn(
-//                            "Took $timeTaken to finish, but due to: ${
-//                                response.finishReason()
-//                            } instead of being completed (used $tokensUsed tokens in total)"
-//                        )
-//                    }
+                    val tokensUsed = response.tokenUsage().outputTokenCount()
 
                     log.info(
-                        "Took $timeTaken to respond (used $tokensUsed tokens in total)"
+                        "Took $timeTaken to respond (used $tokensUsed output tokens)"
                     )
 
                     stream.complete()
                 }
                 .onRetrieved { contents ->
-                    val sources = contents.joinToString(
-                        prefix = "<sources>",
-                        separator = "\n",
-                        transform = ::mergeSources,
-                        postfix = "</sources>"
-                    )
+                    val sources = contents.joinToString(separator = "\n", transform = ::mergeSources)
 
-                    stream.emit(sources)
+                    log.info("Using sources:\n$sources")
+
+                    stream.emit("<sources>$sources</sources>")
                 }
                 .onError {
                     stream.fail(it)
@@ -107,7 +95,7 @@ class ChatService(val assistant: Assistant) {
         val score = ((source.metadata()[ContentMetadata.SCORE] as Double) * 100).roundToInt()
         val metadata = source.textSegment().metadata()
 
-        return "Category: ${metadata.getString("categoryName") ?: ""}; " +
+        return "- Category: ${metadata.getString("categoryName") ?: ""}; " +
                 "Title: ${metadata.getString("title")}; " +
                 "Author ${
                     metadata.getString("author")
