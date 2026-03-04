@@ -100,7 +100,6 @@ class ChatService(val assistant: Assistant) {
                 .start()
         }
 
-
         return response
     }
 

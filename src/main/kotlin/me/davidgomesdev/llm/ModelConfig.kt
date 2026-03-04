@@ -6,9 +6,9 @@ import dev.langchain4j.data.document.splitter.DocumentByRegexSplitter
 import dev.langchain4j.data.document.splitter.DocumentBySentenceSplitter
 import dev.langchain4j.data.segment.TextSegment
 import dev.langchain4j.model.chat.ChatModel
+import dev.langchain4j.model.chat.StreamingChatModel
 import dev.langchain4j.model.embedding.EmbeddingModel
 import dev.langchain4j.model.input.PromptTemplate
-import dev.langchain4j.model.ollama.OllamaChatModel
 import dev.langchain4j.rag.DefaultRetrievalAugmentor
 import dev.langchain4j.rag.RetrievalAugmentor
 import dev.langchain4j.rag.content.retriever.ContentRetriever
@@ -20,8 +20,6 @@ import dev.langchain4j.rag.query.transformer.QueryTransformer
 import dev.langchain4j.service.AiServices
 import dev.langchain4j.store.embedding.EmbeddingStore
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor
-import io.quarkiverse.langchain4j.jaxrsclient.JaxRsHttpClientBuilder
-import io.quarkiverse.langchain4j.ollama.OllamaEmbeddingModel
 import io.quarkiverse.langchain4j.pgvector.PgVectorEmbeddingStore
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Named
@@ -35,13 +33,11 @@ import me.davidgomesdev.source.PessoaText
 import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.jboss.logging.Logger
 import java.io.File
-import java.time.Duration
 import kotlin.time.measureTime
 
 // Livro do Desassossego
 const val PREVIEW_CATEGORY_ID = 33
 
-const val CHAT_MODEL = "qwen3:1.7b"
 const val EMBEDDING_MODEL = "embeddinggemma"
 
 val EXPANDING_QUERY_TEMPLATE: PromptTemplate = PromptTemplate.from(
@@ -79,20 +75,14 @@ class ModelConfig(
     val splitter = DocumentByRegexSplitter("\n\n", "\n", 900, 0, DocumentBySentenceSplitter(300, 0))
 
     @Singleton
-    fun assistant(chatModel: ChatModel, retrievalAugmentor: RetrievalAugmentor): Assistant {
-        log.info("Creating Assistant")
+    fun assistant(chatModel: StreamingChatModel, retrievalAugmentor: RetrievalAugmentor): Assistant {
+        log.info("Creating assistant")
+
         return AiServices.builder(Assistant::class.java)
-            .chatModel(chatModel)
+            .streamingChatModel(chatModel)
             .retrievalAugmentor(retrievalAugmentor)
             .build()
     }
-
-    @ApplicationScoped
-    fun chatModel(): ChatModel = OllamaChatModel.builder().baseUrl("http://127.0.0.1:11434")
-        .modelName(CHAT_MODEL)
-        .httpClientBuilder(JaxRsHttpClientBuilder())
-        .timeout(Duration.ofMinutes(1))
-        .build()
 
     @Singleton
     @Transactional
@@ -193,13 +183,6 @@ class ModelConfig(
         return embeddingStore
     }
 
-    @ApplicationScoped
-    fun embeddingModel() = OllamaEmbeddingModel.builder()
-        .baseUrl("http://127.0.0.1:11434")
-        .timeout(Duration.ofMinutes(15))
-        .model(EMBEDDING_MODEL)
-        .build()
-
     @Named("PessoaDocuments")
     @ApplicationScoped
     fun documents(allTextsByCategory: TextsByCategory): List<Document> {
@@ -252,4 +235,3 @@ class ModelConfig(
         return allTexts
     }
 }
-

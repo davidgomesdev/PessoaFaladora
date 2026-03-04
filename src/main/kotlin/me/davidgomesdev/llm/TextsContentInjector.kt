@@ -19,7 +19,7 @@ class TextsContentInjector : DefaultContentInjector(
             .let { author -> if (author == "Fernando Pessoa") "em teu nome" else "sob o teu heterónimo $author" }
 
         return "Texto " +
-                "'${segmentMetadata.getString("title")}' da coleção '${segmentMetadata.getString("categoryName")}'" +
+                "'${segmentMetadata.getString("title")}' da coleção '${segmentMetadata.getString("categoryName")}' " +
                 "$authorDescription:\n" +
                 segmentContent
     }
