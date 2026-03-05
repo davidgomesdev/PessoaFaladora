@@ -20,6 +20,7 @@ import dev.langchain4j.rag.query.transformer.QueryTransformer
 import dev.langchain4j.service.AiServices
 import dev.langchain4j.store.embedding.EmbeddingStore
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor
+import io.opentelemetry.api.trace.Span
 import io.quarkiverse.langchain4j.pgvector.PgVectorEmbeddingStore
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Named
@@ -27,6 +28,7 @@ import jakarta.inject.Singleton
 import jakarta.transaction.Transactional
 import kotlinx.serialization.json.Json
 import me.davidgomesdev.db.EmbeddingRepository
+import me.davidgomesdev.observability.attributes
 import me.davidgomesdev.service.Assistant
 import me.davidgomesdev.source.PessoaCategory
 import me.davidgomesdev.source.PessoaText
@@ -135,14 +137,21 @@ class ModelConfig(
                 queryTransformer
                     .transform(originalQuery)
                     .also { transformedQuery ->
-                        log.info(
-                            "Transformed original query '${originalQuery.text()}' to '${
-                                transformedQuery.joinToString(
-                                    "\n",
-                                    prefix = "[\n",
-                                    postfix = "]"
-                                ) { "'" + it.text() + "'" }
-                            }'"
+                        val transformedQueries = transformedQuery.joinToString(
+                            "\n",
+                            prefix = "[ ",
+                            postfix = " ]"
+                        ) { "'" + it.text() + "'" }
+
+                        log.info("Transformed original query '${originalQuery.text()}' to '$transformedQueries'")
+
+                        Span.current().addEvent(
+                            "Query Transformed",
+                            attributes {
+                                put("original_query", originalQuery.text())
+                                put("transformed_queries", transformedQueries)
+                                put("transform_queries_count", transformedQuery.size.toLong())
+                            }
                         )
                     }
             }
