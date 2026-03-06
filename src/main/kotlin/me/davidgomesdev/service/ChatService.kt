@@ -4,15 +4,13 @@ import dev.langchain4j.rag.content.Content
 import dev.langchain4j.rag.content.ContentMetadata
 import dev.langchain4j.service.SystemMessage
 import dev.langchain4j.service.TokenStream
-import io.opentelemetry.api.GlobalOpenTelemetry
-import io.opentelemetry.api.trace.SpanKind
+import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.StatusCode
 import io.quarkus.runtime.Startup
 import io.smallrye.mutiny.Multi
 import jakarta.enterprise.context.ApplicationScoped
 import me.davidgomesdev.observability.attributes
 import org.jboss.logging.Logger
-import java.util.UUID
 import kotlin.math.roundToInt
 import kotlin.time.DurationUnit
 import kotlin.time.TimeSource
@@ -29,21 +27,9 @@ fun interface Assistant {
 class ChatService(val assistant: Assistant) {
 
     val log: Logger = Logger.getLogger(this::class.java)
-    private val tracer = GlobalOpenTelemetry.getTracer(this::class.java.name)
 
     fun query(input: String): Multi<String> {
-        val spanId = UUID.randomUUID().toString()
-
-        val rootSpan = tracer.spanBuilder("chat.query")
-            .setSpanKind(SpanKind.INTERNAL)
-            .setAttribute("query.id", spanId)
-            .setAttribute("query.input", input)
-            .startSpan()
-
-        val scope = rootSpan.makeCurrent()
-
         val chatStream = assistant.chat(input)
-
         val timeSource = TimeSource.Monotonic
         val startTime = timeSource.markNow()
 
@@ -60,7 +46,7 @@ class ChatService(val assistant: Assistant) {
                         "Took $timeTaken to respond (used $tokensUsed output tokens)"
                     )
 
-                    rootSpan.apply {
+                    Span.current().apply {
                         addEvent(
                             "Response complete",
                             attributes {
@@ -69,15 +55,12 @@ class ChatService(val assistant: Assistant) {
                                 put("output_tokens_used", tokensUsed.toLong())
                             }
                         )
-                        scope.close()
-                        setStatus(StatusCode.OK)
-                        end()
                     }
 
                     stream.complete()
                 }
                 .onRetrieved { contents ->
-                    rootSpan.apply {
+                    Span.current().apply {
                         contents.forEachIndexed { index, content ->
                             val score = (content.metadata()[ContentMetadata.SCORE] as? Double) ?: 0.0
                             val metadata = content.textSegment().metadata()
@@ -103,11 +86,9 @@ class ChatService(val assistant: Assistant) {
                 .onError { error ->
                     stream.fail(error)
 
-                    rootSpan.apply {
-                        scope.close()
+                    Span.current().apply {
                         recordException(error)
                         setStatus(StatusCode.ERROR)
-                        end()
                     }
 
                     log.error("There was a problem with the assistant!", error)
