@@ -101,9 +101,9 @@ class ChatService(val assistant: Assistant) {
         val score = ((source.metadata()[ContentMetadata.SCORE] as Double) * 100).roundToInt()
         val metadata = source.textSegment().metadata()
 
-        return "- Category: ${metadata.getString("categoryName") ?: ""}; " +
-                "Title: ${metadata.getString("title")}; " +
-                "Author ${
+        return "- Categoria: ${metadata.getString("categoryName") ?: ""}\n" +
+                "  Título: ${metadata.getString("title")}\n" +
+                "  Autor ${
                     metadata.getString("author")
                 } " +
                 "(score: $score%)"
