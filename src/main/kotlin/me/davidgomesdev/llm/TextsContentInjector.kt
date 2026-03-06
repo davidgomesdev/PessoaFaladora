@@ -1,6 +1,7 @@
 package me.davidgomesdev.llm
 
 import dev.langchain4j.data.message.ChatMessage
+import dev.langchain4j.data.message.TextContent
 import dev.langchain4j.data.message.UserMessage
 import dev.langchain4j.model.input.PromptTemplate
 import dev.langchain4j.rag.content.Content
@@ -15,6 +16,7 @@ val CONTENT_INJECTOR_TEMPLATE: PromptTemplate = PromptTemplate.from(
     {{userMessage}}
     
     Responde tendo em conta estes textos teus:
+    
     {{contents}}
     """.trimIndent()
 )
@@ -24,7 +26,7 @@ class TextsContentInjector : DefaultContentInjector(
     CONTENT_INJECTOR_TEMPLATE,
     mutableListOf("author", "title", "categoryName")
 ) {
-    val log = Logger.getLogger(TextsContentInjector::class.java)
+    val log: Logger = Logger.getLogger(TextsContentInjector::class.java)
 
     override fun inject(contents: List<Content>, chatMessage: ChatMessage): ChatMessage {
         return super.inject(contents, chatMessage).also {
@@ -34,7 +36,12 @@ class TextsContentInjector : DefaultContentInjector(
             }
 
             Span.current().addEvent("Content injected", attributes {
-                put("message_with_content", (it as UserMessage).contents().joinToString("\n\n"))
+                put(
+                    "message_with_content",
+                    (it as UserMessage).contents()
+                        .filterIsInstance<TextContent>()
+                        .joinToString("\n\n", transform = TextContent::text)
+                )
             })
         }
     }
@@ -48,7 +55,7 @@ class TextsContentInjector : DefaultContentInjector(
         val authorDescription = segmentMetadata.getString("author")
             .let { author -> if (author == "Fernando Pessoa") "em teu nome" else "sob o teu heterónimo $author" }
 
-        return "Texto da coleção '${segmentMetadata.getString("categoryName")}' " +
+        return "- Texto da coleção '${segmentMetadata.getString("categoryName")}' " +
                 "$authorDescription:\n" +
                 segmentContent
     }

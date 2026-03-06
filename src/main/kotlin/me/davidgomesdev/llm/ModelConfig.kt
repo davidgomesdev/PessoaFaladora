@@ -1,78 +1,26 @@
 package me.davidgomesdev.llm
 
-import dev.langchain4j.data.document.Document
-import dev.langchain4j.data.document.Metadata
-import dev.langchain4j.data.document.splitter.DocumentByRegexSplitter
-import dev.langchain4j.data.document.splitter.DocumentBySentenceSplitter
 import dev.langchain4j.data.message.SystemMessage
 import dev.langchain4j.data.message.TextContent
-import dev.langchain4j.data.segment.TextSegment
-import dev.langchain4j.model.chat.ChatModel
 import dev.langchain4j.model.chat.StreamingChatModel
-import dev.langchain4j.model.embedding.EmbeddingModel
-import dev.langchain4j.model.input.PromptTemplate
 import dev.langchain4j.observability.api.listener.AiServiceErrorListener
 import dev.langchain4j.observability.api.listener.AiServiceStartedListener
-import dev.langchain4j.rag.DefaultRetrievalAugmentor
 import dev.langchain4j.rag.RetrievalAugmentor
-import dev.langchain4j.rag.content.retriever.ContentRetriever
-import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever
-import dev.langchain4j.rag.query.router.DefaultQueryRouter
-import dev.langchain4j.rag.query.transformer.DefaultQueryTransformer
-import dev.langchain4j.rag.query.transformer.ExpandingQueryTransformer
-import dev.langchain4j.rag.query.transformer.QueryTransformer
 import dev.langchain4j.service.AiServices
-import dev.langchain4j.store.embedding.EmbeddingStore
-import dev.langchain4j.store.embedding.EmbeddingStoreIngestor
 import io.opentelemetry.api.trace.Span
-import io.quarkiverse.langchain4j.pgvector.PgVectorEmbeddingStore
 import jakarta.enterprise.context.ApplicationScoped
-import jakarta.inject.Named
 import jakarta.inject.Singleton
-import jakarta.transaction.Transactional
-import kotlinx.serialization.json.Json
-import me.davidgomesdev.db.EmbeddingRepository
 import me.davidgomesdev.observability.attributes
 import me.davidgomesdev.service.Assistant
-import me.davidgomesdev.source.PessoaCategory
-import me.davidgomesdev.source.PessoaText
-import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.jboss.logging.Logger
-import java.io.File
-import kotlin.time.measureTime
-
-// Livro do Desassossego
-const val PREVIEW_CATEGORY_ID = 33
-
-const val EMBEDDING_MODEL = "embeddinggemma"
-
-val EXPANDING_QUERY_TEMPLATE: PromptTemplate = PromptTemplate.from(
-    """
-    Gera {{n}} versões diferentes EM PORTUGUÊS DE PORTUGAL de uma dada pergunta do utilizador.
-    Cada versão deve ser redigida de forma diferente, usando sinónimos ou estruturas de frase alternativas,
-    mas todas devem manter o significado original.
-    Estas versões serão usadas para recuperar documentos relevantes.
-    É muito importante fornecer cada versão da query em uma linha separada,
-    sem enumerações, hífens ou qualquer formatação adicional!
-    Pergunta do utilizador: {{query}}"
-    """.trimIndent()
-)
-
-typealias TextsByCategory = Map<Pair<Int, String>, List<PessoaText>>
 
 @ApplicationScoped
-class ModelConfig(
-    val repository: EmbeddingRepository,
-    @param:ConfigProperty(name = "preview-only", defaultValue = "false")
-    val isPreviewOnly: Boolean,
-    @param:ConfigProperty(name = "recreate.embeddings", defaultValue = "false")
-    val recreateEmbeddings: Boolean,
-) {
+class ModelConfig {
 
     val log: Logger = Logger.getLogger(this::class.java)
-    val splitter = DocumentByRegexSplitter("\n\n", "\n", 900, 0, DocumentBySentenceSplitter(300, 0))
 
     @Singleton
+    @Suppress("unused")
     fun assistant(chatModel: StreamingChatModel, retrievalAugmentor: RetrievalAugmentor): Assistant {
         log.info("Creating assistant")
 
@@ -100,163 +48,5 @@ class ModelConfig(
             .streamingChatModel(chatModel)
             .retrievalAugmentor(retrievalAugmentor)
             .build()
-    }
-
-    @Singleton
-    @Transactional
-    fun contentRetriever(
-        @Named("PessoaDocuments")
-        documents: List<Document>,
-        embeddingModel: EmbeddingModel,
-        @Named("PessoaTexts")
-        embeddingStore: EmbeddingStore<TextSegment>,
-    ): ContentRetriever {
-        log.info("Preparing content retriever")
-        if (isPreviewOnly) log.info("Running for preview ONLY")
-
-        val ingestedDocuments = repository.count()
-
-        log.info("DB has $ingestedDocuments embeddings")
-
-        if (ingestedDocuments == 0L) {
-            log.info("Ingesting ${documents.size} documents")
-            val timeSpent = measureTime {
-                EmbeddingStoreIngestor.builder()
-                    .documentSplitter(splitter)
-                    .embeddingStore(embeddingStore)
-                    .embeddingModel(embeddingModel)
-                    .build()
-                    .ingest(documents)
-            }
-            log.info("Documents ingested (took $timeSpent)")
-        }
-
-        val contentRetriever = EmbeddingStoreContentRetriever.builder()
-            .embeddingStore(embeddingStore)
-            .embeddingModel(embeddingModel)
-            .maxResults(3)
-            .minScore(0.70)
-            .build()
-
-        return contentRetriever
-    }
-
-    @Singleton
-    fun augmentor(
-        contentRetriever: ContentRetriever,
-        queryTransformer: QueryTransformer,
-        contentInjector: TextsContentInjector
-    ): RetrievalAugmentor =
-        DefaultRetrievalAugmentor.builder()
-            .queryRouter(DefaultQueryRouter(contentRetriever))
-            .queryTransformer { originalQuery ->
-                queryTransformer
-                    .transform(originalQuery)
-                    .also { transformedQuery ->
-                        val transformedQueries = transformedQuery.joinToString(
-                            "\n",
-                            prefix = "[ ",
-                            postfix = " ]"
-                        ) { "'" + it.text() + "'" }
-
-                        log.info("Transformed original query '${originalQuery.text()}' to '$transformedQueries'")
-
-                        Span.current().addEvent(
-                            "Query Transformed",
-                            attributes {
-                                put("original_query", originalQuery.text())
-                                put("transformed_queries", transformedQueries)
-                                put("transform_queries_count", transformedQuery.size.toLong())
-                            }
-                        )
-                    }
-            }
-            .contentInjector(contentInjector)
-            .build()
-
-    @Singleton
-    fun queryTransformer(chatModel: ChatModel): QueryTransformer {
-        if (isPreviewOnly) {
-            log.info("Using simple query transformer for preview")
-            return DefaultQueryTransformer()
-        }
-        return ExpandingQueryTransformer(chatModel, EXPANDING_QUERY_TEMPLATE)
-    }
-
-    @Named("PessoaTexts")
-    @Singleton
-    @Transactional
-    fun embeddingStore(embeddingModel: EmbeddingModel): EmbeddingStore<TextSegment> {
-        log.info("Creating Embedding store")
-
-        val table = if (isPreviewOnly) "embeddings_preview" else "embeddings"
-        val embeddingStore: EmbeddingStore<TextSegment> = PgVectorEmbeddingStore.builder()
-            .host("127.0.0.1")
-            .port(15432)
-            .database("pessoa_faladora")
-            .user("ricardo-reis")
-            .password("isThisNotAVerySecurePassword")
-            .table(table)
-            .dimension(embeddingModel.dimension())
-            .build()
-
-        if (recreateEmbeddings) {
-            log.info("Recreating embeddings, deleting")
-            repository.deleteAll()
-        }
-
-        return embeddingStore
-    }
-
-    @Named("PessoaDocuments")
-    @ApplicationScoped
-    fun documents(allTextsByCategory: TextsByCategory): List<Document> {
-        return allTextsByCategory.map { category ->
-            category.value.filter { it.content != "" }
-                .map {
-                    Document.document(
-                        it.content, Metadata.from(
-                            mapOf(
-                                "title" to it.title,
-                                "author" to it.author,
-                                "textId" to it.id,
-                                "categoryId" to category.key.first,
-                                "categoryName" to category.key.second,
-                            )
-                        )
-                    )
-                }
-        }.flatten()
-    }
-
-    @ApplicationScoped
-    fun allTextsByCategory(): TextsByCategory {
-        val rootCategories = Json.decodeFromString<List<PessoaCategory>>(File("assets/all_texts.json").readText())
-        val allTexts = mutableMapOf<Pair<Int, String>, MutableList<PessoaText>>()
-
-        val categoriesToBeProcessed = rootCategories.toMutableList()
-
-        while (categoriesToBeProcessed.isNotEmpty()) {
-            val currentCategories = categoriesToBeProcessed.toList()
-
-            categoriesToBeProcessed.clear()
-
-            currentCategories.forEach { category ->
-                categoriesToBeProcessed.addAll(category.subcategories)
-
-                val categoryTexts = allTexts.getOrPut(Pair(category.id, category.title)) { mutableListOf() }
-
-                if (category.texts != null)
-                    categoryTexts.addAll(category.texts)
-            }
-        }
-
-        log.info("Total amount of texts ${allTexts.map { it.value.size }.sum()}")
-
-        if (isPreviewOnly) {
-            return allTexts.filter { it.key.first == PREVIEW_CATEGORY_ID }
-        }
-
-        return allTexts
     }
 }

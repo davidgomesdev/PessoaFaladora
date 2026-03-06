@@ -24,5 +24,3 @@ class ThinkingAPI(val chatService: ChatService) {
 }
 
 data class QueryPayload(val input: String)
-
-data class QueryResponse(val response: String, val sources: List<String>)
