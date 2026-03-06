@@ -18,7 +18,10 @@ import dev.langchain4j.rag.query.transformer.ExpandingQueryTransformer
 import dev.langchain4j.rag.query.transformer.QueryTransformer
 import dev.langchain4j.store.embedding.EmbeddingStore
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor
+import io.opentelemetry.api.GlobalOpenTelemetry
 import io.opentelemetry.api.trace.Span
+import io.opentelemetry.api.trace.SpanKind
+import io.opentelemetry.api.trace.StatusCode
 import io.quarkiverse.langchain4j.pgvector.PgVectorEmbeddingStore
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Named
@@ -62,6 +65,7 @@ class RAG(
     val config: RAGConfig,
 ) {
     val log: Logger = Logger.getLogger(this::class.java)
+    private val tracer = GlobalOpenTelemetry.getTracer(this::class.java.name)
     val splitter = DocumentByRegexSplitter("\n\n", "\n", 900, 0, DocumentBySentenceSplitter(300, 0))
 
     @Singleton
@@ -109,14 +113,37 @@ class RAG(
         embeddingStore: EmbeddingStore<TextSegment>,
     ): ContentRetriever {
         log.info("Preparing content retriever")
-        if (isPreviewOnly) log.info("Running for preview ONLY")
 
-        val ingestedDocuments = repository.count()
+        val span = tracer.spanBuilder("rag.creating")
+            .setSpanKind(SpanKind.INTERNAL).apply {
+                setAttribute("mode", if (isPreviewOnly) "preview" else "full")
+                setAttribute("recreate-embeddings", recreateEmbeddings)
+                setAttribute("min-score", config.minScore())
+                setAttribute("max-results", config.maxResults().toLong())
+            }
+            .startSpan()
 
-        log.info("DB has $ingestedDocuments embeddings")
+        val scope = span.makeCurrent()
 
-        if (ingestedDocuments == 0L) {
+        if (isPreviewOnly) {
+            log.info("Running for preview ONLY")
+        }
+
+        val ingestedDocumentsCount = repository.count()
+
+        span.addEvent("Found documents", attributes {
+            put("ingested_documents_count", ingestedDocumentsCount)
+        })
+
+        log.info("DB has $ingestedDocumentsCount embeddings")
+
+        if (ingestedDocumentsCount == 0L) {
             log.info("Ingesting ${documents.size} documents")
+
+            span.addEvent("Ingesting documents", attributes {
+                put("documents_count", documents.size.toLong())
+            })
+
             val timeSpent = measureTime {
                 EmbeddingStoreIngestor.builder()
                     .documentSplitter(splitter)
@@ -125,6 +152,12 @@ class RAG(
                     .build()
                     .ingest(documents)
             }
+
+            span.addEvent("Documents ingested", attributes {
+                put("documents_count", documents.size.toLong())
+                put("time_spent_ms", timeSpent.inWholeMilliseconds)
+            })
+
             log.info("Documents ingested (took $timeSpent)")
         }
 
@@ -134,6 +167,10 @@ class RAG(
             .maxResults(config.maxResults())
             .minScore(config.minScore())
             .build()
+
+        scope.close()
+        span.setStatus(StatusCode.OK)
+        span.end()
 
         return contentRetriever
     }
@@ -145,6 +182,7 @@ class RAG(
             log.info("Using simple query transformer for preview")
             return DefaultQueryTransformer()
         }
+
         return ExpandingQueryTransformer(chatModel, EXPANDING_QUERY_TEMPLATE)
     }
 
