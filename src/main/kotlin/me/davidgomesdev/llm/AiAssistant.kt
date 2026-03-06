@@ -15,7 +15,7 @@ import me.davidgomesdev.service.Assistant
 import org.jboss.logging.Logger
 
 @ApplicationScoped
-class ModelConfig {
+class AiAssistant {
 
     val log: Logger = Logger.getLogger(this::class.java)
 

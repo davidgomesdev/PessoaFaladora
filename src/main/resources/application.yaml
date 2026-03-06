@@ -33,3 +33,6 @@ quarkus:
     physical-naming-strategy: me.davidgomesdev.db.RepositoryNaming
   http:
     host: 0.0.0.0
+rag:
+  max-results: 3
+  min-score: 0.7

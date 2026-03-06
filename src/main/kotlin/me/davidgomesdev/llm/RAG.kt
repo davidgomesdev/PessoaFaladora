@@ -26,6 +26,7 @@ import jakarta.inject.Singleton
 import jakarta.transaction.Transactional
 import kotlinx.serialization.json.Json
 import me.davidgomesdev.db.EmbeddingRepository
+import me.davidgomesdev.llm.config.RAGConfig
 import me.davidgomesdev.observability.attributes
 import me.davidgomesdev.source.PessoaCategory
 import me.davidgomesdev.source.PessoaText
@@ -58,6 +59,7 @@ class RAG(
     val isPreviewOnly: Boolean,
     @param:ConfigProperty(name = "recreate.embeddings", defaultValue = "false")
     val recreateEmbeddings: Boolean,
+    val config: RAGConfig,
 ) {
     val log: Logger = Logger.getLogger(this::class.java)
     val splitter = DocumentByRegexSplitter("\n\n", "\n", 900, 0, DocumentBySentenceSplitter(300, 0))
@@ -129,8 +131,8 @@ class RAG(
         val contentRetriever = EmbeddingStoreContentRetriever.builder()
             .embeddingStore(embeddingStore)
             .embeddingModel(embeddingModel)
-            .maxResults(3)
-            .minScore(0.70)
+            .maxResults(config.maxResults())
+            .minScore(config.minScore())
             .build()
 
         return contentRetriever
