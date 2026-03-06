@@ -57,14 +57,6 @@ val EXPANDING_QUERY_TEMPLATE: PromptTemplate = PromptTemplate.from(
     Pergunta do utilizador: {{query}}"
     """.trimIndent()
 )
-val CONTENT_INJECTOR_TEMPLATE: PromptTemplate = PromptTemplate.from(
-    """
-    {{userMessage}}
-    
-    Responde tendo em conta estes textos teus:
-    {{contents}}
-    """.trimIndent()
-)
 
 typealias TextsByCategory = Map<Pair<Int, String>, List<PessoaText>>
 
@@ -93,7 +85,9 @@ class ModelConfig(
                             put(
                                 "user_message",
                                 event.userMessage().contents()
-                                    .joinToString("\n\n") { (it as TextContent).text() })
+                                    .filterIsInstance<TextContent>()
+                                    .joinToString("\n\n", transform = TextContent::text)
+                            )
                             put(
                                 "system_message", event.systemMessage()
                                     .map(SystemMessage::text)
