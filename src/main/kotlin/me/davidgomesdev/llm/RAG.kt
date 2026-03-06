@@ -124,55 +124,55 @@ class RAG(
             .startSpan()
 
         val scope = span.makeCurrent()
-
-        if (isPreviewOnly) {
-            log.info("Running for preview ONLY")
-        }
-
-        val ingestedDocumentsCount = repository.count()
-
-        span.addEvent("Found documents", attributes {
-            put("ingested_documents_count", ingestedDocumentsCount)
-        })
-
-        log.info("DB has $ingestedDocumentsCount embeddings")
-
-        if (ingestedDocumentsCount == 0L) {
-            log.info("Ingesting ${documents.size} documents")
-
-            span.addEvent("Ingesting documents", attributes {
-                put("documents_count", documents.size.toLong())
-            })
-
-            val timeSpent = measureTime {
-                EmbeddingStoreIngestor.builder()
-                    .documentSplitter(splitter)
-                    .embeddingStore(embeddingStore)
-                    .embeddingModel(embeddingModel)
-                    .build()
-                    .ingest(documents)
+        try {
+            if (isPreviewOnly) {
+                log.info("Running for preview ONLY")
             }
 
-            span.addEvent("Documents ingested", attributes {
-                put("documents_count", documents.size.toLong())
-                put("time_spent_ms", timeSpent.inWholeMilliseconds)
+            val ingestedDocumentsCount = repository.count()
+
+            span.addEvent("Found documents", attributes {
+                put("ingested_documents_count", ingestedDocumentsCount)
             })
 
-            log.info("Documents ingested (took $timeSpent)")
+            log.info("DB has $ingestedDocumentsCount embeddings")
+
+            if (ingestedDocumentsCount == 0L) {
+                log.info("Ingesting ${documents.size} documents")
+
+                span.addEvent("Ingesting documents", attributes {
+                    put("documents_count", documents.size.toLong())
+                })
+
+                val timeSpent = measureTime {
+                    EmbeddingStoreIngestor.builder()
+                        .documentSplitter(splitter)
+                        .embeddingStore(embeddingStore)
+                        .embeddingModel(embeddingModel)
+                        .build()
+                        .ingest(documents)
+                }
+
+                span.addEvent("Documents ingested", attributes {
+                    put("documents_count", documents.size.toLong())
+                    put("time_spent_ms", timeSpent.inWholeMilliseconds)
+                })
+
+                log.info("Documents ingested (took $timeSpent)")
+            }
+
+            span.setStatus(StatusCode.OK)
+        } finally {
+            scope.close()
+            span.end()
         }
 
-        val contentRetriever = EmbeddingStoreContentRetriever.builder()
+        return EmbeddingStoreContentRetriever.builder()
             .embeddingStore(embeddingStore)
             .embeddingModel(embeddingModel)
             .maxResults(config.maxResults())
             .minScore(config.minScore())
             .build()
-
-        scope.close()
-        span.setStatus(StatusCode.OK)
-        span.end()
-
-        return contentRetriever
     }
 
     @Singleton
