@@ -4,11 +4,15 @@ import dev.langchain4j.data.document.Document
 import dev.langchain4j.data.document.Metadata
 import dev.langchain4j.data.document.splitter.DocumentByRegexSplitter
 import dev.langchain4j.data.document.splitter.DocumentBySentenceSplitter
+import dev.langchain4j.data.message.SystemMessage
+import dev.langchain4j.data.message.TextContent
 import dev.langchain4j.data.segment.TextSegment
 import dev.langchain4j.model.chat.ChatModel
 import dev.langchain4j.model.chat.StreamingChatModel
 import dev.langchain4j.model.embedding.EmbeddingModel
 import dev.langchain4j.model.input.PromptTemplate
+import dev.langchain4j.observability.api.listener.AiServiceErrorListener
+import dev.langchain4j.observability.api.listener.AiServiceStartedListener
 import dev.langchain4j.rag.DefaultRetrievalAugmentor
 import dev.langchain4j.rag.RetrievalAugmentor
 import dev.langchain4j.rag.content.retriever.ContentRetriever
@@ -81,6 +85,24 @@ class ModelConfig(
         log.info("Creating assistant")
 
         return AiServices.builder(Assistant::class.java)
+            .registerListeners(
+                AiServiceStartedListener { event ->
+                    Span.current().addEvent(
+                        "LLM query",
+                        attributes {
+                            put(
+                                "user_message",
+                                event.userMessage().contents()
+                                    .joinToString("\n\n") { (it as TextContent).text() })
+                            put(
+                                "system_message", event.systemMessage()
+                                    .map(SystemMessage::text)
+                                    .orElseGet { "" })
+                        })
+                },
+                AiServiceErrorListener { error ->
+                    Span.current().recordException(error.error())
+                })
             .streamingChatModel(chatModel)
             .retrievalAugmentor(retrievalAugmentor)
             .build()

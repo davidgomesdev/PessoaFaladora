@@ -69,17 +69,18 @@ class ChatService(val assistant: Assistant) {
             .setAttribute("query.input", input)
             .startSpan()
 
+        val scope = rootSpan.makeCurrent()
+
         val chatStream = assistant.chat(input)
 
         val timeSource = TimeSource.Monotonic
         val startTime = timeSource.markNow()
 
-        val scope = rootSpan.makeCurrent()
-
         return Multi.createFrom().emitter { stream ->
             chatStream
                 .onPartialResponse { partialResponse -> stream.emit(partialResponse); }
                 .onCompleteResponse { response ->
+                    val message = response.aiMessage().text()
                     val timeTaken = (startTime.elapsedNow())
                         .toString(DurationUnit.SECONDS, 2)
                     val tokensUsed = response.tokenUsage().outputTokenCount()
@@ -92,6 +93,7 @@ class ChatService(val assistant: Assistant) {
                         addEvent(
                             "Response complete",
                             attributes {
+                                put("message", message)
                                 put("model_duration.ms", timeTaken)
                                 put("output_tokens_used", tokensUsed.toLong())
                             }
