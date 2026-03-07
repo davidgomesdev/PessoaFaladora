@@ -42,8 +42,8 @@ quarkus:
         - http://localhost:8080
         - http://127.0.0.1:8080
 rag:
-  max-results: 3
-  min-score: 0.7
+  max-results: 6
+  min-score: 0.75
 
 pessoa:
   url: http://127.0.0.1:8080
