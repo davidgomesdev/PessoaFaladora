@@ -217,7 +217,8 @@ class RAG(
     @Suppress("unused")
     fun documents(allTextsByCategory: TextsByCategory): List<Document> {
         return allTextsByCategory.map { category ->
-            category.value.filter { it.content != "" }
+            category.value
+                .filter { it.content.isNotBlank() }
                 .map {
                     Document.document(
                         it.content, Metadata.from(

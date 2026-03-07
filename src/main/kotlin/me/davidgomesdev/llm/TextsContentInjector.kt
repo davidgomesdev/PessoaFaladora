@@ -55,7 +55,8 @@ class TextsContentInjector : DefaultContentInjector(
         val authorDescription = segmentMetadata.getString("author")
             .let { author -> if (author == "Fernando Pessoa") "em teu nome" else "sob o teu heterónimo $author" }
 
-        return "- Texto da coleção '${segmentMetadata.getString("categoryName")}' " +
+        return "- Texto '${segmentMetadata.getString("title")}' " +
+                "da coleção '${segmentMetadata.getString("categoryName")}' " +
                 "$authorDescription:\n" +
                 segmentContent
     }
