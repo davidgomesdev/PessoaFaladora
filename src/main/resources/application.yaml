@@ -39,3 +39,7 @@ quarkus:
 rag:
   max-results: 3
   min-score: 0.7
+
+pessoa:
+  url: http://127.0.0.1:8080
+
