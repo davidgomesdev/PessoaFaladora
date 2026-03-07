@@ -38,6 +38,9 @@ quarkus:
       path: uiResources/composeResources
     cors:
       enabled: true
+      origins:
+        - http://localhost:8080
+        - http://127.0.0.1:8080
 rag:
   max-results: 3
   min-score: 0.7
