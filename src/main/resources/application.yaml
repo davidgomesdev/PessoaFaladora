@@ -36,6 +36,8 @@ quarkus:
     static-dir:
       endpoint: composeResources
       path: uiResources/composeResources
+    cors:
+      enabled: true
 rag:
   max-results: 3
   min-score: 0.7

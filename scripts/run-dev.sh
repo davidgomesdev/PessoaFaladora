@@ -25,4 +25,4 @@ else
 fi
 
 docker compose up -d
-tmux new-session -d -s PessoaFaladora "PREVIEW_ONLY=\"$PREVIEW_ONLY\" ./gradlew quarkusDev"
+tmux new-session -d -s PessoaFaladora "PREVIEW_ONLY=\"$PREVIEW_ONLY\" QUARKUS_HTTP_CORS_ORIGINS=\"${ALLOWED_ORIGINS:-http://127.0.0.1:8080,http://localhost:8080}\" ./gradlew quarkusDev"
