@@ -19,7 +19,7 @@ quarkus:
         model-id: qwen3:1.7b
         temperature: 0.7
       embedding-model:
-        model-id: embeddinggemma
+        model-id: qwen3-embedding:8b
     pgvector:
       dimension: 256
   datasource:
