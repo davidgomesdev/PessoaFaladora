@@ -1,6 +1,7 @@
 package me.davidgomesdev.ofingidor.ui
 
 import androidx.compose.ui.graphics.Color
+import me.davidgomesdev.ofingidor.shared.dto.Persona
 
 val backgroundColor = Color(0xFF111111)
 val componentsBackgroundColor = Color(0xFF323232)
@@ -44,3 +45,18 @@ val aiBubbleBackgroundColor = Color(0xFF161616)
 val aiBubbleBorder = Color(0xFF3D2E5A)
 val personaLabelColor = Color(0xFF7C5CBF)
 val portraitThumbnailBackgroundColor = Color(0xFF1A1428)
+
+data class DebateBubblePalette(
+    val background: Color,
+    val border: Color,
+    val label: Color,
+)
+
+fun debateBubblePalette(persona: Persona): DebateBubblePalette = when (persona) {
+    Persona.FERNANDO_PESSOA -> DebateBubblePalette(Color(0xFF16131E), Color(0xFF5D4C85), Color(0xFFC6B7ED))
+    Persona.ALBERTO_CAEIRO -> DebateBubblePalette(Color(0xFF132018), Color(0xFF4C7A5A), Color(0xFFB7E2C4))
+    Persona.ALVARO_DE_CAMPOS -> DebateBubblePalette(Color(0xFF1F1713), Color(0xFF9A5A3A), Color(0xFFF2C5AE))
+    Persona.RICARDO_REIS -> DebateBubblePalette(Color(0xFF171A20), Color(0xFF596E8A), Color(0xFFC2D2EB))
+    Persona.BERNARDO_SOARES -> DebateBubblePalette(Color(0xFF1B171C), Color(0xFF6E5673), Color(0xFFD7C1DB))
+    Persona.O_FINGIDOR -> DebateBubblePalette(Color(0xFF201B12), Color(0xFF8B7140), Color(0xFFE4D0A5))
+}

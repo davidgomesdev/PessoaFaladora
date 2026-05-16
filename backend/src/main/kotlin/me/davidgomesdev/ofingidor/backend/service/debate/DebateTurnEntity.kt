@@ -1,4 +1,4 @@
-package me.davidgomesdev.ofingidor.backend.llm
+package me.davidgomesdev.ofingidor.backend.service.debate
 
 import io.quarkus.hibernate.orm.panache.kotlin.PanacheCompanionBase
 import io.quarkus.hibernate.orm.panache.kotlin.PanacheEntityBase
@@ -10,8 +10,8 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 @Entity
-@Table(name = "chat_history")
-class ChatHistoryEntity : PanacheEntityBase {
+@Table(name = "debate_turns")
+class DebateTurnEntity : PanacheEntityBase {
 
     @Id
     lateinit var id: UUID
@@ -19,20 +19,23 @@ class ChatHistoryEntity : PanacheEntityBase {
     @Column(name = "conversation_id", nullable = false)
     lateinit var conversationId: UUID
 
-    @Column(name = "user_message", nullable = false, columnDefinition = "TEXT")
-    lateinit var userMessage: String
+    @Column(name = "turn_index", nullable = false)
+    var turnIndex: Int = 0
 
-    @Column(name = "ai_response", nullable = false, columnDefinition = "TEXT")
-    lateinit var aiResponse: String
+    @Column(name = "entry_type", nullable = false)
+    lateinit var entryType: String
+
+    @Column(name = "speaker_persona_code")
+    var speakerPersonaCode: String? = null
+
+    @Column(name = "text", nullable = false, columnDefinition = "TEXT")
+    lateinit var text: String
 
     @Column(name = "sources_json", columnDefinition = "TEXT")
     var sourcesJson: String? = null
 
-    @Column(name = "persona_code", length = 50)
-    var personaCode: String? = null
-
     @Column(name = "created_at", nullable = false)
     lateinit var createdAt: OffsetDateTime
 
-    companion object : PanacheCompanionBase<ChatHistoryEntity, UUID>
+    companion object : PanacheCompanionBase<DebateTurnEntity, UUID>
 }

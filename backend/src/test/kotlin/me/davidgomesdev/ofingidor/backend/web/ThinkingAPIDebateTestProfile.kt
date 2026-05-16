@@ -9,24 +9,21 @@ import dev.langchain4j.model.output.TokenUsage
 import dev.langchain4j.rag.content.Content
 import dev.langchain4j.service.TokenStream
 import dev.langchain4j.service.tool.ToolExecution
-import io.opentelemetry.api.trace.Span
 import io.qdrant.client.QdrantClient
 import io.qdrant.client.grpc.Collections
 import io.quarkus.test.Mock
 import io.quarkus.test.junit.QuarkusTestProfile
-import io.smallrye.mutiny.Multi
 import jakarta.enterprise.context.Dependent
 import jakarta.enterprise.inject.Produces
 import jakarta.inject.Singleton
 import me.davidgomesdev.ofingidor.backend.service.Assistant
-import me.davidgomesdev.ofingidor.backend.service.debate.DebateService
-import me.davidgomesdev.ofingidor.shared.dto.DebateEvent
+import me.davidgomesdev.ofingidor.backend.service.debate.DebateAssistant
 import org.mockito.Mockito
-import org.mockito.kotlin.any
-import org.mockito.kotlin.whenever
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.function.Consumer
 
-class ThinkingAPIMemoryTestProfile : QuarkusTestProfile {
+class ThinkingAPIDebateTestProfile : QuarkusTestProfile {
     override fun getConfigOverrides(): Map<String, String> = mapOf(
         "recreate.embeddings" to "false",
         "preview-only" to "true",
@@ -34,7 +31,7 @@ class ThinkingAPIMemoryTestProfile : QuarkusTestProfile {
         "session.jwt.ttl" to "PT1H",
         "session.memory.max-messages" to "20",
         "quarkus.datasource.db-kind" to "h2",
-        "quarkus.datasource.jdbc.url" to "jdbc:h2:mem:thinking_test;DB_CLOSE_DELAY=-1;MODE=PostgreSQL",
+        "quarkus.datasource.jdbc.url" to "jdbc:h2:mem:thinking_debate_test;DB_CLOSE_DELAY=-1;MODE=PostgreSQL",
         "quarkus.datasource.username" to "sa",
         "quarkus.datasource.password" to "",
         "quarkus.flyway.migrate-at-start" to "true",
@@ -47,17 +44,13 @@ class ThinkingAPIMemoryTestProfile : QuarkusTestProfile {
         @Singleton
         fun qdrantClient(): QdrantClient {
             val mock = Mockito.mock(QdrantClient::class.java)
-            Mockito.`when`(mock.listCollectionsAsync()).thenReturn(
-                Futures.immediateFuture(emptyList<String>())
-            )
+            Mockito.`when`(mock.listCollectionsAsync()).thenReturn(Futures.immediateFuture(emptyList<String>()))
             Mockito.`when`(
                 mock.createCollectionAsync(
                     Mockito.anyString(),
                     Mockito.any(Collections.VectorParams::class.java)
                 )
-            ).thenReturn(
-                Futures.immediateFuture(Collections.CollectionOperationResponse.getDefaultInstance())
-            )
+            ).thenReturn(Futures.immediateFuture(Collections.CollectionOperationResponse.getDefaultInstance()))
             return mock
         }
 
@@ -78,24 +71,57 @@ class ThinkingAPIMemoryTestProfile : QuarkusTestProfile {
         @Produces
         @Mock
         @Singleton
-        fun debateService(): DebateService {
-            val mock = Mockito.mock(DebateService::class.java)
-            whenever(mock.query(any(), any(), any(), any(), any<Span>())).thenReturn(
-                Multi.createFrom().items(
-                    DebateEvent.Start("trace-id", "fernando_pessoa", "alberto_caeiro"),
-                    DebateEvent.Done,
-                )
-            )
-            return mock
+        fun debateAssistant(): DebateAssistant {
+            val counter = AtomicInteger(0)
+            return DebateAssistant {
+                asyncRespondingTokenStream("Resposta ${counter.incrementAndGet()}")
+            }
         }
 
         private fun respondingTokenStream(text: String): TokenStream = object : TokenStream {
             private var onComplete: Consumer<ChatResponse>? = null
-            private var onError: Consumer<Throwable>? = null
 
             override fun onPartialResponse(consumer: Consumer<String>): TokenStream = this
             override fun onRetrieved(consumer: Consumer<List<Content>>): TokenStream = this
             override fun onToolExecuted(consumer: Consumer<ToolExecution>): TokenStream = this
+
+            override fun onCompleteResponse(consumer: Consumer<ChatResponse>): TokenStream {
+                onComplete = consumer
+                return this
+            }
+
+            override fun onError(consumer: Consumer<Throwable>): TokenStream = this
+            override fun ignoreErrors(): TokenStream = this
+
+            override fun start() {
+                onComplete?.accept(
+                    ChatResponse.builder()
+                        .aiMessage(AiMessage.from(text))
+                        .tokenUsage(TokenUsage(10, 5))
+                        .finishReason(FinishReason.STOP)
+                        .build()
+                )
+            }
+        }
+
+        private fun asyncRespondingTokenStream(text: String): TokenStream = object : TokenStream {
+            private var onPartialResponse: Consumer<String>? = null
+            private var onRetrieved: Consumer<List<Content>>? = null
+            private var onComplete: Consumer<ChatResponse>? = null
+            private var onError: Consumer<Throwable>? = null
+
+            override fun onPartialResponse(consumer: Consumer<String>): TokenStream {
+                onPartialResponse = consumer
+                return this
+            }
+
+            override fun onRetrieved(consumer: Consumer<List<Content>>): TokenStream {
+                onRetrieved = consumer
+                return this
+            }
+
+            override fun onToolExecuted(consumer: Consumer<ToolExecution>): TokenStream = this
+
             override fun onCompleteResponse(consumer: Consumer<ChatResponse>): TokenStream {
                 onComplete = consumer
                 return this
@@ -107,13 +133,23 @@ class ThinkingAPIMemoryTestProfile : QuarkusTestProfile {
             }
 
             override fun ignoreErrors(): TokenStream = this
+
             override fun start() {
-                val response = ChatResponse.builder()
-                    .aiMessage(AiMessage.from(text))
-                    .tokenUsage(TokenUsage(10, 5))
-                    .finishReason(FinishReason.STOP)
-                    .build()
-                onComplete?.accept(response)
+                CompletableFuture.runAsync {
+                    try {
+                        onRetrieved?.accept(emptyList())
+                        onPartialResponse?.accept(text)
+                        onComplete?.accept(
+                            ChatResponse.builder()
+                                .aiMessage(AiMessage.from(text))
+                                .tokenUsage(TokenUsage(10, 5))
+                                .finishReason(FinishReason.STOP)
+                                .build()
+                        )
+                    } catch (error: Throwable) {
+                        onError?.accept(error)
+                    }
+                }
             }
         }
     }

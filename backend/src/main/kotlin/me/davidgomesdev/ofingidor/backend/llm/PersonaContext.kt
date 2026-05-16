@@ -1,7 +1,7 @@
 package me.davidgomesdev.ofingidor.backend.llm
 
 import jakarta.enterprise.context.RequestScoped
-import me.davidgomesdev.ofingidor.backend.model.Persona
+import me.davidgomesdev.ofingidor.shared.dto.Persona
 
 @RequestScoped
 class PersonaContext {

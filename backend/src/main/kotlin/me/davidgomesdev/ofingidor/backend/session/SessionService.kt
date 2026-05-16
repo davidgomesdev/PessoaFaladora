@@ -14,7 +14,7 @@ import io.quarkus.runtime.Startup
 import jakarta.annotation.PostConstruct
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.transaction.Transactional
-import me.davidgomesdev.ofingidor.backend.model.Persona
+import me.davidgomesdev.ofingidor.shared.dto.Persona
 import org.jboss.logging.Logger
 import java.time.Instant
 import java.util.Date
@@ -58,7 +58,9 @@ class SessionService(private val config: SessionConfig) {
         val session = SessionEntity()
 
         session.conversationId = conversationId
+        session.conversationType = ConversationType.SINGLE
         session.persona = personaEntity
+        session.opponentPersona = null
 
         session.persist()
 
@@ -67,6 +69,28 @@ class SessionService(private val config: SessionConfig) {
         val token = buildJwt(conversationId.toString())
 
         return ConversationSession(token, conversationId.toString())
+    }
+
+    @Transactional
+    fun createDebateSession(personaA: Persona, personaB: Persona): ConversationSession {
+        require(personaA != personaB) { "debate personas must be different" }
+
+        val personaEntity = PersonaEntity.findByCodeName(personaA.codeName)
+            ?: error("Persona '${personaA.codeName}' not found in database")
+        val opponentEntity = PersonaEntity.findByCodeName(personaB.codeName)
+            ?: error("Persona '${personaB.codeName}' not found in database")
+
+        val conversationId = UuidCreator.getTimeOrderedEpoch()
+
+        SessionEntity().also { session ->
+            session.conversationId = conversationId
+            session.conversationType = ConversationType.DEBATE
+            session.persona = personaEntity
+            session.opponentPersona = opponentEntity
+            session.persist()
+        }
+
+        return ConversationSession(buildJwt(conversationId.toString()), conversationId.toString())
     }
 
     fun extractConversationId(token: String): Either<SessionError, String> {
@@ -107,6 +131,51 @@ class SessionService(private val config: SessionConfig) {
             ?: error("Unknown persona code '${session.persona.codeName}' in database")
         return persona.right()
     }
+
+    @Transactional
+    fun getConversationParticipants(conversationId: String): Either<SessionError, ConversationParticipants> {
+        val uuid = try {
+            UUID.fromString(conversationId)
+        } catch (_: IllegalArgumentException) {
+            return SessionError.SESSION_NOT_FOUND.left()
+        }
+
+        val session = SessionEntity.findById(uuid) ?: return SessionError.SESSION_NOT_FOUND.left()
+
+        val primary = resolvePersona(session.persona.codeName) ?: return SessionError.PERSONA_MISMATCH.left()
+
+        return when (session.conversationType) {
+            ConversationType.SINGLE -> {
+                if (session.opponentPersona != null) {
+                    SessionError.SESSION_MODE_MISMATCH.left()
+                } else {
+                    ConversationParticipants(
+                        type = ConversationType.SINGLE,
+                        persona = primary,
+                    ).right()
+                }
+            }
+
+            ConversationType.DEBATE -> {
+                val opponent = session.opponentPersona ?: return SessionError.SESSION_MODE_MISMATCH.left()
+                val resolvedOpponent = resolvePersona(opponent.codeName)
+                    ?: return SessionError.PERSONA_PAIR_MISMATCH.left()
+
+                if (resolvedOpponent == primary) {
+                    SessionError.PERSONA_PAIR_MISMATCH.left()
+                } else {
+                    ConversationParticipants(
+                        type = ConversationType.DEBATE,
+                        persona = primary,
+                        opponentPersona = resolvedOpponent,
+                    ).right()
+                }
+            }
+        }
+    }
+
+    private fun resolvePersona(codeName: String): Persona? =
+        Persona.entries.firstOrNull { it.codeName == codeName }
 
     private fun buildJwt(conversationId: String): String {
         val now = Instant.now()

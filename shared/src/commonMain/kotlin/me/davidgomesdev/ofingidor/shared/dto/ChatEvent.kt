@@ -2,9 +2,6 @@ package me.davidgomesdev.ofingidor.shared.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-
-val json = Json { classDiscriminator = "type"; ignoreUnknownKeys = true }
 
 @Serializable
 sealed class ChatEvent {

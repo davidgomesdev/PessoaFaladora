@@ -13,6 +13,7 @@ import io.quarkus.runtime.Startup
 import io.smallrye.mutiny.Multi
 import jakarta.enterprise.context.ApplicationScoped
 import me.davidgomesdev.ofingidor.backend.llm.ChatHistoryRepository
+import me.davidgomesdev.ofingidor.backend.llm.PersonaContext
 import me.davidgomesdev.ofingidor.backend.llm.TextAttributes
 import me.davidgomesdev.ofingidor.backend.observability.attributes
 import me.davidgomesdev.ofingidor.backend.session.ConversationContext
@@ -32,6 +33,7 @@ fun interface Assistant {
 class ChatService(
     val assistant: Assistant,
     val conversationContext: ConversationContext,
+    val personaContext: PersonaContext,
     val chatHistoryRepository: ChatHistoryRepository,
 ) {
 
@@ -130,6 +132,8 @@ class ChatService(
                         userMessage = input,
                         aiResponse = response.aiMessage().text() ?: "",
                         sources = capturedSources,
+                        personaCode = personaContext.persona?.codeName
+                            ?: error("personaCode not set on PersonaContext"),
                     )
 
                     stream.emit(ChatEvent.Done(totalTokensUsed, timeTaken))

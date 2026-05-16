@@ -18,3 +18,9 @@ kotlin {
         }
     }
 }
+
+tasks.register("test") {
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    description = "Alias for shared jvmTest"
+    dependsOn("jvmTest")
+}

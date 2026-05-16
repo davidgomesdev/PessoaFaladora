@@ -6,9 +6,11 @@ import dev.langchain4j.rag.RetrievalAugmentor
 import dev.langchain4j.service.AiServices
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Singleton
-import me.davidgomesdev.ofingidor.backend.model.Persona
+import me.davidgomesdev.ofingidor.backend.model.getSystemPromptFileName
 import me.davidgomesdev.ofingidor.backend.service.Assistant
+import me.davidgomesdev.ofingidor.backend.service.debate.DebateAssistant
 import me.davidgomesdev.ofingidor.backend.session.SessionConfig
+import me.davidgomesdev.ofingidor.shared.dto.Persona
 import org.jboss.logging.Logger
 import java.io.File
 
@@ -41,8 +43,20 @@ class AiAssistant(
             .build()
     }
 
+    @Singleton
+    @Suppress("unused")
+    fun debateAssistant(
+        streamingChatModel: StreamingChatModel,
+        retrievalAugmentor: RetrievalAugmentor,
+    ): DebateAssistant = AiServices.builder(DebateAssistant::class.java)
+        .systemMessageProvider { _ -> resolveSystemMessage() }
+        .streamingChatModel(streamingChatModel)
+        .retrievalAugmentor(retrievalAugmentor)
+        .build()
+
     private fun getPersonaSystemMessages(): Map<String, String> = buildMap {
-        val allFiles = Persona.entries.map(Persona::systemPromptFilename)
+        val allFiles = Persona.entries.map(Persona::getSystemPromptFileName)
+
         allFiles.forEach { fileName ->
             val stream = Thread.currentThread().contextClassLoader.getResourceAsStream("prompts/$fileName")
                 ?: throw IllegalStateException("Prompt '$fileName' not found")
@@ -53,7 +67,7 @@ class AiAssistant(
 
     private fun resolveSystemMessage(): String {
         val persona = personaContext.persona ?: throw IllegalStateException("Persona not set")
-        val fileName = persona.systemPromptFilename
+        val fileName = persona.getSystemPromptFileName()
 
         val localFile = File(fileName)
         if (localFile.exists()) return localFile.readText()

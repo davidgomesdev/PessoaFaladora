@@ -20,6 +20,7 @@ class ChatHistoryRepository(private val objectMapper: ObjectMapper) {
         userMessage: String,
         aiResponse: String,
         sources: List<ChatEvent.Sources.Source>,
+        personaCode: String,
     ) {
         ChatHistoryEntity().also { entity ->
             entity.id = UuidCreator.getTimeOrderedEpoch()
@@ -27,8 +28,9 @@ class ChatHistoryRepository(private val objectMapper: ObjectMapper) {
             entity.userMessage = userMessage
             entity.aiResponse = aiResponse
             entity.sourcesJson = if (sources.isEmpty()) null else objectMapper.writeValueAsString(sources)
+            entity.personaCode = personaCode
             entity.createdAt = OffsetDateTime.now()
         }.persist()
-        log.debug("Persisted chat history for conversationId=$conversationId (${sources.size} sources)")
+        log.debug("Persisted chat history for conversationId=$conversationId persona=$personaCode (${sources.size} sources)")
     }
 }
