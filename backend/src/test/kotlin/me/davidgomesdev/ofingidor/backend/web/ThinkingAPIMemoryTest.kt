@@ -17,7 +17,7 @@ class ThinkingAPIMemoryTest {
             .contentType("application/json")
             .body("""{"input": "Quem és tu?", "persona": "alberto_caeiro"}""")
             .`when`()
-            .put("/pensa")
+            .put("/pensa/conversation")
             .then()
             .statusCode(200)
             .extract()
@@ -32,7 +32,7 @@ class ThinkingAPIMemoryTest {
             .contentType("application/json")
             .body("""{"input": "Quem és tu?", "persona": "alberto_caeiro"}""")
             .`when`()
-            .put("/pensa")
+            .put("/pensa/conversation")
             .then()
             .statusCode(200)
             .extract()
@@ -46,7 +46,7 @@ class ThinkingAPIMemoryTest {
             .header("Authorization", "Bearer $token")
             .body("""{"input": "Fala mais sobre ti.", "persona": "alberto_caeiro"}""")
             .`when`()
-            .put("/pensa")
+            .put("/pensa/conversation")
             .then()
             .statusCode(200)
             .extract()
@@ -64,7 +64,7 @@ class ThinkingAPIMemoryTest {
             .contentType("application/json")
             .body("""{"input": "Quem és tu?", "persona": "alberto_caeiro"}""")
             .`when`()
-            .put("/pensa")
+            .put("/pensa/conversation")
             .then()
             .statusCode(200)
             .extract()
@@ -78,7 +78,36 @@ class ThinkingAPIMemoryTest {
             .header("Authorization", "Bearer $token")
             .body("""{"input": "Fala mais.", "persona": "ricardo_reis"}""")
             .`when`()
-            .put("/pensa")
+            .put("/pensa/conversation")
+            .then()
+            .statusCode(409)
+    }
+
+    @Test
+    fun `debate token reused on single chat returns 409`() {
+        val firstResponse = given()
+            .contentType("application/json")
+            .body(
+                """
+                {"input": "Debatam a poesia.", "personaA": "fernando_pessoa", "personaB": "alberto_caeiro"}
+                """.trimIndent()
+            )
+            .`when`()
+            .put("/pensa/debate")
+            .then()
+            .statusCode(200)
+            .extract()
+            .response()
+
+        val token = firstResponse.header("X-Session-Token")
+        assertNotNull(token)
+
+        given()
+            .contentType("application/json")
+            .header("Authorization", "Bearer $token")
+            .body("""{"input": "Quem és tu?", "persona": "fernando_pessoa"}""")
+            .`when`()
+            .put("/pensa/conversation")
             .then()
             .statusCode(409)
     }
@@ -90,7 +119,7 @@ class ThinkingAPIMemoryTest {
             .header("Authorization", "Bearer not.a.real.token")
             .body("""{"input": "Quem és tu?", "persona": "alberto_caeiro"}""")
             .`when`()
-            .put("/pensa")
+            .put("/pensa/conversation")
             .then()
             .statusCode(401)
     }

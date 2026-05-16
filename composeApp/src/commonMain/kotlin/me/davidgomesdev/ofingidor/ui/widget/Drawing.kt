@@ -1,6 +1,5 @@
 package me.davidgomesdev.ofingidor.ui.widget
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -20,21 +19,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import me.davidgomesdev.ofingidor.shared.dto.Persona
 import me.davidgomesdev.ofingidor.ui.aiBubbleBorder
 import me.davidgomesdev.ofingidor.ui.cardBorderColor
 import me.davidgomesdev.ofingidor.ui.devChipBorderColor
 import me.davidgomesdev.ofingidor.ui.devChipColor
 import me.davidgomesdev.ofingidor.ui.devChipTextColor
-import me.davidgomesdev.ofingidor.ui.model.Persona
+import me.davidgomesdev.ofingidor.ui.model.PersonaPortrait
 import me.davidgomesdev.ofingidor.ui.personaLabelColor
 import me.davidgomesdev.ofingidor.ui.portraitThumbnailBackgroundColor
-import ofingidor.composeapp.generated.resources.Res
-import ofingidor.composeapp.generated.resources.logo
-import org.jetbrains.compose.resources.painterResource
+
+data class AppHeaderIdentity(
+    val portrait: PersonaPortrait,
+    val personaLabel: String,
+)
+
+fun appHeaderIdentity(persona: Persona): AppHeaderIdentity = AppHeaderIdentity(
+    portrait = requireNotNull(personaPortrait(persona)) { "Missing portrait for $persona" },
+    personaLabel = persona.displayName.uppercase(),
+)
 
 @Composable
 fun AppHeader(
@@ -45,6 +51,7 @@ fun AppHeader(
     onNewConversation: (() -> Unit)?,
     isCompact: Boolean = false,
 ) {
+    val identity = appHeaderIdentity(selectedPersona)
     val horizontalPadding = if (isCompact) 12.dp else 24.dp
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
@@ -67,14 +74,11 @@ fun AppHeader(
                         .border(1.dp, aiBubbleBorder, RoundedCornerShape(6.dp)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Image(
-                        painter = painterResource(Res.drawable.logo),
-                        contentDescription = selectedPersona.displayName,
-                        contentScale = ContentScale.Crop,
+                    PersonaPortraitThumbnail(
+                        portrait = identity.portrait,
                         modifier = Modifier
                             .width(32.dp)
                             .height(46.dp)
-                            .clip(RoundedCornerShape(6.dp))
                     )
                 }
                 Column {
@@ -85,7 +89,7 @@ fun AppHeader(
                         fontSize = 14.sp
                     )
                     Text(
-                        selectedPersona.displayName.uppercase(),
+                        identity.personaLabel,
                         color = personaLabelColor,
                         fontSize = 9.sp,
                         letterSpacing = 1.sp,

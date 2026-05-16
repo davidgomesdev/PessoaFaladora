@@ -1,4 +1,4 @@
-package me.davidgomesdev.ofingidor.ui.model
+package me.davidgomesdev.ofingidor.shared.dto
 
 enum class Persona(val displayName: String, val category: PersonaCategory) {
     O_FINGIDOR("O Fingidor", PersonaCategory.DEV),

@@ -36,10 +36,10 @@ import jakarta.inject.Singleton
 import kotlinx.serialization.json.Json
 import me.davidgomesdev.ofingidor.backend.dto.PessoaCategoryDto
 import me.davidgomesdev.ofingidor.backend.llm.config.RAGConfig
-import me.davidgomesdev.ofingidor.backend.model.Persona
 import me.davidgomesdev.ofingidor.backend.model.PessoaCategory
 import me.davidgomesdev.ofingidor.backend.observability.attributes
 import me.davidgomesdev.ofingidor.backend.observability.span
+import me.davidgomesdev.ofingidor.shared.dto.Persona
 import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.eclipse.microprofile.context.ManagedExecutor
 import org.jboss.logging.Logger
