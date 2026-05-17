@@ -72,8 +72,6 @@ class SemanticDocumentSplitter(
             val allSegments = mutableListOf<TextSegment>()
 
             for (document in documents) {
-                log.info("Processing document for semantic chunking")
-
                 val initialSegments = document.text().split("\n\n").map { it.trim() }.filter { it.isNotBlank() }
 
                 if (initialSegments.isEmpty()) {
