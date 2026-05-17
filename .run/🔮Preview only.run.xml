@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="🔮Preview only" type="QuarkusRunConfiguration"
+                   factoryName="QuarkusRunConfiguration" folderName="🔮" focusToolWindowBeforeRun="true">
+        <option name="env">
+            <map>
+                <entry key="PREVIEW_ONLY" value="true"/>
+            </map>
+        </option>
+        <module name="o-fingidor.backend.main"/>
+        <option name="profile"/>
+        <option name="programParameters"/>
+        <method v="2"/>
+    </configuration>
+</component>
