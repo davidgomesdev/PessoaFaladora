@@ -1,8 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-    <configuration default="false" name="🔮All texts" type="QuarkusRunConfiguration"
-                   factoryName="QuarkusRunConfiguration" folderName="🔮" focusToolWindowBeforeRun="true">
-        <module name="o-fingidor.backend.main"/>
-        <option name="profile"/>
-        <method v="2"/>
-    </configuration>
+  <configuration default="false" name="🔮All texts" type="QuarkusRunConfiguration" factoryName="QuarkusRunConfiguration"
+                 folderName="🔮" focusToolWindowBeforeRun="true">
+    <module name="o-fingidor.backend.main"/>
+    <option name="profile"/>
+    <option name="programParameters"/>
+    <method v="2"/>
+  </configuration>
 </component>

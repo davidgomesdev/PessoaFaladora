@@ -12,34 +12,39 @@ import org.jboss.logging.Logger
 class ModelsProducer(
     private val ollama: OllamaLanguageModel,
     private val anthropic: AnthropicLanguageModel,
-    @param:ConfigProperty(name = "model.name")
-    private val name: String,
+    private val voyage: VoyageEmbeddingChatModel,
+    @param:ConfigProperty(name = "model.chat-name")
+    private val chatModelName: String,
+    @param:ConfigProperty(name = "model.embedding-name")
+    private val embeddingModelName: String,
 ) : LanguageModel {
     val logger: Logger = Logger.getLogger(this::class.java)
 
     init {
-        logger.info("Using '$name' language model")
+        logger.info("Using '$chatModelName' language model")
     }
 
     @Singleton
     override fun chatModel(): ChatModel =
-        when (name) {
-            "ollama" -> ollama.chatModel()
-            "anthropic" -> anthropic.chatModel()
-            else -> throw IllegalArgumentException("Unknown chat model '$name'")
-        }
+        when (chatModelName) {
+            "ollama" -> ollama
+            "anthropic" -> anthropic
+            else -> throw IllegalArgumentException("Unknown chat model '$chatModelName'")
+        }.chatModel()
 
     @Singleton
     override fun streamingChatModel(): StreamingChatModel =
-        when (name) {
-            "ollama" -> ollama.streamingChatModel()
-            "anthropic" -> anthropic.streamingChatModel()
-            else -> throw IllegalArgumentException("Unknown chat model '$name'")
-        }
+        when (chatModelName) {
+            "ollama" -> ollama
+            "anthropic" -> anthropic
+            else -> throw IllegalArgumentException("Unknown chat model '$chatModelName'")
+        }.streamingChatModel()
 
     @Singleton
-    fun embeddingModel(): EmbeddingModel {
-        // Anthropic doesn't have an embedding model
-        return ollama.embeddingModel()
-    }
+    fun embeddingModel(): EmbeddingModel =
+        when (embeddingModelName) {
+            "ollama" -> ollama
+            "voyage" -> voyage
+            else -> throw IllegalArgumentException("Unknown embedding model '$embeddingModelName'")
+        }.embeddingModel()
 }

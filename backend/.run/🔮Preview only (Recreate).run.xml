@@ -1,17 +1,18 @@
 <component name="ProjectRunConfigurationManager">
-    <configuration default="false" name="🔮Preview only (Recreate)" type="QuarkusRunConfiguration"
-                   factoryName="QuarkusRunConfiguration" folderName="🔮" focusToolWindowBeforeRun="true">
-        <option name="env">
-            <map>
-                <entry key="MODEL_OLLAMA_EMBEDDING_MODEL_MODEL_ID" value="qwen3-embedding:0.6b"/>
-                <entry key="PREVIEW_ONLY" value="true"/>
-                <entry key="RAG_INGESTION_CHUNK_SIZE" value="5"/>
-                <entry key="RAG_SEMANTIC_CHUNKING_ENABLED" value="false"/>
-                <entry key="RECREATE_EMBEDDINGS" value="true"/>
-            </map>
-        </option>
-        <module name="o-fingidor.backend.main"/>
-        <option name="profile"/>
-        <method v="2"/>
-    </configuration>
+  <configuration default="false" name="🔮Preview only (Recreate)" type="QuarkusRunConfiguration"
+                 factoryName="QuarkusRunConfiguration" folderName="🔮" focusToolWindowBeforeRun="true">
+    <option name="env">
+      <map>
+        <entry key="MODEL_OLLAMA_EMBEDDING_MODEL_MODEL_ID" value="qwen3-embedding:0.6b"/>
+        <entry key="PREVIEW_ONLY" value="true"/>
+        <entry key="RAG_INGESTION_CHUNK_SIZE" value="5"/>
+        <entry key="RAG_SEMANTIC_CHUNKING_ENABLED" value="false"/>
+        <entry key="RECREATE_EMBEDDINGS" value="true"/>
+      </map>
+    </option>
+    <module name="o-fingidor.backend.main"/>
+    <option name="profile"/>
+    <option name="programParameters"/>
+    <method v="2"/>
+  </configuration>
 </component>
