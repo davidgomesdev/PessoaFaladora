@@ -11,6 +11,8 @@ ktor = "3.4.0"
 napier = "2.7.1"
 # JVM Default logger
 slf4j = "2.0.17"
+# Functional programming
+arrow = "2.2.2.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -28,6 +30,8 @@ kotlinx-coroutinesSwing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-s
 kotlinx-coroutinesTest = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 
 napier = { module = "io.github.aakira:napier", version.ref = "napier" }
+
+arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
 
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
