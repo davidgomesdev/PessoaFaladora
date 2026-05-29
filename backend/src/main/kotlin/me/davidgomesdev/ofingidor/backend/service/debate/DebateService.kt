@@ -10,6 +10,7 @@ import io.opentelemetry.api.trace.SpanKind
 import io.opentelemetry.api.trace.StatusCode
 import io.opentelemetry.context.Scope
 import io.quarkus.arc.Arc
+import io.quarkus.arc.ManagedContext
 import io.smallrye.mutiny.Multi
 import io.smallrye.mutiny.subscription.MultiEmitter
 import jakarta.enterprise.context.ApplicationScoped
@@ -76,39 +77,44 @@ class DebateService(
             return
         }
 
-        withActiveRequestContext {
-            val speaker = ctx.speakerPlan[turnIndex]
-            val persistedTurnIndex = turnIndex + 1
+        val requestContext = Arc.container()?.requestContext() as? ManagedContext
+        val activatedForThisTurn = requestContext != null && !requestContext.isActive
+        if (activatedForThisTurn) requestContext!!.activate()
 
-            personaContext.persona = speaker
+        val speaker = ctx.speakerPlan[turnIndex]
+        val persistedTurnIndex = turnIndex + 1
 
-            val prompt = try {
-                buildPrompt(ctx, persistedTurnIndex, speaker)
-            } catch (error: Throwable) {
-                failStream(ctx, error)
-                return
-            }
+        personaContext.persona = speaker
 
-            val turnSpan = tracer.spanBuilder(DebateApiConstants.SPAN_NAME_DEBATE_TURN)
-                .setSpanKind(SpanKind.INTERNAL)
-                .setAttribute("conversationId", ctx.conversationId.toString())
-                .setAttribute("speaker", speaker.codeName)
-                .setAttribute("turnIndex", persistedTurnIndex.toLong())
-                .startSpan()
-            val turnScope = turnSpan.makeCurrent()
-
-            ctx.emitter.emit(DebateEvent.TurnStart(persistedTurnIndex, speaker))
-
-            val stream = try {
-                debateAssistant.chat(prompt)
-            } catch (error: Throwable) {
-                endTurnSpanWithError(error, turnSpan, turnScope)
-                failStream(ctx, error)
-                return
-            }
-
-            attachStreamHandlers(stream, ctx, turnIndex, persistedTurnIndex, speaker, turnSpan, turnScope)
+        val prompt = try {
+            buildPrompt(ctx, persistedTurnIndex, speaker)
+        } catch (error: Throwable) {
+            if (activatedForThisTurn) requestContext?.terminate()
+            failStream(ctx, error)
+            return
         }
+
+        val turnSpan = tracer.spanBuilder(DebateApiConstants.SPAN_NAME_DEBATE_TURN)
+            .setSpanKind(SpanKind.INTERNAL)
+            .setAttribute("conversationId", ctx.conversationId.toString())
+            .setAttribute("speaker", speaker.codeName)
+            .setAttribute("turnIndex", persistedTurnIndex.toLong())
+            .startSpan()
+        val turnScope = turnSpan.makeCurrent()
+
+        ctx.emitter.emit(DebateEvent.TurnStart(persistedTurnIndex, speaker))
+
+        val stream = try {
+            debateAssistant.chat(prompt)
+        } catch (error: Throwable) {
+            if (activatedForThisTurn) requestContext?.terminate()
+            endTurnSpanWithError(error, turnSpan, turnScope)
+            failStream(ctx, error)
+            return
+        }
+
+        attachStreamHandlers(stream, ctx, turnIndex, persistedTurnIndex, speaker, turnSpan, turnScope, requestContext, activatedForThisTurn)
+        // Context intentionally NOT terminated here — it stays alive until the async callbacks fire
     }
 
     private fun buildPrompt(ctx: DebateContext, persistedTurnIndex: Int, speaker: Persona): String =
@@ -131,6 +137,8 @@ class DebateService(
         speaker: Persona,
         turnSpan: Span,
         turnScope: Scope,
+        requestContext: ManagedContext?,
+        activatedForThisTurn: Boolean,
     ) {
         val startTime = TimeSource.Monotonic.markNow()
         val capturedSources = mutableListOf<ChatEvent.Sources.Source>()
@@ -164,14 +172,17 @@ class DebateService(
                     ctx.emitter.emit(DebateEvent.TurnDone(persistedTurnIndex, speaker, totalTokensUsed, timeTaken))
                     turnScope.close()
                     turnSpan.end()
+                    if (activatedForThisTurn) requestContext?.terminate()
                     processTurn(ctx, turnIndex + 1)
                 } catch (error: Throwable) {
+                    if (activatedForThisTurn) requestContext?.terminate()
                     endTurnSpanWithError(error, turnSpan, turnScope)
                     failStream(ctx, error)
                 }
             }
             .onError { error ->
                 log.error("Debate turn failed for ${speaker.codeName}", error)
+                if (activatedForThisTurn) requestContext?.terminate()
                 endTurnSpanWithError(error, turnSpan, turnScope)
                 failStream(ctx, error)
             }
@@ -211,28 +222,5 @@ class DebateService(
             category = metadata.getString(TextAttributes.CATEGORY_NAME) ?: "",
             score = score.roundToInt(),
         )
-    }
-
-    private inline fun withActiveRequestContext(block: () -> Unit) {
-        val container = Arc.container()
-        if (container == null) {
-            block()
-            return
-        }
-
-        val requestContext = container.requestContext()
-        val activatedHere = !requestContext.isActive
-
-        if (activatedHere) {
-            requestContext.activate()
-        }
-
-        try {
-            block()
-        } finally {
-            if (activatedHere) {
-                requestContext.terminate()
-            }
-        }
     }
 }
