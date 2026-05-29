@@ -7,12 +7,12 @@ import me.davidgomesdev.ofingidor.shared.dto.Persona
 @ApplicationScoped
 class DebatePromptBuilder {
 
-    fun openingPrompt(userInput: String, speaker: Persona): String = """
+    fun openingPrompt(userInput: String, speaker: Persona, opponent: Persona): String = """
         Responde como ${speaker.displayName}.
-        O utilizador pediu:
+        Estás a participar num debate com ${opponent.displayName} sobre o tema pedido pelo utilizador:
         $userInput
 
-        Assume uma posição clara e responde em tom de debate, dirigindo-te ao outro poeta mesmo que ele ainda não tenha falado.
+        Exprime a tua posição com confiança e naturalidade — como quem começa a falar sobre algo que pensa há muito. Não uses preambles formais nem te dirijas a uma audiência genérica. Podes ou não dirigir-te a ${opponent.displayName} diretamente, conforme for natural para a tua voz.
     """.trimIndent()
 
     fun rebuttalPrompt(userInput: String, speaker: Persona, transcript: List<DebateTurnEntity>): String {
