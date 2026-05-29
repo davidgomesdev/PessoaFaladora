@@ -16,9 +16,7 @@ import androidx.compose.foundation.text.selection.DisableSelection
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -44,11 +42,11 @@ private const val textReaderUrl = "https://pessoa.davidgomes.blog/textReader"
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 @Suppress("kotlin:S3776")
-internal fun SourceChip(source: Source) {
+internal fun SourceChip(source: Source, tappedSourceId: Long? = null, onTap: (Long?) -> Unit = {}) {
     val isMobile = isMobileDevice()
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
-    var isTapped by remember { mutableStateOf(false) }
+    val isTapped = tappedSourceId == source.id
     val showTooltip = if (isMobile) isTapped else isHovered
 
     Layout(
@@ -64,8 +62,11 @@ internal fun SourceChip(source: Source) {
                             interactionSource = interactionSource,
                             indication = null,
                             onClick = {
-                                if (isMobile) isTapped = !isTapped
-                                else openUrl("$textReaderUrl/${source.id}")
+                                if (isMobile) {
+                                    val tappedSourceId = if (isTapped) null else source.id
+
+                                    onTap(tappedSourceId)
+                                } else openUrl("$textReaderUrl/${source.id}")
                             },
                             onLongClick = if (isMobile) {
                                 { openUrl("$textReaderUrl/${source.id}") }
