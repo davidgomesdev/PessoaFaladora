@@ -10,14 +10,17 @@ class DebatePromptBuilderTest {
     private val promptBuilder = DebatePromptBuilder()
 
     @Test
-    fun `opening prompt includes speaker and user input`() {
-        val prompt = promptBuilder.openingPrompt("O que é a sinceridade poética?", Persona.FERNANDO_PESSOA)
+    fun `opening prompt includes speaker, opponent and user input`() {
+        val prompt = promptBuilder.openingPrompt(
+            "O que é a sinceridade poética?",
+            Persona.FERNANDO_PESSOA,
+            Persona.ALBERTO_CAEIRO
+        )
 
         assertTrue(prompt.contains("Fernando Pessoa"))
+        assertTrue(prompt.contains("Alberto Caeiro"))
         assertTrue(prompt.contains("O que é a sinceridade poética?"))
-        assertTrue(prompt.contains("Assume uma posição clara"))
-        assertTrue(prompt.contains("responde em tom de debate"))
-        assertTrue(prompt.contains("dirigindo-te ao outro poeta"))
+        assertTrue(prompt.contains("Exprime a tua posição com confiança"))
     }
 
     @Test

@@ -113,7 +113,8 @@ class DebateService(
 
     private fun buildPrompt(ctx: DebateContext, persistedTurnIndex: Int, speaker: Persona): String =
         if (persistedTurnIndex == 1) {
-            promptBuilder.openingPrompt(ctx.input, speaker)
+            val opponent = ctx.speakerPlan[1]
+            promptBuilder.openingPrompt(ctx.input, speaker, opponent)
         } else {
             promptBuilder.rebuttalPrompt(
                 ctx.input,
