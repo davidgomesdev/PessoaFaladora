@@ -4,6 +4,11 @@ import me.davidgomesdev.ofingidor.shared.dto.Persona
 
 enum class DebateSide { LEFT, RIGHT }
 
+internal data class DebateQuestionEntry(
+    val question: String,
+    val startOffset: Int,
+)
+
 data class DebatePair(val left: Persona, val right: Persona) {
     init {
         require(left != right) { "Debate personas must be different" }
