@@ -80,7 +80,7 @@ class DebateServiceTest {
             callerSpan = Span.getInvalid(),
         ).collect().asList().subscribeAsCompletionStage().toCompletableFuture().get()
 
-        val speakers = events.filterIsInstance<DebateEvent.TurnStart>().map { it.speaker }
+        val speakers = events.filterIsInstance<DebateEvent.TurnStart>().map { it.speaker.codeName }
 
         assertEquals(
             listOf("fernando_pessoa", "alberto_caeiro", "fernando_pessoa", "alberto_caeiro"),

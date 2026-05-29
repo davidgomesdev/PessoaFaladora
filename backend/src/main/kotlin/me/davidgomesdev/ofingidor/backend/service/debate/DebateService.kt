@@ -8,8 +8,10 @@ import io.opentelemetry.api.GlobalOpenTelemetry
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.SpanKind
 import io.opentelemetry.api.trace.StatusCode
+import io.opentelemetry.context.Scope
 import io.quarkus.arc.Arc
 import io.smallrye.mutiny.Multi
+import io.smallrye.mutiny.subscription.MultiEmitter
 import jakarta.enterprise.context.ApplicationScoped
 import me.davidgomesdev.ofingidor.backend.constants.DebateApiConstants
 import me.davidgomesdev.ofingidor.backend.llm.PersonaContext
@@ -38,6 +40,15 @@ class DebateService(
     private val log: Logger = Logger.getLogger(this::class.java)
     private val tracer = GlobalOpenTelemetry.getTracer(this::class.java.name)
 
+    private data class DebateContext(
+        val input: String,
+        val conversationId: UUID,
+        val speakerPlan: List<Persona>,
+        val emitter: MultiEmitter<in DebateEvent>,
+        val callerSpan: Span,
+        val callerScope: Scope,
+    )
+
     fun query(
         input: String,
         conversationId: UUID,
@@ -48,145 +59,144 @@ class DebateService(
         val speakerPlan = listOf(personaA, personaB, personaA, personaB)
 
         return Multi.createFrom().emitter { emitter ->
-            val callerScope = callerSpan.makeCurrent()
-
-            fun finishSuccessfully() {
-                emitter.emit(DebateEvent.Done)
-                emitter.complete()
-                callerScope.close()
-                callerSpan.end()
-            }
-
-            fun failStream(error: Throwable) {
-                callerSpan.recordException(error)
-                callerSpan.setStatus(StatusCode.ERROR)
-                callerScope.close()
-                callerSpan.end()
-                emitter.fail(error)
-            }
-
-            fun processTurn(turnIndex: Int) {
-                if (turnIndex > speakerPlan.lastIndex) {
-                    finishSuccessfully()
-                    return
-                }
-
-                withActiveRequestContext {
-                    val speaker = speakerPlan[turnIndex]
-                    val persistedTurnIndex = turnIndex + 1
-
-                    personaContext.persona = speaker
-
-                    val prompt = try {
-                        if (persistedTurnIndex == 1) {
-                            promptBuilder.openingPrompt(input, speaker)
-                        } else {
-                            promptBuilder.rebuttalPrompt(
-                                input,
-                                speaker,
-                                transcriptRepository.loadTranscript(conversationId)
-                            )
-                        }
-                    } catch (error: Throwable) {
-                        failStream(error)
-                        return
-                    }
-
-                    val turnSpan = tracer.spanBuilder(DebateApiConstants.SPAN_NAME_DEBATE_TURN)
-                        .setSpanKind(SpanKind.INTERNAL)
-                        .setAttribute("conversationId", conversationId.toString())
-                        .setAttribute("speaker", speaker.codeName)
-                        .setAttribute("turnIndex", persistedTurnIndex.toLong())
-                        .startSpan()
-                    val turnScope = turnSpan.makeCurrent()
-                    val startTime = TimeSource.Monotonic.markNow()
-                    val capturedSources = mutableListOf<ChatEvent.Sources.Source>()
-                    val responseText = StringBuilder()
-                    var emittedSources = false
-
-                    emitter.emit(DebateEvent.TurnStart(persistedTurnIndex, speaker))
-
-                    val stream = try {
-                        debateAssistant.chat(prompt)
-                    } catch (error: Throwable) {
-                        turnSpan.recordException(error)
-                        turnSpan.setStatus(StatusCode.ERROR)
-                        turnScope.close()
-                        turnSpan.end()
-                        failStream(error)
-                        return
-                    }
-
-                    stream
-                        .onRetrieved { contents ->
-                            val items = contents.map(::toSourceItem)
-                            capturedSources.clear()
-                            capturedSources.addAll(items)
-                            emittedSources = true
-                            emitter.emit(DebateEvent.Sources(persistedTurnIndex, speaker, ChatEvent.Sources(items)))
-                        }
-                        .onPartialResponse { partialResponse ->
-                            responseText.append(partialResponse)
-                            emitter.emit(DebateEvent.Token(persistedTurnIndex, speaker, partialResponse))
-                        }
-                        .onCompleteResponse { response ->
-                            try {
-                                if (!emittedSources) {
-                                    emitter.emit(DebateEvent.Sources(persistedTurnIndex, speaker, ChatEvent.Sources()))
-                                }
-
-                                val finalText = response.aiMessage().text() ?: responseText.toString()
-                                transcriptRepository.appendPersonaTurn(
-                                    conversationId = conversationId,
-                                    turnIndex = persistedTurnIndex,
-                                    speaker = speaker,
-                                    text = finalText,
-                                    sources = capturedSources,
-                                )
-
-                                val timeTaken = startTime.elapsedNow().toString(DurationUnit.SECONDS, 2)
-                                val totalTokensUsed = response.tokenUsage().totalTokenCount()
-
-                                emitter.emit(
-                                    DebateEvent.TurnDone(
-                                        turnIndex = persistedTurnIndex,
-                                        speaker = speaker,
-                                        tokensUsed = totalTokensUsed,
-                                        timeTaken = timeTaken,
-                                    )
-                                )
-
-                                turnScope.close()
-                                turnSpan.end()
-                                processTurn(turnIndex + 1)
-                            } catch (error: Throwable) {
-                                turnSpan.recordException(error)
-                                turnSpan.setStatus(StatusCode.ERROR)
-                                turnScope.close()
-                                turnSpan.end()
-                                failStream(error)
-                            }
-                        }
-                        .onError { error ->
-                            log.error("Debate turn failed for ${speaker.codeName}", error)
-                            turnSpan.recordException(error)
-                            turnSpan.setStatus(StatusCode.ERROR)
-                            turnScope.close()
-                            turnSpan.end()
-                            failStream(error)
-                        }
-                        .start()
-                }
-            }
-
+            val ctx = DebateContext(input, conversationId, speakerPlan, emitter, callerSpan, callerSpan.makeCurrent())
             try {
                 transcriptRepository.appendUserPrompt(conversationId, 0, input)
                 emitter.emit(DebateEvent.Start(callerSpan.spanContext.traceId, personaA.codeName, personaB.codeName))
-                processTurn(0)
+                processTurn(ctx, 0)
             } catch (error: Throwable) {
-                failStream(error)
+                failStream(ctx, error)
             }
         }
+    }
+
+    private fun processTurn(ctx: DebateContext, turnIndex: Int) {
+        if (turnIndex > ctx.speakerPlan.lastIndex) {
+            finishSuccessfully(ctx)
+            return
+        }
+
+        withActiveRequestContext {
+            val speaker = ctx.speakerPlan[turnIndex]
+            val persistedTurnIndex = turnIndex + 1
+
+            personaContext.persona = speaker
+
+            val prompt = try {
+                buildPrompt(ctx, persistedTurnIndex, speaker)
+            } catch (error: Throwable) {
+                failStream(ctx, error)
+                return
+            }
+
+            val turnSpan = tracer.spanBuilder(DebateApiConstants.SPAN_NAME_DEBATE_TURN)
+                .setSpanKind(SpanKind.INTERNAL)
+                .setAttribute("conversationId", ctx.conversationId.toString())
+                .setAttribute("speaker", speaker.codeName)
+                .setAttribute("turnIndex", persistedTurnIndex.toLong())
+                .startSpan()
+            val turnScope = turnSpan.makeCurrent()
+
+            ctx.emitter.emit(DebateEvent.TurnStart(persistedTurnIndex, speaker))
+
+            val stream = try {
+                debateAssistant.chat(prompt)
+            } catch (error: Throwable) {
+                endTurnSpanWithError(error, turnSpan, turnScope)
+                failStream(ctx, error)
+                return
+            }
+
+            attachStreamHandlers(stream, ctx, turnIndex, persistedTurnIndex, speaker, turnSpan, turnScope)
+        }
+    }
+
+    private fun buildPrompt(ctx: DebateContext, persistedTurnIndex: Int, speaker: Persona): String =
+        if (persistedTurnIndex == 1) {
+            promptBuilder.openingPrompt(ctx.input, speaker)
+        } else {
+            promptBuilder.rebuttalPrompt(
+                ctx.input,
+                speaker,
+                transcriptRepository.loadTranscript(ctx.conversationId),
+            )
+        }
+
+    private fun attachStreamHandlers(
+        stream: TokenStream,
+        ctx: DebateContext,
+        turnIndex: Int,
+        persistedTurnIndex: Int,
+        speaker: Persona,
+        turnSpan: Span,
+        turnScope: Scope,
+    ) {
+        val startTime = TimeSource.Monotonic.markNow()
+        val capturedSources = mutableListOf<ChatEvent.Sources.Source>()
+        val responseText = StringBuilder()
+        var emittedSources = false
+
+        stream
+            .onRetrieved { contents ->
+                val items = contents.map(::toSourceItem)
+                capturedSources.clear()
+                capturedSources.addAll(items)
+                emittedSources = true
+                ctx.emitter.emit(DebateEvent.Sources(persistedTurnIndex, speaker, ChatEvent.Sources(items)))
+            }
+            .onPartialResponse { partialResponse ->
+                responseText.append(partialResponse)
+                ctx.emitter.emit(DebateEvent.Token(persistedTurnIndex, speaker, partialResponse))
+            }
+            .onCompleteResponse { response ->
+                try {
+                    if (!emittedSources) {
+                        ctx.emitter.emit(DebateEvent.Sources(persistedTurnIndex, speaker, ChatEvent.Sources()))
+                    }
+
+                    val finalText = response.aiMessage().text() ?: responseText.toString()
+                    transcriptRepository.appendPersonaTurn(ctx.conversationId, persistedTurnIndex, speaker, finalText, capturedSources)
+
+                    val timeTaken = startTime.elapsedNow().toString(DurationUnit.SECONDS, 2)
+                    val totalTokensUsed = response.tokenUsage().totalTokenCount()
+
+                    ctx.emitter.emit(DebateEvent.TurnDone(persistedTurnIndex, speaker, totalTokensUsed, timeTaken))
+                    turnScope.close()
+                    turnSpan.end()
+                    processTurn(ctx, turnIndex + 1)
+                } catch (error: Throwable) {
+                    endTurnSpanWithError(error, turnSpan, turnScope)
+                    failStream(ctx, error)
+                }
+            }
+            .onError { error ->
+                log.error("Debate turn failed for ${speaker.codeName}", error)
+                endTurnSpanWithError(error, turnSpan, turnScope)
+                failStream(ctx, error)
+            }
+            .start()
+    }
+
+    private fun finishSuccessfully(ctx: DebateContext) {
+        ctx.emitter.emit(DebateEvent.Done)
+        ctx.emitter.complete()
+        ctx.callerScope.close()
+        ctx.callerSpan.end()
+    }
+
+    private fun failStream(ctx: DebateContext, error: Throwable) {
+        ctx.callerSpan.recordException(error)
+        ctx.callerSpan.setStatus(StatusCode.ERROR)
+        ctx.callerScope.close()
+        ctx.callerSpan.end()
+        ctx.emitter.fail(error)
+    }
+
+    private fun endTurnSpanWithError(error: Throwable, span: Span, scope: Scope) {
+        span.recordException(error)
+        span.setStatus(StatusCode.ERROR)
+        scope.close()
+        span.end()
     }
 
     private fun toSourceItem(source: Content): ChatEvent.Sources.Source {
