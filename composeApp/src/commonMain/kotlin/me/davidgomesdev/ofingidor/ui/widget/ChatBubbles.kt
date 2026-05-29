@@ -271,6 +271,7 @@ private fun BubbleSources(sources: List<Source>) {
     if (sources.isEmpty()) return
 
     var expanded by remember { mutableStateOf(false) }
+    var tappedSourceId by remember { mutableStateOf<Long?>(null) }
     val visibleSources = if (sources.size > 3 && !expanded) sources.take(3) else sources
 
     FlowRow(
@@ -279,7 +280,13 @@ private fun BubbleSources(sources: List<Source>) {
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         visibleSources.forEach { source ->
-            key(source.id) { SourceChip(source) }
+            key(source.id) {
+                SourceChip(
+                    source = source,
+                    tappedSourceId = tappedSourceId,
+                    onTap = { tappedSourceId = it },
+                )
+            }
         }
         if (sources.size > 3) {
             ExpandToggleChip(
