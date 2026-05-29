@@ -41,10 +41,14 @@ import me.davidgomesdev.ofingidor.shared.dto.Persona
 import me.davidgomesdev.ofingidor.ui.model.ConversationMode
 import me.davidgomesdev.ofingidor.ui.model.ConversationTurn
 import me.davidgomesdev.ofingidor.ui.model.DebatePair
+import me.davidgomesdev.ofingidor.ui.model.DebateQuestionEntry
 import me.davidgomesdev.ofingidor.ui.model.DebateTurn
 import me.davidgomesdev.ofingidor.ui.model.OngoingConversationTurn
 import me.davidgomesdev.ofingidor.ui.model.Source
 import me.davidgomesdev.ofingidor.ui.service.ThinkAPI
+import me.davidgomesdev.ofingidor.ui.service.formatChatConversation
+import me.davidgomesdev.ofingidor.ui.service.formatDebateConversation
+import me.davidgomesdev.ofingidor.ui.service.shareConversation
 import me.davidgomesdev.ofingidor.ui.widget.AiBubble
 import me.davidgomesdev.ofingidor.ui.widget.AppHeader
 import me.davidgomesdev.ofingidor.ui.widget.CenteredUserBubble
@@ -57,11 +61,6 @@ import me.davidgomesdev.ofingidor.ui.widget.ThinkInputCard
 import me.davidgomesdev.ofingidor.ui.widget.UserBubble
 
 private val COMPACT_BREAKPOINT = 500.dp
-
-private data class DebateQuestionEntry(
-    val question: String,
-    val startOffset: Int,
-)
 
 internal data class DevModeDisabledState(
     val selectedPersona: Persona,
@@ -213,6 +212,14 @@ fun App() {
 
         val onNewConversation: () -> Unit = resetConversationState
 
+        val onShare: () -> Unit = {
+            val text = when (conversationMode) {
+                ConversationMode.CHAT -> formatChatConversation(turns)
+                ConversationMode.DEBATE -> formatDebateConversation(debateQuestions, debateTurns)
+            }
+            if (text.isNotBlank()) shareConversation(text)
+        }
+
         val onModeSelected: (ConversationMode) -> Unit = { mode ->
             if (mode != conversationMode) {
                 resetConversationState()
@@ -310,6 +317,7 @@ fun App() {
                     hasConversationStarted = hasConversationStarted,
                     onDevModeToggle = onDevModeToggle,
                     onNewConversation = onNewConversation,
+                    onShare = onShare,
                     onModeSelected = onModeSelected,
                     onPersonaSelected = { selectedPersona = it },
                     onLeftPersonaSelected = { persona ->
@@ -703,6 +711,7 @@ private fun StickyHeader(
     hasConversationStarted: Boolean,
     onDevModeToggle: () -> Unit,
     onNewConversation: () -> Unit,
+    onShare: () -> Unit,
     onModeSelected: (ConversationMode) -> Unit,
     onPersonaSelected: (Persona) -> Unit,
     onLeftPersonaSelected: (Persona) -> Unit,
@@ -716,6 +725,7 @@ private fun StickyHeader(
             hasConversationStarted,
             onDevModeToggle,
             onNewConversation,
+            onShare = if (hasConversationStarted) onShare else null,
             isCompact = isCompact,
         )
         ConversationModeToggle(
