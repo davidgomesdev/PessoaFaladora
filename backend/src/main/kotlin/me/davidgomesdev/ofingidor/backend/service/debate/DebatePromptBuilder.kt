@@ -3,9 +3,12 @@ package me.davidgomesdev.ofingidor.backend.service.debate
 import jakarta.enterprise.context.ApplicationScoped
 import me.davidgomesdev.ofingidor.shared.constants.DebateConstants
 import me.davidgomesdev.ofingidor.shared.dto.Persona
+import org.jboss.logging.Logger
 
 @ApplicationScoped
 class DebatePromptBuilder {
+
+    private val log: Logger = Logger.getLogger(this::class.java)
 
     fun openingPrompt(userInput: String, speaker: Persona, opponent: Persona): String = """
         Responde como ${speaker.displayName}.
@@ -19,9 +22,20 @@ class DebatePromptBuilder {
         val transcriptText = transcript.joinToString("\n") { turn ->
             when (turn.entryType) {
                 DebateConstants.DEBATE_ENTRY_TYPE_USER_PROMPT -> "Utilizador: ${turn.text}"
-                else -> "${requireNotNull(turn.speakerPersonaCode) { "speakerPersonaCode is required for ${turn.entryType}" }}: ${turn.text}"
+                else -> {
+                    val speakerCode = turn.speakerPersonaId
+                    if (speakerCode == null) {
+                        log.warnf(
+                            "Skipping corrupted debate turn id=%s: speakerPersonaId is null for entry_type=%s",
+                            turn.id,
+                            turn.entryType
+                        )
+                        return@joinToString ""
+                    }
+                    "$speakerCode: ${turn.text}"
+                }
             }
-        }
+        }.lines().filter { it.isNotEmpty() }.joinToString("\n")
 
         return """
             Responde como ${speaker.displayName}.

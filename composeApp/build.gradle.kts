@@ -31,7 +31,6 @@ kotlin {
             implementation(libs.ktor.client.content.regotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.napier)
-            implementation(libs.arrow.core)
             implementation(project(":shared"))
         }
         commonTest.dependencies {

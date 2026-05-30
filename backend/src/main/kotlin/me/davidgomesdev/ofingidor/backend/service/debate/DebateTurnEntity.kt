@@ -25,8 +25,8 @@ class DebateTurnEntity : PanacheEntityBase {
     @Column(name = "entry_type", nullable = false)
     lateinit var entryType: String
 
-    @Column(name = "speaker_persona_code")
-    var speakerPersonaCode: String? = null
+    @Column(name = "speaker_persona_id", nullable = true)
+    var speakerPersonaId: String? = null
 
     @Column(name = "text", nullable = false, columnDefinition = "TEXT")
     lateinit var text: String

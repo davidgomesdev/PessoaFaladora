@@ -28,7 +28,7 @@ class ChatHistoryRepository(private val objectMapper: ObjectMapper) {
             entity.userMessage = userMessage
             entity.aiResponse = aiResponse
             entity.sourcesJson = if (sources.isEmpty()) null else objectMapper.writeValueAsString(sources)
-            entity.personaCode = personaCode
+            entity.personaId = personaCode
             entity.createdAt = OffsetDateTime.now()
         }.persist()
         log.debug("Persisted chat history for conversationId=$conversationId persona=$personaCode (${sources.size} sources)")

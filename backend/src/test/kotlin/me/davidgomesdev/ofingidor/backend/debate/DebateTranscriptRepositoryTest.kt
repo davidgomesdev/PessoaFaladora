@@ -120,7 +120,7 @@ class DebateTranscriptRepositoryTest {
                 this.conversationId = conversationId
                 this.turnIndex = turnIndex
                 this.entryType = entryType
-                this.speakerPersonaCode = speaker?.codeName
+                this.speakerPersonaId = speaker?.codeName
                 this.text = text
                 this.createdAt = createdAt
             },

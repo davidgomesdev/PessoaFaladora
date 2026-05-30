@@ -38,6 +38,13 @@ CREATE TABLE IF NOT EXISTS chat_history
     user_message    TEXT                     NOT NULL,
     ai_response     TEXT                     NOT NULL,
     sources_json    TEXT,
+    persona_id VARCHAR
+(
+    50
+) NOT NULL REFERENCES personas
+(
+    code_name
+),
     created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS idx_chat_history_conversation_id ON chat_history (conversation_id);

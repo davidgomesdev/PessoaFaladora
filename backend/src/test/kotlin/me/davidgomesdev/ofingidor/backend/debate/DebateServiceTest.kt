@@ -59,7 +59,7 @@ class DebateServiceTest {
                 this.conversationId = conversationId
                 turnIndex = invocation.getArgument(1)
                 entryType = "persona_turn"
-                speakerPersonaCode = invocation.getArgument<Persona>(2).codeName
+                speakerPersonaId = invocation.getArgument<Persona>(2).codeName
                 text = invocation.getArgument(3)
                 createdAt = OffsetDateTime.now()
             }
@@ -109,7 +109,7 @@ class DebateServiceTest {
                 this.conversationId = conversationId
                 turnIndex = invocation.getArgument(1)
                 entryType = "persona_turn"
-                speakerPersonaCode = invocation.getArgument<Persona>(2).codeName
+                speakerPersonaId = invocation.getArgument<Persona>(2).codeName
                 text = invocation.getArgument(3)
                 createdAt = OffsetDateTime.now()
             }
