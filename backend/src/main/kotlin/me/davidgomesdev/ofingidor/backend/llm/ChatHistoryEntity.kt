@@ -28,8 +28,8 @@ class ChatHistoryEntity : PanacheEntityBase {
     @Column(name = "sources_json", columnDefinition = "TEXT")
     var sourcesJson: String? = null
 
-    @Column(name = "persona_code", length = 50)
-    var personaCode: String? = null
+    @Column(name = "persona_id", nullable = false, length = 50)
+    lateinit var personaId: String
 
     @Column(name = "created_at", nullable = false)
     lateinit var createdAt: OffsetDateTime

@@ -32,7 +32,7 @@ class DebatePromptBuilderTest {
             },
             DebateTurnEntity().apply {
                 entryType = "persona_turn"
-                speakerPersonaCode = "fernando_pessoa"
+                speakerPersonaId = "fernando_pessoa"
                 text = "É uma máscara consciente."
             },
         )

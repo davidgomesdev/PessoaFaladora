@@ -38,7 +38,7 @@ class DebateTranscriptRepository(private val objectMapper: ObjectMapper) {
             entity.conversationId = conversationId
             entity.turnIndex = turnIndex
             entity.entryType = DebateConstants.DEBATE_ENTRY_TYPE_PERSONA_TURN
-            entity.speakerPersonaCode = speaker.codeName
+            entity.speakerPersonaId = speaker.codeName
             entity.text = text
             entity.sourcesJson = if (sources.isEmpty()) null else objectMapper.writeValueAsString(sources)
             entity.createdAt = OffsetDateTime.now()
