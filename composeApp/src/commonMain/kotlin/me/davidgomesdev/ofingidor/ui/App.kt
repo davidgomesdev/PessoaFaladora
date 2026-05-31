@@ -312,24 +312,12 @@ fun App() {
                 StickyHeader(
                     selectedPersona = selectedPersona,
                     conversationMode = conversationMode,
-                    debatePair = debatePair,
                     isDevMode = isDevMode,
                     hasConversationStarted = hasConversationStarted,
                     onDevModeToggle = onDevModeToggle,
                     onNewConversation = onNewConversation,
                     onShare = onShare,
                     onModeSelected = onModeSelected,
-                    onPersonaSelected = { selectedPersona = it },
-                    onLeftPersonaSelected = { persona ->
-                        if (persona != debatePair.right) {
-                            debatePair = debatePair.copy(left = persona)
-                        }
-                    },
-                    onRightPersonaSelected = { persona ->
-                        if (persona != debatePair.left) {
-                            debatePair = debatePair.copy(right = persona)
-                        }
-                    },
                     isCompact = isCompact,
                 )
 
@@ -341,6 +329,29 @@ fun App() {
                         .padding(horizontal = horizontalPadding, vertical = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
+                    if (!hasConversationStarted) {
+                        when (conversationMode) {
+                            ConversationMode.CHAT -> PersonaTab(
+                                selectedPersona = selectedPersona,
+                                onPersonaSelected = { selectedPersona = it },
+                                devMode = isDevMode,
+                            )
+                            ConversationMode.DEBATE -> DebatePicker(
+                                selectedPair = debatePair,
+                                onLeftPersonaSelected = { persona ->
+                                    if (persona != debatePair.right) {
+                                        debatePair = debatePair.copy(left = persona)
+                                    }
+                                },
+                                onRightPersonaSelected = { persona ->
+                                    if (persona != debatePair.left) {
+                                        debatePair = debatePair.copy(right = persona)
+                                    }
+                                },
+                                devMode = isDevMode,
+                            )
+                        }
+                    }
                     ConversationFeed(
                         conversationMode = conversationMode,
                         turns = turns,
@@ -706,16 +717,12 @@ private fun DebateTurnView(
 private fun StickyHeader(
     selectedPersona: Persona,
     conversationMode: ConversationMode,
-    debatePair: DebatePair,
     isDevMode: Boolean,
     hasConversationStarted: Boolean,
     onDevModeToggle: () -> Unit,
     onNewConversation: () -> Unit,
     onShare: () -> Unit,
     onModeSelected: (ConversationMode) -> Unit,
-    onPersonaSelected: (Persona) -> Unit,
-    onLeftPersonaSelected: (Persona) -> Unit,
-    onRightPersonaSelected: (Persona) -> Unit,
     isCompact: Boolean,
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -732,22 +739,6 @@ private fun StickyHeader(
             mode = conversationMode,
             onModeSelected = onModeSelected,
         )
-        if (!hasConversationStarted) {
-            when (conversationMode) {
-                ConversationMode.CHAT -> PersonaTab(
-                    selectedPersona = selectedPersona,
-                    onPersonaSelected = onPersonaSelected,
-                    devMode = isDevMode,
-                )
-
-                ConversationMode.DEBATE -> DebatePicker(
-                    selectedPair = debatePair,
-                    onLeftPersonaSelected = onLeftPersonaSelected,
-                    onRightPersonaSelected = onRightPersonaSelected,
-                    devMode = isDevMode,
-                )
-            }
-            HorizontalDivider(color = cardBorderColor, thickness = 1.dp)
-        }
+        HorizontalDivider(color = cardBorderColor, thickness = 1.dp)
     }
 }
