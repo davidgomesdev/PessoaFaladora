@@ -149,8 +149,7 @@ class SessionService(private val config: SessionConfig) {
                 if (session.opponentPersona != null) {
                     SessionError.SESSION_MODE_MISMATCH.left()
                 } else {
-                    ConversationParticipants(
-                        type = ConversationType.SINGLE,
+                    ConversationParticipants.Single(
                         persona = primary,
                     ).right()
                 }
@@ -164,8 +163,7 @@ class SessionService(private val config: SessionConfig) {
                 if (resolvedOpponent == primary) {
                     SessionError.PERSONA_PAIR_MISMATCH.left()
                 } else {
-                    ConversationParticipants(
-                        type = ConversationType.DEBATE,
+                    ConversationParticipants.Debate(
                         persona = primary,
                         opponentPersona = resolvedOpponent,
                     ).right()

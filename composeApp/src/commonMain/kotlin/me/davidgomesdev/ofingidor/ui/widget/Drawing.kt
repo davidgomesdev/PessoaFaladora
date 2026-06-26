@@ -37,6 +37,7 @@ import me.davidgomesdev.ofingidor.ui.devChipTextColor
 import me.davidgomesdev.ofingidor.ui.model.PersonaPortrait
 import me.davidgomesdev.ofingidor.ui.personaLabelColor
 import me.davidgomesdev.ofingidor.ui.portraitThumbnailBackgroundColor
+import kotlin.time.Duration.Companion.milliseconds
 
 data class AppHeaderIdentity(
     val portrait: PersonaPortrait,
@@ -175,7 +176,7 @@ private fun ShareButton(onClick: () -> Unit) {
 
     LaunchedEffect(shared) {
         if (shared) {
-            delay(2000)
+            delay(2000.milliseconds)
             shared = false
         }
     }

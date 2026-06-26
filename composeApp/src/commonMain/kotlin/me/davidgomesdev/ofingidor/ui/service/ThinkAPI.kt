@@ -165,4 +165,4 @@ class ThinkAPI {
 data class ThinkPayload(val input: String, val persona: String)
 
 @Serializable
-data class DebatePayload(val input: String, val personaA: String, val personaB: String)
+data class DebatePayload(val input: String, val persona: String, val opponentPersona: String)
