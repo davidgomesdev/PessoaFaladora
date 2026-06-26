@@ -10,8 +10,8 @@ sealed class DebateEvent {
     @SerialName("start")
     data class Start(
         val traceId: String,
-        val personaA: String,
-        val personaB: String,
+        val persona: String,
+        val opponentPersona: String,
     ) : DebateEvent()
 
     @Serializable

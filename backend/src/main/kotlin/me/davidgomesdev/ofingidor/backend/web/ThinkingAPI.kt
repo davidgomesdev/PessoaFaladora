@@ -23,6 +23,7 @@ import me.davidgomesdev.ofingidor.backend.llm.PersonaContext
 import me.davidgomesdev.ofingidor.backend.service.ChatService
 import me.davidgomesdev.ofingidor.backend.service.debate.DebateService
 import me.davidgomesdev.ofingidor.backend.session.ConversationContext
+import me.davidgomesdev.ofingidor.backend.session.ConversationParticipants
 import me.davidgomesdev.ofingidor.backend.session.ConversationType
 import me.davidgomesdev.ofingidor.backend.session.SessionError
 import me.davidgomesdev.ofingidor.backend.session.SessionService
@@ -76,7 +77,7 @@ class ThinkingAPI(
                 is Either.Right -> result.value
             }
 
-            if (participants.type != ConversationType.SINGLE) {
+            if (participants !is ConversationParticipants.Single) {
                 throw WebApplicationException(Response.status(SessionError.SESSION_MODE_MISMATCH.httpStatus).build())
             }
 
@@ -125,12 +126,12 @@ class ThinkingAPI(
         body: DebateQueryPayload,
         @HeaderParam("Authorization") authorization: String?,
     ): RestMulti<DebateEvent> {
-        if (body.personaA.isBlank()) throw BadRequestException("personaA must be present")
-        if (body.personaB.isBlank()) throw BadRequestException("personaB must be present")
+        if (body.persona.isBlank()) throw BadRequestException("personaA must be present")
+        if (body.opponentPersona.isBlank()) throw BadRequestException("personaB must be present")
 
-        val requestedPersonaA = Persona.entries.firstOrNull { it.codeName == body.personaA }
+        val requestedPersonaA = Persona.entries.firstOrNull { it.codeName == body.persona }
             ?: throw NotFoundException("personaA not found")
-        val requestedPersonaB = Persona.entries.firstOrNull { it.codeName == body.personaB }
+        val requestedPersonaB = Persona.entries.firstOrNull { it.codeName == body.opponentPersona }
             ?: throw NotFoundException("personaB not found")
 
         if (requestedPersonaA == requestedPersonaB) {
@@ -151,7 +152,7 @@ class ThinkingAPI(
                 is Either.Right -> result.value
             }
 
-            if (participants.type != ConversationType.DEBATE) {
+            if (participants !is ConversationParticipants.Debate) {
                 throw WebApplicationException(Response.status(SessionError.SESSION_MODE_MISMATCH.httpStatus).build())
             }
 
@@ -165,8 +166,8 @@ class ThinkingAPI(
         conversationContext.conversationId = conversationId
 
         val span = tracer.spanBuilder(DebateApiConstants.SPAN_NAME_QUERY_DEBATE).apply {
-            setAttribute("personaA", requestedPersonaA.codeName)
-            setAttribute("personaB", requestedPersonaB.codeName)
+            setAttribute("persona", requestedPersonaA.codeName)
+            setAttribute("opponentPersona", requestedPersonaB.codeName)
             setAttribute("conversationId", conversationId)
         }
             .setSpanKind(SpanKind.INTERNAL)
@@ -221,8 +222,9 @@ class ThinkingAPI(
 }
 
 data class QueryPayload(val input: String, val persona: String)
+
 data class DebateQueryPayload(
     val input: String,
-    val personaA: String,
-    val personaB: String,
+    val persona: String,
+    val opponentPersona: String,
 )

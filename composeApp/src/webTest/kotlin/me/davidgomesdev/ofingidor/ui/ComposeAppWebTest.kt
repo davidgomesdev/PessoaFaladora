@@ -340,8 +340,8 @@ class ComposeAppWebTest {
         handleDebateEvent(
             event = DebateEvent.Start(
                 traceId = "trace-123",
-                personaA = Persona.FERNANDO_PESSOA.codeName,
-                personaB = Persona.ALBERTO_CAEIRO.codeName,
+                persona = Persona.FERNANDO_PESSOA.codeName,
+                opponentPersona = Persona.ALBERTO_CAEIRO.codeName,
             ),
             pair = pair,
             turns = turns,
