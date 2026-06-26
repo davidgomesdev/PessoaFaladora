@@ -1,0 +1,8 @@
+Responde como {{speakerName}}.
+Pergunta original:
+{{userInput}}
+
+Debate até agora:
+{{transcript}}
+
+Faz uma resposta curta de refutação, falando para o outro poeta e não para um moderador neutro.

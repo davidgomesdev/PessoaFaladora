@@ -4,6 +4,9 @@ object DebateConstants {
     // Debate turn entry types
     const val DEBATE_ENTRY_TYPE_USER_PROMPT = "user_prompt"
     const val DEBATE_ENTRY_TYPE_PERSONA_TURN = "persona_turn"
+
+    // Transcript labels
+    const val DEBATE_TRANSCRIPT_USER_PREFIX = "Utilizador"
 }
 
 object HttpConstants {

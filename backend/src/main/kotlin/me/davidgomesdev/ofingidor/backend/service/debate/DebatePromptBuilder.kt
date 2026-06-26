@@ -1,5 +1,6 @@
 package me.davidgomesdev.ofingidor.backend.service.debate
 
+import dev.langchain4j.model.input.PromptTemplate
 import jakarta.enterprise.context.ApplicationScoped
 import me.davidgomesdev.ofingidor.shared.constants.DebateConstants
 import me.davidgomesdev.ofingidor.shared.dto.Persona
@@ -10,18 +11,22 @@ class DebatePromptBuilder {
 
     private val log: Logger = Logger.getLogger(this::class.java)
 
-    fun openingPrompt(userInput: String, speaker: Persona, opponent: Persona): String = """
-        Responde como ${speaker.displayName}.
-        Estás a participar num debate com ${opponent.displayName} sobre o tema pedido pelo utilizador:
-        $userInput
+    private val openingTemplate: String = loadResource("prompts/debate_opening.txt")
+    private val rebuttalTemplate: String = loadResource("prompts/debate_rebuttal.txt")
 
-        Exprime a tua posição com confiança e naturalidade — como quem começa a falar sobre algo que pensa há muito. Não uses preambles formais nem te dirijas a uma audiência genérica. Podes ou não dirigir-te a ${opponent.displayName} diretamente, conforme for natural para a tua voz.
-    """.trimIndent()
+    fun openingPrompt(userInput: String, speaker: Persona, opponent: Persona): String =
+        PromptTemplate.from(openingTemplate).apply(
+            mapOf(
+                "speakerName" to speaker.displayName,
+                "opponentName" to opponent.displayName,
+                "userInput" to userInput
+            )
+        ).text()
 
     fun rebuttalPrompt(userInput: String, speaker: Persona, transcript: List<DebateTurnEntity>): String {
         val transcriptText = transcript.joinToString("\n") { turn ->
             when (turn.entryType) {
-                DebateConstants.DEBATE_ENTRY_TYPE_USER_PROMPT -> "Utilizador: ${turn.text}"
+                DebateConstants.DEBATE_ENTRY_TYPE_USER_PROMPT -> "${DebateConstants.DEBATE_TRANSCRIPT_USER_PREFIX}: ${turn.text}"
                 else -> {
                     val speakerCode = turn.speakerPersonaId
                     if (speakerCode == null) {
@@ -37,15 +42,17 @@ class DebatePromptBuilder {
             }
         }.lines().filter { it.isNotEmpty() }.joinToString("\n")
 
-        return """
-            Responde como ${speaker.displayName}.
-            Pergunta original:
-            $userInput
-
-            Debate até agora:
-            $transcriptText
-
-            Faz uma resposta curta de refutação, falando para o outro poeta e não para um moderador neutro.
-        """.trimIndent()
+        return PromptTemplate.from(rebuttalTemplate).apply(
+            mapOf(
+                "speakerName" to speaker.displayName,
+                "userInput" to userInput,
+                "transcript" to transcriptText
+            )
+        ).text()
     }
+
+    private fun loadResource(path: String): String =
+        Thread.currentThread().contextClassLoader
+            .getResourceAsStream(path)!!
+            .reader().readText()
 }
