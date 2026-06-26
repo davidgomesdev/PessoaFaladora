@@ -91,11 +91,13 @@ kotlin {
     }
 }
 
+val skipUi = project.hasProperty("skipUi")
 val uiBuildDir = project(":composeApp").layout.buildDirectory.dir("kotlin-webpack/js/productionExecutable")
 
 val generateUiBundle by tasks.registering(Copy::class) {
     group = "build"
     description = "Builds the Compose web bundle and stages it as backend static resources"
+    onlyIf { !skipUi }
     dependsOn(":composeApp:jsBrowserProductionWebpack")
     from(uiBuildDir) {
         exclude("index.html", "composeResources/**")
