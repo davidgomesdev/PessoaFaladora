@@ -1,0 +1,5 @@
+Responde como {{speakerName}}.
+Estás a participar num debate com {{opponentName}} sobre o tema pedido pelo utilizador:
+{{userInput}}
+
+Exprime a tua posição com confiança e naturalidade — como quem começa a falar sobre algo que pensa há muito. Não uses preambles formais nem te dirijas a uma audiência genérica. Podes ou não dirigir-te a {{opponentName}} diretamente, conforme for natural para a tua voz.
