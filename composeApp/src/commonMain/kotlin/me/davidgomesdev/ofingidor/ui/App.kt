@@ -93,16 +93,18 @@ internal fun devModeDisabledState(
     selectedPersona: Persona,
     debatePair: DebatePair,
 ): DevModeDisabledState {
-    val normalizedSelectedPersona = if (selectedPersona == Persona.O_FINGIDOR) {
-        Persona.FERNANDO_PESSOA
-    } else {
-        selectedPersona
-    }
-    val normalizedDebatePair = if (debatePair.left == Persona.O_FINGIDOR || debatePair.right == Persona.O_FINGIDOR) {
-        DebatePair(Persona.FERNANDO_PESSOA, Persona.ALBERTO_CAEIRO)
-    } else {
-        debatePair
-    }
+    val normalizedSelectedPersona =
+        if (selectedPersona == Persona.O_FINGIDOR) {
+            Persona.FERNANDO_PESSOA
+        } else {
+            selectedPersona
+        }
+    val normalizedDebatePair =
+        if (debatePair.left == Persona.O_FINGIDOR || debatePair.right == Persona.O_FINGIDOR) {
+            DebatePair(Persona.FERNANDO_PESSOA, Persona.ALBERTO_CAEIRO)
+        } else {
+            debatePair
+        }
 
     return DevModeDisabledState(
         selectedPersona = normalizedSelectedPersona,
@@ -117,7 +119,8 @@ internal fun debateFeedItemCount(
     hasOngoingQuestion: Boolean,
     hasOngoingTurn: Boolean,
     hasDebateError: Boolean,
-): Int = questionCount +
+): Int =
+    questionCount +
         debateTurnCount +
         (if (hasOngoingQuestion) 1 else 0) +
         (if (hasOngoingTurn) 1 else 0) +
@@ -153,24 +156,32 @@ fun App() {
         val hasChatConversationStarted = turns.isNotEmpty() || ongoingTurn != null || ongoingTurnError != null
         val hasDebateConversationStarted =
             debateQuestions.isNotEmpty() || ongoingDebateQuestion != null || ongoingDebateTurn != null || debateError != null
-        val hasConversationStarted = when (conversationMode) {
-            ConversationMode.CHAT -> hasChatConversationStarted
-            ConversationMode.DEBATE -> hasDebateConversationStarted
-        }
-        val isLoading = when (conversationMode) {
-            ConversationMode.CHAT -> ongoingTurn != null
-            ConversationMode.DEBATE -> ongoingDebateQuestion != null
-        }
-        val feedItemCount = when (conversationMode) {
-            ConversationMode.CHAT -> turns.size + if (ongoingTurn != null || ongoingTurnError != null) 1 else 0
-            ConversationMode.DEBATE -> debateFeedItemCount(
-                questionCount = debateQuestions.size,
-                debateTurnCount = debateTurns.size,
-                hasOngoingQuestion = ongoingDebateQuestion != null,
-                hasOngoingTurn = ongoingDebateTurn != null,
-                hasDebateError = debateError != null,
-            )
-        }
+        val hasConversationStarted =
+            when (conversationMode) {
+                ConversationMode.CHAT -> hasChatConversationStarted
+                ConversationMode.DEBATE -> hasDebateConversationStarted
+            }
+        val isLoading =
+            when (conversationMode) {
+                ConversationMode.CHAT -> ongoingTurn != null
+                ConversationMode.DEBATE -> ongoingDebateQuestion != null
+            }
+        val feedItemCount =
+            when (conversationMode) {
+                ConversationMode.CHAT -> {
+                    turns.size + if (ongoingTurn != null || ongoingTurnError != null) 1 else 0
+                }
+
+                ConversationMode.DEBATE -> {
+                    debateFeedItemCount(
+                        questionCount = debateQuestions.size,
+                        debateTurnCount = debateTurns.size,
+                        hasOngoingQuestion = ongoingDebateQuestion != null,
+                        hasOngoingTurn = ongoingDebateTurn != null,
+                        hasDebateError = debateError != null,
+                    )
+                }
+            }
 
         AutoScrollEffect(turnCount = feedItemCount, scrollState = scrollState)
 
@@ -196,10 +207,11 @@ fun App() {
         val onDevModeToggle: () -> Unit = {
             isDevMode = !isDevMode
             if (!isDevMode) {
-                val disabledState = devModeDisabledState(
-                    selectedPersona = selectedPersona,
-                    debatePair = debatePair,
-                )
+                val disabledState =
+                    devModeDisabledState(
+                        selectedPersona = selectedPersona,
+                        debatePair = debatePair,
+                    )
                 selectedPersona = disabledState.selectedPersona
                 if (disabledState.shouldResetConversation) {
                     debatePair = disabledState.debatePair
@@ -213,10 +225,11 @@ fun App() {
         val onNewConversation: () -> Unit = resetConversationState
 
         val onShare: () -> Unit = {
-            val text = when (conversationMode) {
-                ConversationMode.CHAT -> formatChatConversation(turns)
-                ConversationMode.DEBATE -> formatDebateConversation(debateQuestions, debateTurns)
-            }
+            val text =
+                when (conversationMode) {
+                    ConversationMode.CHAT -> formatChatConversation(turns)
+                    ConversationMode.DEBATE -> formatDebateConversation(debateQuestions, debateTurns)
+                }
             if (text.isNotBlank()) shareConversation(text)
         }
 
@@ -237,14 +250,15 @@ fun App() {
                 when (conversationMode) {
                     ConversationMode.CHAT -> {
                         ongoingTurnError = null
-                        val result = processSubmit(
-                            question = question,
-                            selectedPersona = selectedPersona,
-                            thinkAPI = thinkAPI,
-                            getOngoingTurn = { ongoingTurn },
-                            setOngoingTurn = { ongoingTurn = it },
-                            onTraceId = { if (conversationTraceId.isBlank()) conversationTraceId = it },
-                        )
+                        val result =
+                            processSubmit(
+                                question = question,
+                                selectedPersona = selectedPersona,
+                                thinkAPI = thinkAPI,
+                                getOngoingTurn = { ongoingTurn },
+                                setOngoingTurn = { ongoingTurn = it },
+                                onTraceId = { if (conversationTraceId.isBlank()) conversationTraceId = it },
+                            )
                         result.fold(
                             onSuccess = { turn -> turn?.let { turns.add(it) } },
                             onFailure = {
@@ -261,22 +275,24 @@ fun App() {
                         ongoingDebateStartOffset = initialTurnCount
 
                         try {
-                            val result = performDebateSubmit(
-                                question = question,
-                                pair = debatePair,
-                                thinkAPI = thinkAPI,
-                                turns = debateTurns,
-                                getOngoingTurn = { ongoingDebateTurn },
-                                setOngoingTurn = { ongoingDebateTurn = it },
-                                onTraceId = { if (conversationTraceId.isBlank()) conversationTraceId = it },
-                            )
+                            val result =
+                                performDebateSubmit(
+                                    question = question,
+                                    pair = debatePair,
+                                    thinkAPI = thinkAPI,
+                                    turns = debateTurns,
+                                    getOngoingTurn = { ongoingDebateTurn },
+                                    setOngoingTurn = { ongoingDebateTurn = it },
+                                    onTraceId = { if (conversationTraceId.isBlank()) conversationTraceId = it },
+                                )
 
                             result.fold(
                                 onSuccess = {
-                                    debateQuestions += DebateQuestionEntry(
-                                        question = question,
-                                        startOffset = initialTurnCount
-                                    )
+                                    debateQuestions +=
+                                        DebateQuestionEntry(
+                                            question = question,
+                                            startOffset = initialTurnCount,
+                                        )
                                 },
                                 onFailure = {
                                     while (debateTurns.size > initialTurnCount) {
@@ -285,7 +301,7 @@ fun App() {
                                     ongoingDebateTurn = null
                                     debateError = it
                                     inputText = question
-                                }
+                                },
                             )
                         } finally {
                             ongoingDebateQuestion = null
@@ -297,9 +313,10 @@ fun App() {
         }
 
         BoxWithConstraints(
-            modifier = Modifier
-                .background(backgroundColor)
-                .fillMaxSize(),
+            modifier =
+                Modifier
+                    .background(backgroundColor)
+                    .fillMaxSize(),
             contentAlignment = Alignment.TopCenter,
         ) {
             val isCompact = maxWidth < COMPACT_BREAKPOINT
@@ -322,34 +339,40 @@ fun App() {
                 )
 
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .verticalScroll(scrollState)
-                        .padding(horizontal = horizontalPadding, vertical = 16.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .verticalScroll(scrollState)
+                            .padding(horizontal = horizontalPadding, vertical = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     if (!hasConversationStarted) {
                         when (conversationMode) {
-                            ConversationMode.CHAT -> PersonaTab(
-                                selectedPersona = selectedPersona,
-                                onPersonaSelected = { selectedPersona = it },
-                                devMode = isDevMode,
-                            )
-                            ConversationMode.DEBATE -> DebatePicker(
-                                selectedPair = debatePair,
-                                onLeftPersonaSelected = { persona ->
-                                    if (persona != debatePair.right) {
-                                        debatePair = debatePair.copy(left = persona)
-                                    }
-                                },
-                                onRightPersonaSelected = { persona ->
-                                    if (persona != debatePair.left) {
-                                        debatePair = debatePair.copy(right = persona)
-                                    }
-                                },
-                                devMode = isDevMode,
-                            )
+                            ConversationMode.CHAT -> {
+                                PersonaTab(
+                                    selectedPersona = selectedPersona,
+                                    onPersonaSelected = { selectedPersona = it },
+                                    devMode = isDevMode,
+                                )
+                            }
+
+                            ConversationMode.DEBATE -> {
+                                DebatePicker(
+                                    selectedPair = debatePair,
+                                    onLeftPersonaSelected = { persona ->
+                                        if (persona != debatePair.right) {
+                                            debatePair = debatePair.copy(left = persona)
+                                        }
+                                    },
+                                    onRightPersonaSelected = { persona ->
+                                        if (persona != debatePair.left) {
+                                            debatePair = debatePair.copy(right = persona)
+                                        }
+                                    },
+                                    devMode = isDevMode,
+                                )
+                            }
                         }
                     }
                     ConversationFeed(
@@ -422,8 +445,8 @@ internal suspend fun performDebateSubmit(
     setOngoingTurn: (DebateTurn?) -> Unit,
     onTraceId: (String) -> Unit,
     submitDebate: DebateSubmitHandler = ::processDebateSubmit,
-): Result<Unit> {
-    return try {
+): Result<Unit> =
+    try {
         submitDebate(
             question,
             pair,
@@ -432,13 +455,11 @@ internal suspend fun performDebateSubmit(
             getOngoingTurn,
             setOngoingTurn,
             onTraceId,
-            { thinkAPI.resetConversation() },
-        )
+        ) { thinkAPI.resetConversation() }
     } catch (error: Throwable) {
         thinkAPI.resetConversation()
         Result.failure(error)
     }
-}
 
 private suspend fun processDebateSubmit(
     question: String,
@@ -449,8 +470,8 @@ private suspend fun processDebateSubmit(
     setOngoingTurn: (DebateTurn?) -> Unit,
     onTraceId: (String) -> Unit,
     onFailure: (Throwable) -> Unit,
-): Result<Unit> {
-    return processDebateEvents(
+): Result<Unit> =
+    processDebateEvents(
         events = thinkAPI.sendDebateRequest(query = question, pair = pair),
         onEvent = { event ->
             handleDebateEvent(
@@ -465,7 +486,6 @@ private suspend fun processDebateSubmit(
         onCleanup = { setOngoingTurn(null) },
         onFailure = onFailure,
     )
-}
 
 internal suspend fun processDebateEvents(
     events: Flow<Result<DebateEvent>>,
@@ -527,9 +547,15 @@ private fun handleChatEvent(
             onNewEvent(turn.copy(traceId = event.traceId))
         }
 
-        is ChatEvent.Token -> onNewEvent(turn.copy(message = turn.message + event.value))
-        is ChatEvent.Sources -> onNewEvent(turn.copy(sources = event.items.map(Source::from)))
-        is ChatEvent.Done -> Unit
+        is ChatEvent.Token -> {
+            onNewEvent(turn.copy(message = turn.message + event.value))
+        }
+
+        is ChatEvent.Sources -> {
+            onNewEvent(turn.copy(sources = event.items.map(Source::from)))
+        }
+
+        is ChatEvent.Done -> {}
     }
 }
 
@@ -542,7 +568,10 @@ internal fun handleDebateEvent(
     onTraceId: (String) -> Unit,
 ) {
     when (event) {
-        is DebateEvent.Start -> onTraceId(event.traceId)
+        is DebateEvent.Start -> {
+            onTraceId(event.traceId)
+        }
+
         is DebateEvent.TurnStart -> {
             val speaker = Persona.entries.first { it == event.speaker }
             pair.sideFor(speaker)
@@ -565,12 +594,15 @@ internal fun handleDebateEvent(
             setOngoingTurn(null)
         }
 
-        DebateEvent.Done -> Unit
+        DebateEvent.Done -> {}
     }
 }
 
 @Composable
-private fun AutoScrollEffect(turnCount: Int, scrollState: ScrollState) {
+private fun AutoScrollEffect(
+    turnCount: Int,
+    scrollState: ScrollState,
+) {
     LaunchedEffect(turnCount) {
         scrollState.animateScrollTo(scrollState.maxValue)
     }
@@ -599,9 +631,10 @@ private fun ConversationFeed(
 ) {
     if (!hasConversationStarted) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(100.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(100.dp),
             contentAlignment = Alignment.Center,
         ) {
             Text("Começa uma conversa...", color = Color(0xFF333333), fontSize = 12.sp)
