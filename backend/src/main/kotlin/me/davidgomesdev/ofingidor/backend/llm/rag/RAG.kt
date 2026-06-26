@@ -48,6 +48,8 @@ import org.jboss.logging.Logger
 import java.io.File
 import kotlin.time.measureTime
 
+typealias PessoaTexts = List<PessoaText>
+
 object TextAttributes {
     const val TEXT_ID = "textId"
     const val TITLE = "title"
@@ -107,7 +109,8 @@ class RAG(
                     .also { transformedQuery ->
                         traceQueryExpansion(transformedQuery, originalQuery)
                     }
-            }.contentInjector(contentInjector)
+            }
+            .contentInjector(contentInjector)
             .build()
 
     @Singleton
@@ -244,6 +247,7 @@ class RAG(
             val wholeTimeSpent =
                 measureTime {
                     texts()
+                        .map(PessoaText::toDocument)
                         .filter { doc ->
                             val textId = doc.metadata().getLong(TextAttributes.TEXT_ID) ?: return@filter true
                             textId !in ingestedDocumentIds && seenIds.add(textId)
@@ -420,7 +424,7 @@ class RAG(
     }
 
     @ApplicationScoped
-    private fun texts(): List<Document> {
+    fun texts(): PessoaTexts {
         val filename =
             if (isPreviewOnly) {
                 log.info("Using preview only texts")
@@ -430,7 +434,7 @@ class RAG(
             }
 
         val rootCategories = Json.decodeFromString<List<PessoaCategoryDto>>(File(filename).readText())
-        val allTexts = mutableListOf<Document>()
+        val allTexts = mutableListOf<PessoaText>()
 
         val categoriesToBeProcessed = rootCategories.map(PessoaCategory::fromRootCategory).toMutableList()
 
@@ -449,18 +453,7 @@ class RAG(
                     .filter { it.content.isNotBlank() }
                     .forEach { text ->
                         allTexts.add(
-                            Document.document(
-                                text.content,
-                                Metadata.from(
-                                    mapOf(
-                                        TextAttributes.TITLE to text.title,
-                                        TextAttributes.AUTHOR to text.author,
-                                        TextAttributes.TEXT_ID to text.id,
-                                        TextAttributes.CATEGORY_ID to category.id,
-                                        TextAttributes.CATEGORY_NAME to category.title,
-                                    ),
-                                ),
-                            ),
+                            PessoaText(text.title, text.author, text.content, text.id, category.id, category.title)
                         )
                     }
             }
@@ -489,6 +482,30 @@ class RAG(
                 put("transformed_queries", transformedQueries)
                 put("transform_queries_count", transformedQuery.size.toLong())
             },
+        )
+    }
+}
+
+data class PessoaText(
+    val title: String,
+    val author: String,
+    val content: String,
+    val id: Int,
+    val categoryId: Int,
+    val categoryTitle: String
+) {
+    fun toDocument(): Document {
+        return  Document.document(
+            content,
+            Metadata.from(
+                mapOf(
+                    TextAttributes.TITLE to title,
+                    TextAttributes.AUTHOR to author,
+                    TextAttributes.TEXT_ID to id,
+                    TextAttributes.CATEGORY_ID to categoryId,
+                    TextAttributes.CATEGORY_NAME to categoryTitle,
+                ),
+            ),
         )
     }
 }
