@@ -12,9 +12,9 @@ import io.opentelemetry.api.trace.StatusCode
 import io.quarkus.runtime.Startup
 import io.smallrye.mutiny.Multi
 import jakarta.enterprise.context.ApplicationScoped
-import me.davidgomesdev.ofingidor.backend.llm.ChatHistoryRepository
-import me.davidgomesdev.ofingidor.backend.llm.PersonaContext
-import me.davidgomesdev.ofingidor.backend.llm.TextAttributes
+import me.davidgomesdev.ofingidor.backend.llm.persistance.ChatHistoryRepository
+import me.davidgomesdev.ofingidor.backend.web.PersonaContext
+import me.davidgomesdev.ofingidor.backend.llm.rag.TextAttributes
 import me.davidgomesdev.ofingidor.backend.observability.attributes
 import me.davidgomesdev.ofingidor.backend.session.ConversationContext
 import me.davidgomesdev.ofingidor.shared.dto.ChatEvent

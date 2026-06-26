@@ -8,7 +8,7 @@ import dev.langchain4j.rag.content.Content
 import dev.langchain4j.service.TokenStream
 import dev.langchain4j.service.tool.ToolExecution
 import io.opentelemetry.api.trace.Span
-import me.davidgomesdev.ofingidor.backend.llm.PersonaContext
+import me.davidgomesdev.ofingidor.backend.web.PersonaContext
 import me.davidgomesdev.ofingidor.backend.service.debate.DebateAssistant
 import me.davidgomesdev.ofingidor.backend.service.debate.DebatePromptBuilder
 import me.davidgomesdev.ofingidor.backend.service.debate.DebateService

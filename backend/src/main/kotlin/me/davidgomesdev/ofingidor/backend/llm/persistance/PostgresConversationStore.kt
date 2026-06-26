@@ -1,4 +1,4 @@
-package me.davidgomesdev.ofingidor.backend.llm
+package me.davidgomesdev.ofingidor.backend.llm.persistance
 
 import com.github.f4b6a3.uuid.UuidCreator
 import dev.langchain4j.data.message.ChatMessage

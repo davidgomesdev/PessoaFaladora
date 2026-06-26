@@ -1,4 +1,4 @@
-package me.davidgomesdev.ofingidor.backend.llm
+package me.davidgomesdev.ofingidor.backend.llm.rag
 
 import dev.langchain4j.data.message.ChatMessage
 import dev.langchain4j.data.message.TextContent

@@ -1,4 +1,4 @@
-package me.davidgomesdev.ofingidor.backend.llm
+package me.davidgomesdev.ofingidor.backend.llm.persistance
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.f4b6a3.uuid.UuidCreator

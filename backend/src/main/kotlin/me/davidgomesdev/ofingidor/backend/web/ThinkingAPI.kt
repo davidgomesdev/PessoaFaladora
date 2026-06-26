@@ -19,12 +19,10 @@ import me.davidgomesdev.ofingidor.backend.constants.DebateApiConstants
 import me.davidgomesdev.ofingidor.backend.constants.DebateApiConstants.CONTENT_TYPE_NDJSON
 import me.davidgomesdev.ofingidor.backend.constants.DebateApiConstants.CONVERSATION_ENDPOINT
 import me.davidgomesdev.ofingidor.backend.constants.DebateApiConstants.DEBATE_ENDPOINT
-import me.davidgomesdev.ofingidor.backend.llm.PersonaContext
 import me.davidgomesdev.ofingidor.backend.service.ChatService
 import me.davidgomesdev.ofingidor.backend.service.debate.DebateService
 import me.davidgomesdev.ofingidor.backend.session.ConversationContext
 import me.davidgomesdev.ofingidor.backend.session.ConversationParticipants
-import me.davidgomesdev.ofingidor.backend.session.ConversationType
 import me.davidgomesdev.ofingidor.backend.session.SessionError
 import me.davidgomesdev.ofingidor.backend.session.SessionService
 import me.davidgomesdev.ofingidor.shared.constants.HttpConstants

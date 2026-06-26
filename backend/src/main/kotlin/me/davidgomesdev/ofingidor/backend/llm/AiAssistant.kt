@@ -6,10 +6,12 @@ import dev.langchain4j.rag.RetrievalAugmentor
 import dev.langchain4j.service.AiServices
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Singleton
+import me.davidgomesdev.ofingidor.backend.llm.persistance.PostgresConversationStore
 import me.davidgomesdev.ofingidor.backend.model.getSystemPromptFileName
 import me.davidgomesdev.ofingidor.backend.service.Assistant
 import me.davidgomesdev.ofingidor.backend.service.debate.DebateAssistant
 import me.davidgomesdev.ofingidor.backend.session.SessionConfig
+import me.davidgomesdev.ofingidor.backend.web.PersonaContext
 import me.davidgomesdev.ofingidor.shared.dto.Persona
 import org.jboss.logging.Logger
 import java.io.File

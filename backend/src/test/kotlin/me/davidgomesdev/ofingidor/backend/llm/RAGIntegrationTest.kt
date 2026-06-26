@@ -8,6 +8,9 @@ import dev.langchain4j.model.embedding.EmbeddingModel
 import dev.langchain4j.model.output.Response
 import dev.langchain4j.store.embedding.EmbeddingStore
 import me.davidgomesdev.ofingidor.backend.llm.config.RAGConfig
+import me.davidgomesdev.ofingidor.backend.llm.rag.RAG
+import me.davidgomesdev.ofingidor.backend.llm.rag.SemanticDocumentSplitter
+import me.davidgomesdev.ofingidor.backend.web.PersonaContext
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test

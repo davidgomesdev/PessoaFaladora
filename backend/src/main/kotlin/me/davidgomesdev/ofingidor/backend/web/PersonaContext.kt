@@ -1,4 +1,4 @@
-package me.davidgomesdev.ofingidor.backend.llm
+package me.davidgomesdev.ofingidor.backend.web
 
 import jakarta.enterprise.context.RequestScoped
 import me.davidgomesdev.ofingidor.shared.dto.Persona
@@ -7,4 +7,3 @@ import me.davidgomesdev.ofingidor.shared.dto.Persona
 class PersonaContext {
     var persona: Persona? = null
 }
-

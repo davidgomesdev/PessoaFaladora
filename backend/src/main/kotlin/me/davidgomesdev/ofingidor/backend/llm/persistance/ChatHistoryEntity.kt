@@ -1,4 +1,4 @@
-package me.davidgomesdev.ofingidor.backend.llm
+package me.davidgomesdev.ofingidor.backend.llm.persistance
 
 import io.quarkus.hibernate.orm.panache.kotlin.PanacheCompanionBase
 import io.quarkus.hibernate.orm.panache.kotlin.PanacheEntityBase

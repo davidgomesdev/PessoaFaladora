@@ -1,4 +1,4 @@
-package me.davidgomesdev.ofingidor.backend.llm
+package me.davidgomesdev.ofingidor.backend.llm.rag
 
 import dev.langchain4j.data.document.Document
 import dev.langchain4j.data.document.DocumentSplitter
@@ -26,6 +26,7 @@ import io.opentelemetry.api.GlobalOpenTelemetry
 import io.opentelemetry.api.trace.Span
 import io.opentelemetry.api.trace.SpanKind
 import io.opentelemetry.api.trace.StatusCode
+import io.opentelemetry.context.Context
 import io.qdrant.client.QdrantClient
 import io.qdrant.client.QdrantGrpcClient
 import io.qdrant.client.grpc.Collections.Distance
@@ -39,6 +40,7 @@ import me.davidgomesdev.ofingidor.backend.llm.config.RAGConfig
 import me.davidgomesdev.ofingidor.backend.model.PessoaCategory
 import me.davidgomesdev.ofingidor.backend.observability.attributes
 import me.davidgomesdev.ofingidor.backend.observability.span
+import me.davidgomesdev.ofingidor.backend.web.PersonaContext
 import me.davidgomesdev.ofingidor.shared.dto.Persona
 import org.eclipse.microprofile.config.inject.ConfigProperty
 import org.eclipse.microprofile.context.ManagedExecutor
@@ -276,7 +278,7 @@ class RAG(
         }
 
         val chunkSpan = tracer.spanBuilder("rag.ingesting.chunk")
-            .setParent(io.opentelemetry.context.Context.current().with(Span.current()))
+            .setParent(Context.current().with(Span.current()))
             .setSpanKind(SpanKind.INTERNAL)
             .setAttribute("chunk_size", chunk.size.toLong())
             .startSpan()

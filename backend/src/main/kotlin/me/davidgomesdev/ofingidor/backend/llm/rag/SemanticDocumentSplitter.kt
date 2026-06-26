@@ -1,4 +1,4 @@
-package me.davidgomesdev.ofingidor.backend.llm
+package me.davidgomesdev.ofingidor.backend.llm.rag
 
 import dev.langchain4j.data.document.Document
 import dev.langchain4j.data.document.DocumentSplitter
@@ -12,6 +12,7 @@ import io.opentelemetry.api.trace.StatusCode
 import org.jboss.logging.Logger
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.sqrt
 
 /**
  * A document splitter that uses semantic similarity to group related paragraphs into chunks.
@@ -218,7 +219,7 @@ class SemanticDocumentSplitter(
             norm2 += embedding2[i] * embedding2[i]
         }
 
-        val denominator = kotlin.math.sqrt(norm1) * kotlin.math.sqrt(norm2)
+        val denominator = sqrt(norm1) * sqrt(norm2)
 
         return if (denominator == 0.0) {
             0.0
