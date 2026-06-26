@@ -20,7 +20,6 @@ import java.util.UUID
 @QuarkusTest
 @TestProfile(SessionServiceTestProfile::class)
 class DebateTranscriptRepositoryTest {
-
     @Inject
     lateinit var repository: DebateTranscriptRepository
 

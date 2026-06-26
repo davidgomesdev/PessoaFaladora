@@ -17,7 +17,6 @@ import java.util.UUID
 @QuarkusTest
 @TestProfile(SessionServiceTestProfile::class)
 class SessionServiceTest {
-
     @Inject
     lateinit var sessionService: SessionService
 
@@ -92,9 +91,10 @@ class SessionServiceTest {
 
     @Test
     fun `createDebateSession rejects duplicate personas`() {
-        val error = runCatching {
-            sessionService.createDebateSession(Persona.RICARDO_REIS, Persona.RICARDO_REIS)
-        }.exceptionOrNull()
+        val error =
+            runCatching {
+                sessionService.createDebateSession(Persona.RICARDO_REIS, Persona.RICARDO_REIS)
+            }.exceptionOrNull()
 
         assertTrue(error is IllegalArgumentException)
     }
@@ -137,12 +137,13 @@ class SessionServiceTest {
         persona: Persona,
         opponent: Persona?,
     ) {
-        val session = SessionEntity().apply {
-            this.conversationId = conversationId
-            this.conversationType = type
-            this.persona = requireNotNull(PersonaEntity.findByCodeName(persona.codeName))
-            this.opponentPersona = opponent?.let { requireNotNull(PersonaEntity.findByCodeName(it.codeName)) }
-        }
+        val session =
+            SessionEntity().apply {
+                this.conversationId = conversationId
+                this.conversationType = type
+                this.persona = requireNotNull(PersonaEntity.findByCodeName(persona.codeName))
+                this.opponentPersona = opponent?.let { requireNotNull(PersonaEntity.findByCodeName(it.codeName)) }
+            }
         entityManager.persist(session)
         entityManager.flush()
     }

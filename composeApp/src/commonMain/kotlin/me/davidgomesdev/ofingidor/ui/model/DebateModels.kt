@@ -9,7 +9,10 @@ internal data class DebateQuestionEntry(
     val startOffset: Int,
 )
 
-data class DebatePair(val left: Persona, val right: Persona) {
+data class DebatePair(
+    val left: Persona,
+    val right: Persona,
+) {
     init {
         require(left != right) { "Debate personas must be different" }
     }

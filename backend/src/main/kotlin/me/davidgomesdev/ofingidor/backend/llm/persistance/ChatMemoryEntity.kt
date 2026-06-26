@@ -12,7 +12,6 @@ import java.util.UUID
 @Entity
 @Table(name = "chat_memory")
 class ChatMemoryEntity : PanacheEntityBase {
-
     @Id
     lateinit var id: UUID
 
@@ -29,10 +28,9 @@ class ChatMemoryEntity : PanacheEntityBase {
         fun findByConversationIdOrdered(conversationId: UUID): List<ChatMemoryEntity> =
             find(
                 "FROM ChatMemoryEntity WHERE conversationId = :cid ORDER BY createdAt ASC",
-                mapOf("cid" to conversationId)
+                mapOf("cid" to conversationId),
             ).list()
 
-        fun deleteByConversationId(conversationId: UUID): Long =
-            delete("conversationId", conversationId)
+        fun deleteByConversationId(conversationId: UUID): Long = delete("conversationId", conversationId)
     }
 }

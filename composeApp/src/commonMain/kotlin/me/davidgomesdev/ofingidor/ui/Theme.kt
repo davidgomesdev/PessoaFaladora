@@ -10,11 +10,12 @@ import org.jetbrains.compose.resources.Font
 
 @Composable
 fun RobotoTypography(): Typography {
-    val roboto = FontFamily(
-        Font(Res.font.RobotoFlexVariable, FontWeight.Normal),
-        Font(Res.font.RobotoFlexVariable, FontWeight.Medium),
-        Font(Res.font.RobotoFlexVariable, FontWeight.Bold),
-    )
+    val roboto =
+        FontFamily(
+            Font(Res.font.RobotoFlexVariable, FontWeight.Normal),
+            Font(Res.font.RobotoFlexVariable, FontWeight.Medium),
+            Font(Res.font.RobotoFlexVariable, FontWeight.Bold),
+        )
     val defaults = Typography()
     return Typography(
         displayLarge = defaults.displayLarge.copy(fontFamily = roboto),
@@ -34,4 +35,3 @@ fun RobotoTypography(): Typography {
         labelSmall = defaults.labelSmall.copy(fontFamily = roboto),
     )
 }
-

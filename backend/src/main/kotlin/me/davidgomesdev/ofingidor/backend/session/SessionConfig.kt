@@ -6,10 +6,12 @@ import java.time.Duration
 @ConfigMapping(prefix = "session")
 interface SessionConfig {
     fun jwt(): JwtConfig
+
     fun memory(): MemoryConfig
 
     interface JwtConfig {
         fun secret(): String
+
         fun ttl(): Duration
     }
 

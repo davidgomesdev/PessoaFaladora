@@ -42,7 +42,11 @@ private const val textReaderUrl = "https://pessoa.davidgomes.blog/textReader"
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 @Suppress("kotlin:S3776")
-internal fun SourceChip(source: Source, tappedSourceId: Long? = null, onTap: (Long?) -> Unit = {}) {
+internal fun SourceChip(
+    source: Source,
+    tappedSourceId: Long? = null,
+    onTap: (Long?) -> Unit = {},
+) {
     val isMobile = isMobileDevice()
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
@@ -56,48 +60,54 @@ internal fun SourceChip(source: Source, tappedSourceId: Long? = null, onTap: (Lo
                     source.title,
                     color = if (showTooltip) accentColorLight else focusedIndicatorColor.copy(alpha = 0.8f),
                     fontSize = 11.sp,
-                    modifier = Modifier
-                        .hoverable(interactionSource)
-                        .combinedClickable(
-                            interactionSource = interactionSource,
-                            indication = null,
-                            onClick = {
-                                if (isMobile) {
-                                    val tappedSourceId = if (isTapped) null else source.id
+                    modifier =
+                        Modifier
+                            .hoverable(interactionSource)
+                            .combinedClickable(
+                                interactionSource = interactionSource,
+                                indication = null,
+                                onClick = {
+                                    if (isMobile) {
+                                        val tappedSourceId = if (isTapped) null else source.id
 
-                                    onTap(tappedSourceId)
-                                } else openUrl("$textReaderUrl/${source.id}")
-                            },
-                            onLongClick = if (isMobile) {
-                                { openUrl("$textReaderUrl/${source.id}") }
-                            } else null,
-                        )
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(if (showTooltip) accentColorLight.copy(alpha = 0.15f) else inputCardBackgroundColor)
-                        .border(
-                            1.dp,
-                            if (showTooltip) accentColorLight.copy(alpha = 0.5f) else cardBorderColor,
-                            RoundedCornerShape(4.dp)
-                        )
-                        .padding(horizontal = 8.dp, vertical = 3.dp)
+                                        onTap(tappedSourceId)
+                                    } else {
+                                        openUrl("$textReaderUrl/${source.id}")
+                                    }
+                                },
+                                onLongClick =
+                                    if (isMobile) {
+                                        { openUrl("$textReaderUrl/${source.id}") }
+                                    } else {
+                                        null
+                                    },
+                            ).clip(RoundedCornerShape(4.dp))
+                            .background(if (showTooltip) accentColorLight.copy(alpha = 0.15f) else inputCardBackgroundColor)
+                            .border(
+                                1.dp,
+                                if (showTooltip) accentColorLight.copy(alpha = 0.5f) else cardBorderColor,
+                                RoundedCornerShape(4.dp),
+                            ).padding(horizontal = 8.dp, vertical = 3.dp),
                 )
             }
             if (showTooltip) {
                 SourcesTooltip(source)
             }
-        }, measurePolicy = MeasureScope::centerTooltip
+        },
+        measurePolicy = MeasureScope::centerTooltip,
     )
 }
 
 @Composable
 private fun SourcesTooltip(source: Source) {
     Column(
-        modifier = Modifier
-            .clip(RoundedCornerShape(6.dp))
-            .background(backgroundColor)
-            .border(1.dp, cardBorderColor, RoundedCornerShape(6.dp))
-            .padding(horizontal = 10.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        modifier =
+            Modifier
+                .clip(RoundedCornerShape(6.dp))
+                .background(backgroundColor)
+                .border(1.dp, cardBorderColor, RoundedCornerShape(6.dp))
+                .padding(horizontal = 10.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         SourceTooltipRow("Autor", source.author)
         SourceTooltipRow("Categoria", source.category)
@@ -106,26 +116,29 @@ private fun SourcesTooltip(source: Source) {
 }
 
 @Composable
-private fun SourceTooltipRow(label: String, value: String) {
+private fun SourceTooltipRow(
+    label: String,
+    value: String,
+) {
     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(
             label,
             color = focusedIndicatorColor.copy(alpha = 0.5f),
             fontSize = 10.sp,
             fontWeight = FontWeight.Medium,
-            letterSpacing = 0.5.sp
+            letterSpacing = 0.5.sp,
         )
         Text(
             value,
             color = focusedIndicatorColor.copy(alpha = 0.9f),
-            fontSize = 10.sp
+            fontSize = 10.sp,
         )
     }
 }
 
 private fun MeasureScope.centerTooltip(
     measurables: List<Measurable>,
-    constraints: Constraints
+    constraints: Constraints,
 ): MeasureResult {
     val chipPlaceable = measurables[0].measure(constraints)
     val tooltipPlaceable = measurables.getOrNull(1)?.measure(Constraints())
@@ -134,7 +147,7 @@ private fun MeasureScope.centerTooltip(
         chipPlaceable.place(0, 0)
         tooltipPlaceable?.place(
             x = (chipPlaceable.width - tooltipPlaceable.width) / 2,
-            y = -tooltipPlaceable.height - 4.dp.roundToPx()
+            y = -tooltipPlaceable.height - 4.dp.roundToPx(),
         )
     }
 }

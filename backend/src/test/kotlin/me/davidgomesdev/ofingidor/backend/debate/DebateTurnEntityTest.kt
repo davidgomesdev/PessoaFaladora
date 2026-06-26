@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 
 class DebateTurnEntityTest {
-
     @Test
     fun `text columns use postgres text mapping without lob`() {
         val textField = DebateTurnEntity::class.java.getDeclaredField("text")

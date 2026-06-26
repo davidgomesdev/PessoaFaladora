@@ -15,16 +15,16 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 class SemanticDocumentSplitterTest {
-
     @Test
     fun `should split document on paragraph boundaries and filter empty segments`() {
         val embeddingModel = mock<EmbeddingModel>()
-        val splitter = SemanticDocumentSplitter(
-            embeddingModel = embeddingModel,
-            minChunkSize = 5,
-            maxChunkSize = 1000,
-            similarityThreshold = 0.5
-        )
+        val splitter =
+            SemanticDocumentSplitter(
+                embeddingModel = embeddingModel,
+                minChunkSize = 5,
+                maxChunkSize = 1000,
+                similarityThreshold = 0.5,
+            )
 
         val text = "First paragraph.\n\nSecond paragraph.\n\n\n\nThird paragraph."
         val document = Document.from(text)
@@ -36,9 +36,9 @@ class SemanticDocumentSplitterTest {
                 listOf(
                     Embedding.from(floatArrayOf(1.0f, 0.0f, 0.0f)),
                     Embedding.from(floatArrayOf(0.0f, 1.0f, 0.0f)),
-                    Embedding.from(floatArrayOf(0.0f, 0.0f, 1.0f))
-                )
-            )
+                    Embedding.from(floatArrayOf(0.0f, 0.0f, 1.0f)),
+                ),
+            ),
         )
 
         val segments = splitter.split(document)
@@ -52,12 +52,13 @@ class SemanticDocumentSplitterTest {
     @Test
     fun `should merge paragraphs with high similarity`() {
         val embeddingModel = mock<EmbeddingModel>()
-        val splitter = SemanticDocumentSplitter(
-            embeddingModel = embeddingModel,
-            minChunkSize = 5,
-            maxChunkSize = 1000,
-            similarityThreshold = 0.8
-        )
+        val splitter =
+            SemanticDocumentSplitter(
+                embeddingModel = embeddingModel,
+                minChunkSize = 5,
+                maxChunkSize = 1000,
+                similarityThreshold = 0.8,
+            )
 
         val text = "First paragraph.\n\nSecond paragraph."
         val document = Document.from(text)
@@ -67,9 +68,9 @@ class SemanticDocumentSplitterTest {
             Response.from(
                 listOf(
                     Embedding.from(floatArrayOf(1.0f, 0.0f, 0.0f)),
-                    Embedding.from(floatArrayOf(1.0f, 0.0f, 0.0f))
-                )
-            )
+                    Embedding.from(floatArrayOf(1.0f, 0.0f, 0.0f)),
+                ),
+            ),
         )
 
         val segments = splitter.split(document)
@@ -81,12 +82,13 @@ class SemanticDocumentSplitterTest {
     @Test
     fun `should not merge paragraphs when combined size exceeds maxChunkSize`() {
         val embeddingModel = mock<EmbeddingModel>()
-        val splitter = SemanticDocumentSplitter(
-            embeddingModel = embeddingModel,
-            minChunkSize = 5,
-            maxChunkSize = 30,
-            similarityThreshold = 0.8
-        )
+        val splitter =
+            SemanticDocumentSplitter(
+                embeddingModel = embeddingModel,
+                minChunkSize = 5,
+                maxChunkSize = 30,
+                similarityThreshold = 0.8,
+            )
 
         val text = "First paragraph.\n\nSecond paragraph."
         val document = Document.from(text)
@@ -96,9 +98,9 @@ class SemanticDocumentSplitterTest {
             Response.from(
                 listOf(
                     Embedding.from(floatArrayOf(1.0f, 0.0f, 0.0f)),
-                    Embedding.from(floatArrayOf(1.0f, 0.0f, 0.0f))
-                )
-            )
+                    Embedding.from(floatArrayOf(1.0f, 0.0f, 0.0f)),
+                ),
+            ),
         )
 
         val segments = splitter.split(document)
@@ -111,12 +113,13 @@ class SemanticDocumentSplitterTest {
     @Test
     fun `should handle single paragraph document`() {
         val embeddingModel = mock<EmbeddingModel>()
-        val splitter = SemanticDocumentSplitter(
-            embeddingModel = embeddingModel,
-            minChunkSize = 5,
-            maxChunkSize = 1000,
-            similarityThreshold = 0.5
-        )
+        val splitter =
+            SemanticDocumentSplitter(
+                embeddingModel = embeddingModel,
+                minChunkSize = 5,
+                maxChunkSize = 1000,
+                similarityThreshold = 0.5,
+            )
 
         val text = "Single paragraph."
         val document = Document.from(text)
@@ -130,12 +133,13 @@ class SemanticDocumentSplitterTest {
     @Test
     fun `should use batch embedAll for multiple paragraphs`() {
         val embeddingModel = mock<EmbeddingModel>()
-        val splitter = SemanticDocumentSplitter(
-            embeddingModel = embeddingModel,
-            minChunkSize = 5,
-            maxChunkSize = 1000,
-            similarityThreshold = 0.5
-        )
+        val splitter =
+            SemanticDocumentSplitter(
+                embeddingModel = embeddingModel,
+                minChunkSize = 5,
+                maxChunkSize = 1000,
+                similarityThreshold = 0.5,
+            )
 
         val text = "Para 1.\n\nPara 2.\n\nPara 3."
         val document = Document.from(text)
@@ -145,15 +149,17 @@ class SemanticDocumentSplitterTest {
                 listOf(
                     Embedding.from(floatArrayOf(1.0f, 0.0f, 0.0f)),
                     Embedding.from(floatArrayOf(0.0f, 1.0f, 0.0f)),
-                    Embedding.from(floatArrayOf(0.0f, 0.0f, 1.0f))
-                )
-            )
+                    Embedding.from(floatArrayOf(0.0f, 0.0f, 1.0f)),
+                ),
+            ),
         )
 
         splitter.split(document)
 
         // Verify embedAll was called (batch operation)
-        org.mockito.kotlin.verify(embeddingModel).embedAll(any<List<TextSegment>>())
+        org.mockito.kotlin
+            .verify(embeddingModel)
+            .embedAll(any<List<TextSegment>>())
     }
 
     @Test
@@ -165,7 +171,7 @@ class SemanticDocumentSplitterTest {
                 embeddingModel = embeddingModel,
                 minChunkSize = 5,
                 maxChunkSize = 1000,
-                similarityThreshold = 1.5
+                similarityThreshold = 1.5,
             )
         }
 
@@ -174,7 +180,7 @@ class SemanticDocumentSplitterTest {
                 embeddingModel = embeddingModel,
                 minChunkSize = 5,
                 maxChunkSize = 1000,
-                similarityThreshold = -0.1
+                similarityThreshold = -0.1,
             )
         }
     }
@@ -182,12 +188,13 @@ class SemanticDocumentSplitterTest {
     @Test
     fun `should merge undersized final chunk with previous`() {
         val embeddingModel = mock<EmbeddingModel>()
-        val splitter = SemanticDocumentSplitter(
-            embeddingModel = embeddingModel,
-            minChunkSize = 20,
-            maxChunkSize = 100,
-            similarityThreshold = 0.7
-        )
+        val splitter =
+            SemanticDocumentSplitter(
+                embeddingModel = embeddingModel,
+                minChunkSize = 20,
+                maxChunkSize = 100,
+                similarityThreshold = 0.7,
+            )
 
         val text = "This is a normal paragraph.\n\nShort."
         val document = Document.from(text)
@@ -197,9 +204,9 @@ class SemanticDocumentSplitterTest {
             Response.from(
                 listOf(
                     Embedding.from(floatArrayOf(1.0f, 0.0f, 0.0f)),
-                    Embedding.from(floatArrayOf(0.0f, 1.0f, 0.0f))
-                )
-            )
+                    Embedding.from(floatArrayOf(0.0f, 1.0f, 0.0f)),
+                ),
+            ),
         )
 
         val segments = splitter.split(document)
@@ -213,16 +220,18 @@ class SemanticDocumentSplitterTest {
     @Test
     fun `should fallback to sentence splitter for oversized paragraph`() {
         val embeddingModel = mock<EmbeddingModel>()
-        val splitter = SemanticDocumentSplitter(
-            embeddingModel = embeddingModel,
-            minChunkSize = 10,
-            maxChunkSize = 50,
-            similarityThreshold = 0.7
-        )
+        val splitter =
+            SemanticDocumentSplitter(
+                embeddingModel = embeddingModel,
+                minChunkSize = 10,
+                maxChunkSize = 50,
+                similarityThreshold = 0.7,
+            )
 
         // Two paragraphs: one oversized that needs fallback, one normal
         // The oversized paragraph by itself exceeds maxChunkSize
-        val text = "This is a very long first paragraph that definitely exceeds the maximum chunk size. " +
+        val text =
+            "This is a very long first paragraph that definitely exceeds the maximum chunk size. " +
                 "It has multiple sentences to ensure it's big enough.\n\n" +
                 "Short second para."
         val document = Document.from(text)
@@ -232,9 +241,9 @@ class SemanticDocumentSplitterTest {
             Response.from(
                 listOf(
                     Embedding.from(floatArrayOf(1.0f, 0.0f, 0.0f)),
-                    Embedding.from(floatArrayOf(0.0f, 1.0f, 0.0f))
-                )
-            )
+                    Embedding.from(floatArrayOf(0.0f, 1.0f, 0.0f)),
+                ),
+            ),
         )
 
         val segments = splitter.split(document)

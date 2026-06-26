@@ -30,9 +30,10 @@ fun DebatePicker(
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 10.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 10.dp),
     ) {
         DebatePersonaSlot(
             title = DebateConstants.DEBATE_POSITION_LEFT,
@@ -62,9 +63,10 @@ private fun DebatePersonaSlot(
     val categories = PersonaCategory.entries.filter { it != PersonaCategory.DEV || devMode }
 
     Row(
-        modifier = Modifier
-            .horizontalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp, vertical = 10.dp),
+        modifier =
+            Modifier
+                .horizontalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 10.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -109,11 +111,12 @@ private fun DebatePersonaCategorySection(
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             personas.forEach { persona ->
                 PersonaIdentityChip(
-                    model = personaIdentityChipModel(
-                        persona = persona,
-                        isCompact = false,
-                        isSelected = persona == selectedPersona,
-                    ),
+                    model =
+                        personaIdentityChipModel(
+                            persona = persona,
+                            isCompact = false,
+                            isSelected = persona == selectedPersona,
+                        ),
                     onSelected = { onPersonaSelected(persona) },
                 )
             }

@@ -13,10 +13,10 @@ import io.quarkus.runtime.Startup
 import io.smallrye.mutiny.Multi
 import jakarta.enterprise.context.ApplicationScoped
 import me.davidgomesdev.ofingidor.backend.llm.persistance.ChatHistoryRepository
-import me.davidgomesdev.ofingidor.backend.web.PersonaContext
 import me.davidgomesdev.ofingidor.backend.llm.rag.TextAttributes
 import me.davidgomesdev.ofingidor.backend.observability.attributes
 import me.davidgomesdev.ofingidor.backend.session.ConversationContext
+import me.davidgomesdev.ofingidor.backend.web.PersonaContext
 import me.davidgomesdev.ofingidor.shared.dto.ChatEvent
 import org.jboss.logging.Logger
 import java.util.UUID
@@ -25,7 +25,10 @@ import kotlin.time.DurationUnit
 import kotlin.time.TimeSource
 
 fun interface Assistant {
-    fun chat(@MemoryId memoryId: String, @UserMessage message: String): TokenStream
+    fun chat(
+        @MemoryId memoryId: String,
+        @UserMessage message: String,
+    ): TokenStream
 }
 
 @ApplicationScoped
@@ -36,33 +39,42 @@ class ChatService(
     val personaContext: PersonaContext,
     val chatHistoryRepository: ChatHistoryRepository,
 ) {
-
     val log: Logger = Logger.getLogger(this::class.java)
 
     private val tracer = GlobalOpenTelemetry.getTracer(this::class.java.name)
 
-    fun query(input: String, callerSpan: Span): Multi<ChatEvent> {
-        val conversationId = conversationContext.conversationId
-            ?: error("conversationId not set on ConversationContext")
+    fun query(
+        input: String,
+        callerSpan: Span,
+    ): Multi<ChatEvent> {
+        val conversationId =
+            conversationContext.conversationId
+                ?: error("conversationId not set on ConversationContext")
 
         val callerScope = callerSpan.makeCurrent()
 
-        val llmSpan = tracer.spanBuilder("LLM inference")
-            .setSpanKind(SpanKind.INTERNAL)
-            .startSpan()
+        val llmSpan =
+            tracer
+                .spanBuilder("LLM inference")
+                .setSpanKind(SpanKind.INTERNAL)
+                .startSpan()
         val llmScope = llmSpan.makeCurrent()
 
-        val chatStream = try {
-            assistant.chat(conversationId, input)
-        } catch (e: Exception) {
-            llmSpan.recordException(e)
-            llmScope.close()
-            llmSpan.end()
-            throw e
-        }
+        val chatStream =
+            try {
+                assistant.chat(conversationId, input)
+            } catch (e: Exception) {
+                llmSpan.recordException(e)
+                llmScope.close()
+                llmSpan.end()
+                throw e
+            }
 
         val startTime = TimeSource.Monotonic.markNow()
         val capturedSources: MutableList<ChatEvent.Sources.Source> = mutableListOf()
+        val capturedPersonaCode =
+            personaContext.persona?.codeName
+                ?: error("personaCode not set on PersonaContext")
 
         return Multi.createFrom().emitter { stream ->
             stream.emit(ChatEvent.Start(callerSpan.spanContext.traceId))
@@ -75,18 +87,19 @@ class ChatService(
                             return@apply
                         }
 
-                        val eventAttributes = attributes {
-                            contents.forEachIndexed { index, content ->
-                                val score = (content.metadata()[ContentMetadata.SCORE] as? Double) ?: 0.0
-                                val metadata = content.textSegment().metadata()
+                        val eventAttributes =
+                            attributes {
+                                contents.forEachIndexed { index, content ->
+                                    val score = (content.metadata()[ContentMetadata.SCORE] as? Double) ?: 0.0
+                                    val metadata = content.textSegment().metadata()
 
-                                TextAttributes.run {
-                                    put("${index}_title", metadata.getString(TITLE))
-                                    put("${index}_category", metadata.getString(CATEGORY_NAME))
+                                    TextAttributes.run {
+                                        put("${index}_title", metadata.getString(TITLE))
+                                        put("${index}_category", metadata.getString(CATEGORY_NAME))
+                                    }
+                                    put("${index}_score", String.format("%.2f", score))
                                 }
-                                put("${index}_score", String.format("%.2f", score))
                             }
-                        }
 
                         addEvent("Sources retrieved", eventAttributes)
                     }
@@ -97,11 +110,9 @@ class ChatService(
                     log.info("Using sources:\n${sources.joinToString("\n") { "- ${it.author}: ${it.title} (${it.score}%)" }}")
 
                     stream.emit(ChatEvent.Sources(sources))
-                }
-                .onPartialResponse { partialResponse ->
+                }.onPartialResponse { partialResponse ->
                     stream.emit(ChatEvent.Token(partialResponse))
-                }
-                .onCompleteResponse { response ->
+                }.onCompleteResponse { response ->
                     val timeTaken = startTime.elapsedNow().toString(DurationUnit.SECONDS, 2)
                     val totalTokensUsed = response.tokenUsage().totalTokenCount()
 
@@ -124,7 +135,7 @@ class ChatService(
                             put("query", input)
                             put("response", response.aiMessage().text())
                             put("thinking", response.aiMessage().thinking())
-                        }
+                        },
                     )
 
                     chatHistoryRepository.persist(
@@ -132,16 +143,14 @@ class ChatService(
                         userMessage = input,
                         aiResponse = response.aiMessage().text() ?: "",
                         sources = capturedSources,
-                        personaCode = personaContext.persona?.codeName
-                            ?: error("personaCode not set on PersonaContext"),
+                        personaCode = capturedPersonaCode,
                     )
 
                     stream.emit(ChatEvent.Done(totalTokensUsed, timeTaken))
                     stream.complete()
                     callerScope.close()
                     callerSpan.end()
-                }
-                .onError { error ->
+                }.onError { error ->
                     stream.fail(error)
 
                     llmSpan.apply {
@@ -159,8 +168,7 @@ class ChatService(
                     }
 
                     log.error("There was a problem with the assistant!", error)
-                }
-                .start()
+                }.start()
         }
     }
 
@@ -175,20 +183,26 @@ class ChatService(
 
         if (listOf(title, author, category).any(String::isBlank)) {
             log.warn("Some metadata fields are empty! (title: $title, author: $author, category: $category)")
-            Span.current().addEvent("Some metadata fields are empty!", attributes {
-                put("title", title)
-                put("author", author)
-                put("category", category)
-            })
+            Span.current().addEvent(
+                "Some metadata fields are empty!",
+                attributes {
+                    put("title", title)
+                    put("author", author)
+                    put("category", category)
+                },
+            )
         }
 
         if (id == 0L) {
             log.warn("Text $title has no ID! (0)")
-            Span.current().addEvent("Text has no ID!", attributes {
-                put("title", title)
-                put("author", author)
-                put("category", category)
-            })
+            Span.current().addEvent(
+                "Text has no ID!",
+                attributes {
+                    put("title", title)
+                    put("author", author)
+                    put("category", category)
+                },
+            )
         }
 
         return ChatEvent.Sources.Source(

@@ -12,7 +12,6 @@ import java.util.UUID
 @Entity
 @Table(name = "chat_history")
 class ChatHistoryEntity : PanacheEntityBase {
-
     @Id
     lateinit var id: UUID
 

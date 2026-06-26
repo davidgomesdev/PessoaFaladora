@@ -10,8 +10,9 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 @ApplicationScoped
-class ChatHistoryRepository(private val objectMapper: ObjectMapper) {
-
+class ChatHistoryRepository(
+    private val objectMapper: ObjectMapper,
+) {
     private val log: Logger = Logger.getLogger(this::class.java)
 
     @Transactional
@@ -22,15 +23,16 @@ class ChatHistoryRepository(private val objectMapper: ObjectMapper) {
         sources: List<ChatEvent.Sources.Source>,
         personaCode: String,
     ) {
-        ChatHistoryEntity().also { entity ->
-            entity.id = UuidCreator.getTimeOrderedEpoch()
-            entity.conversationId = conversationId
-            entity.userMessage = userMessage
-            entity.aiResponse = aiResponse
-            entity.sourcesJson = if (sources.isEmpty()) null else objectMapper.writeValueAsString(sources)
-            entity.personaId = personaCode
-            entity.createdAt = OffsetDateTime.now()
-        }.persist()
+        ChatHistoryEntity()
+            .also { entity ->
+                entity.id = UuidCreator.getTimeOrderedEpoch()
+                entity.conversationId = conversationId
+                entity.userMessage = userMessage
+                entity.aiResponse = aiResponse
+                entity.sourcesJson = if (sources.isEmpty()) null else objectMapper.writeValueAsString(sources)
+                entity.personaId = personaCode
+                entity.createdAt = OffsetDateTime.now()
+            }.persist()
         log.debug("Persisted chat history for conversationId=$conversationId persona=$personaCode (${sources.size} sources)")
     }
 }

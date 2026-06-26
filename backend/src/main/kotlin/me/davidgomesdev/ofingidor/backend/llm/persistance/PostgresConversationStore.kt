@@ -13,14 +13,15 @@ import java.util.UUID
 
 @ApplicationScoped
 class PostgresConversationStore : ChatMemoryStore {
-
     private val log: Logger = Logger.getLogger(this::class.java)
 
     @Transactional
     override fun getMessages(memoryId: Any): List<ChatMessage> {
         val conversationId = UUID.fromString(memoryId.toString())
-        val messages = ChatMemoryEntity.findByConversationIdOrdered(conversationId)
-            .map { ChatMessageDeserializer.messageFromJson(it.messageJson) }
+        val messages =
+            ChatMemoryEntity
+                .findByConversationIdOrdered(conversationId)
+                .map { ChatMessageDeserializer.messageFromJson(it.messageJson) }
 
         log.debug("Loaded ${messages.size} messages for conversationId=$conversationId")
 
@@ -28,7 +29,10 @@ class PostgresConversationStore : ChatMemoryStore {
     }
 
     @Transactional
-    override fun updateMessages(memoryId: Any, messages: List<ChatMessage>) {
+    override fun updateMessages(
+        memoryId: Any,
+        messages: List<ChatMessage>,
+    ) {
         val conversationId = UUID.fromString(memoryId.toString())
 
         ChatMemoryEntity.deleteByConversationId(conversationId)

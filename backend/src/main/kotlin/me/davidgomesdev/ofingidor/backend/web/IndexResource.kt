@@ -12,14 +12,9 @@ import org.eclipse.microprofile.config.inject.ConfigProperty
 @Path("/")
 class IndexResource(
     @param:Location("index.html") val index: Template,
-    @param:ConfigProperty(name = "pessoa.url") val pessoaUrl: String
+    @param:ConfigProperty(name = "pessoa.url") val pessoaUrl: String,
 ) {
-
     @GET
     @Produces(MediaType.TEXT_HTML)
-    fun index(): TemplateInstance {
-        return index.data("pessoaUrl", pessoaUrl)
-    }
+    fun index(): TemplateInstance = index.data("pessoaUrl", pessoaUrl)
 }
-
-

@@ -44,10 +44,11 @@ data class AppHeaderIdentity(
     val personaLabel: String,
 )
 
-fun appHeaderIdentity(persona: Persona): AppHeaderIdentity = AppHeaderIdentity(
-    portrait = requireNotNull(personaPortrait(persona)) { "Missing portrait for $persona" },
-    personaLabel = persona.displayName.uppercase(),
-)
+fun appHeaderIdentity(persona: Persona): AppHeaderIdentity =
+    AppHeaderIdentity(
+        portrait = requireNotNull(personaPortrait(persona)) { "Missing portrait for $persona" },
+        personaLabel = persona.displayName.uppercase(),
+    )
 
 @Composable
 fun AppHeader(
@@ -63,30 +64,33 @@ fun AppHeader(
     val horizontalPadding = if (isCompact) 12.dp else 24.dp
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = horizontalPadding, vertical = 12.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = horizontalPadding, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Box(
-                    modifier = Modifier
-                        .width(32.dp)
-                        .height(46.dp)
-                        .clip(RoundedCornerShape(6.dp))
-                        .background(portraitThumbnailBackgroundColor)
-                        .border(1.dp, aiBubbleBorder, RoundedCornerShape(6.dp)),
-                    contentAlignment = Alignment.Center
+                    modifier =
+                        Modifier
+                            .width(32.dp)
+                            .height(46.dp)
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(portraitThumbnailBackgroundColor)
+                            .border(1.dp, aiBubbleBorder, RoundedCornerShape(6.dp)),
+                    contentAlignment = Alignment.Center,
                 ) {
                     PersonaPortraitThumbnail(
                         portrait = identity.portrait,
-                        modifier = Modifier
-                            .width(32.dp)
-                            .height(46.dp)
+                        modifier =
+                            Modifier
+                                .width(32.dp)
+                                .height(46.dp),
                     )
                 }
                 Column {
@@ -94,14 +98,14 @@ fun AppHeader(
                         "O Fingidor",
                         color = Color.White,
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 14.sp
+                        fontSize = 14.sp,
                     )
                     Text(
                         identity.personaLabel,
                         color = personaLabelColor,
                         fontSize = 9.sp,
                         letterSpacing = 1.sp,
-                        modifier = Modifier.padding(top = 2.dp)
+                        modifier = Modifier.padding(top = 2.dp),
                     )
                 }
             }
@@ -115,7 +119,7 @@ fun AppHeader(
                 if (hasConversationStarted && onNewConversation != null) {
                     NewConversationButton(
                         label = if (isCompact) "Nova" else "Nova conversa",
-                        onClick = onNewConversation
+                        onClick = onNewConversation,
                     )
                 }
                 if (onDevModeToggle != null) {
@@ -128,44 +132,51 @@ fun AppHeader(
 }
 
 @Composable
-private fun NewConversationButton(label: String, onClick: () -> Unit) {
+private fun NewConversationButton(
+    label: String,
+    onClick: () -> Unit,
+) {
     Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(4.dp))
-            .border(1.dp, Color.White.copy(alpha = 0.1f), RoundedCornerShape(4.dp))
-            .clickable(onClick = onClick)
-            .padding(horizontal = 10.dp, vertical = 5.dp)
+        modifier =
+            Modifier
+                .clip(RoundedCornerShape(4.dp))
+                .border(1.dp, Color.White.copy(alpha = 0.1f), RoundedCornerShape(4.dp))
+                .clickable(onClick = onClick)
+                .padding(horizontal = 10.dp, vertical = 5.dp),
     ) {
         Text(
             label,
             color = Color.White.copy(alpha = 0.35f),
             fontSize = 10.sp,
             fontWeight = FontWeight.Medium,
-            letterSpacing = 1.sp
+            letterSpacing = 1.sp,
         )
     }
 }
 
 @Composable
-private fun DevModeToggle(active: Boolean, onToggle: () -> Unit) {
+private fun DevModeToggle(
+    active: Boolean,
+    onToggle: () -> Unit,
+) {
     Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(4.dp))
-            .background(if (active) devChipColor else Color.Transparent)
-            .border(
-                1.dp,
-                if (active) devChipBorderColor else Color.White.copy(alpha = 0.1f),
-                RoundedCornerShape(4.dp)
-            )
-            .clickable(onClick = onToggle)
-            .padding(horizontal = 10.dp, vertical = 5.dp)
+        modifier =
+            Modifier
+                .clip(RoundedCornerShape(4.dp))
+                .background(if (active) devChipColor else Color.Transparent)
+                .border(
+                    1.dp,
+                    if (active) devChipBorderColor else Color.White.copy(alpha = 0.1f),
+                    RoundedCornerShape(4.dp),
+                ).clickable(onClick = onToggle)
+                .padding(horizontal = 10.dp, vertical = 5.dp),
     ) {
         Text(
             "Modo DEV",
             color = if (active) devChipTextColor else Color.White.copy(alpha = 0.2f),
             fontSize = 10.sp,
             fontWeight = FontWeight.Medium,
-            letterSpacing = 1.5.sp
+            letterSpacing = 1.5.sp,
         )
     }
 }
@@ -182,21 +193,21 @@ private fun ShareButton(onClick: () -> Unit) {
     }
 
     Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(4.dp))
-            .border(1.dp, Color.White.copy(alpha = 0.1f), RoundedCornerShape(4.dp))
-            .clickable(enabled = !shared) {
-                onClick()
-                shared = true
-            }
-            .padding(horizontal = 10.dp, vertical = 5.dp)
+        modifier =
+            Modifier
+                .clip(RoundedCornerShape(4.dp))
+                .border(1.dp, Color.White.copy(alpha = 0.1f), RoundedCornerShape(4.dp))
+                .clickable(enabled = !shared) {
+                    onClick()
+                    shared = true
+                }.padding(horizontal = 10.dp, vertical = 5.dp),
     ) {
         Text(
             if (shared) "Partilhado!" else "Partilhar",
             color = Color.White.copy(alpha = if (shared) 0.6f else 0.35f),
             fontSize = 10.sp,
             fontWeight = FontWeight.Medium,
-            letterSpacing = 1.sp
+            letterSpacing = 1.sp,
         )
     }
 }

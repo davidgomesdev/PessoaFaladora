@@ -17,11 +17,12 @@ data class OngoingConversationTurn(
     val sources: List<Source> = emptyList(),
     val traceId: String = "",
 ) {
-    fun toConversationTurn() = ConversationTurn(
-        question = question,
-        message = message,
-        sources = sources,
-        traceId = traceId,
-        persona = persona,
-    )
+    fun toConversationTurn() =
+        ConversationTurn(
+            question = question,
+            message = message,
+            sources = sources,
+            traceId = traceId,
+            persona = persona,
+        )
 }

@@ -8,9 +8,12 @@ import jakarta.enterprise.context.ApplicationScoped
 import me.davidgomesdev.ofingidor.backend.llm.config.AnthropicConfig
 
 @ApplicationScoped
-class AnthropicLanguageModel(val config: AnthropicConfig) : LanguageModel {
+class AnthropicLanguageModel(
+    val config: AnthropicConfig,
+) : LanguageModel {
     override fun chatModel(): ChatModel =
-        AnthropicChatModel.builder()
+        AnthropicChatModel
+            .builder()
             .modelName(config.chatModel().modelId())
             .apiKey(config.apiKey())
             .timeout(config.timeout())
@@ -21,11 +24,11 @@ class AnthropicLanguageModel(val config: AnthropicConfig) : LanguageModel {
                     temperature(config.temperature())
                     maxTokens(config.maxTokens())
                 }
-            }
-            .build()
+            }.build()
 
     override fun streamingChatModel(): StreamingChatModel =
-        AnthropicStreamingChatModel.builder()
+        AnthropicStreamingChatModel
+            .builder()
             .modelName(config.chatModel().modelId())
             .apiKey(config.apiKey())
             .timeout(config.timeout())
@@ -36,6 +39,5 @@ class AnthropicLanguageModel(val config: AnthropicConfig) : LanguageModel {
                     temperature(config.temperature())
                     maxTokens(config.maxTokens())
                 }
-            }
-            .build()
+            }.build()
 }

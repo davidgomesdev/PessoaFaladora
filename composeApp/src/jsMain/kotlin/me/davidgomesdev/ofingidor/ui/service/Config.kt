@@ -14,9 +14,10 @@ actual fun openUrl(url: String) {
 
 actual fun shareConversation(text: String) {
     if (js("'share' in navigator") as Boolean) {
-        js("navigator.share({ title: 'O Fingidor', text: text }).catch(function(e) { if (e.name !== 'AbortError') navigator.clipboard.writeText(text); })")
+        js(
+            "navigator.share({ title: 'O Fingidor', text: text }).catch(function(e) { if (e.name !== 'AbortError') navigator.clipboard.writeText(text); })",
+        )
     } else {
         js("navigator.clipboard.writeText(text)")
     }
 }
-

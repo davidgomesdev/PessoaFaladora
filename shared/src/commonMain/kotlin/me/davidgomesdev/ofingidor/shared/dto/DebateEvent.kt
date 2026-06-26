@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed class DebateEvent {
-
     @Serializable
     @SerialName("start")
     data class Start(

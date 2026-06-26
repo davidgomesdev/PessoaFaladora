@@ -33,7 +33,6 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class ComposeAppWebTest {
-
     private val sampleSource = Source(1L, "Mensagem", "Fernando Pessoa", "Poesia", 92)
 
     @Test
@@ -87,22 +86,24 @@ class ComposeAppWebTest {
     fun chipAvatarContentDescription_resolutionKeepsAvatarDecorative() {
         val model = personaIdentityChipModel(Persona.ALVARO_DE_CAMPOS, isCompact = false, isSelected = false)
         val portrait = requireNotNull(personaPortrait(model.persona))
-        val resolvedContentDescription = resolveAvatarContentDescription(
-            portrait = portrait,
-            requestedContentDescription = model.layout.avatarContentDescription,
-            mode = AvatarContentDescriptionMode.DECORATIVE,
-        )
+        val resolvedContentDescription =
+            resolveAvatarContentDescription(
+                portrait = portrait,
+                requestedContentDescription = model.layout.avatarContentDescription,
+                mode = AvatarContentDescriptionMode.DECORATIVE,
+            )
         assertNull(resolvedContentDescription)
     }
 
     @Test
     fun avatarContentDescription_resolutionUsesPortraitDescriptionForMeaningfulAvatars() {
         val portrait = requireNotNull(personaPortrait(Persona.RICARDO_REIS))
-        val resolvedContentDescription = resolveAvatarContentDescription(
-            portrait = portrait,
-            requestedContentDescription = null,
-            mode = AvatarContentDescriptionMode.MEANINGFUL,
-        )
+        val resolvedContentDescription =
+            resolveAvatarContentDescription(
+                portrait = portrait,
+                requestedContentDescription = null,
+                mode = AvatarContentDescriptionMode.MEANINGFUL,
+            )
         assertEquals("Retrato de Ricardo Reis", resolvedContentDescription)
     }
 
@@ -153,13 +154,14 @@ class ComposeAppWebTest {
 
     @Test
     fun ongoingTurn_toConversationTurn_preservesSelectedPersona() {
-        val ongoing = OngoingConversationTurn(
-            question = "O que é o amor?",
-            message = "O amor é...",
-            sources = listOf(sampleSource),
-            traceId = "abc123",
-            persona = Persona.ALVARO_DE_CAMPOS,
-        )
+        val ongoing =
+            OngoingConversationTurn(
+                question = "O que é o amor?",
+                message = "O amor é...",
+                sources = listOf(sampleSource),
+                traceId = "abc123",
+                persona = Persona.ALVARO_DE_CAMPOS,
+            )
         val completed = ongoing.toConversationTurn()
         assertEquals(ongoing.question, completed.question)
         assertEquals(ongoing.message, completed.message)
@@ -170,38 +172,41 @@ class ComposeAppWebTest {
 
     @Test
     fun ongoingTurn_appendsToken() {
-        val turn = OngoingConversationTurn(
-            question = "Quem és?",
-            message = "Eu sou ",
-            persona = Persona.FERNANDO_PESSOA,
-        )
+        val turn =
+            OngoingConversationTurn(
+                question = "Quem és?",
+                message = "Eu sou ",
+                persona = Persona.FERNANDO_PESSOA,
+            )
         val updated = turn.copy(message = turn.message + "Fernando.")
         assertEquals("Eu sou Fernando.", updated.message)
     }
 
     @Test
-    fun processSubmit_preservesPersonaWithoutDisplayNameRemapping() = runTest {
-        var ongoingTurn: OngoingConversationTurn? = null
-        var traceId = ""
+    fun processSubmit_preservesPersonaWithoutDisplayNameRemapping() =
+        runTest {
+            var ongoingTurn: OngoingConversationTurn? = null
+            var traceId = ""
 
-        val result = processSubmit(
-            question = "Quem és?",
-            selectedPersona = Persona.ALVARO_DE_CAMPOS,
-            thinkAPI = ThinkAPI(),
-            getOngoingTurn = { ongoingTurn },
-            setOngoingTurn = { ongoingTurn = it },
-            onTraceId = { traceId = it },
-            collectEvents = { _, _, _, getCurrentTurn, onNewEvent, _, onTrace ->
-                val current = getCurrentTurn() ?: error("ongoing turn should exist")
-                onTrace("trace-123")
-                onNewEvent(current.copy(message = "Sou Álvaro de Campos.", traceId = "trace-123"))
-            },
-        )
+            val result =
+                processSubmit(
+                    question = "Quem és?",
+                    selectedPersona = Persona.ALVARO_DE_CAMPOS,
+                    thinkAPI = ThinkAPI(),
+                    getOngoingTurn = { ongoingTurn },
+                    setOngoingTurn = { ongoingTurn = it },
+                    onTraceId = { traceId = it },
+                    collectEvents = { _, _, _, getCurrentTurn, onNewEvent, _, onTrace ->
+                        val current = getCurrentTurn() ?: error("ongoing turn should exist")
+                        onTrace("trace-123")
+                        onNewEvent(current.copy(message = "Sou Álvaro de Campos.", traceId = "trace-123"))
+                    },
+                )
 
-        assertEquals("trace-123", traceId)
-        assertNull(ongoingTurn)
-        assertEquals(Persona.ALVARO_DE_CAMPOS, result.getOrNull()?.persona)
-    }
+            assertEquals("trace-123", traceId)
+            assertNull(ongoingTurn)
+            assertEquals(Persona.ALVARO_DE_CAMPOS, result.getOrNull()?.persona)
+        }
 
     @Test
     fun debatePair_sideForMapsLeftAndRightSpeakers() {
@@ -222,10 +227,11 @@ class ComposeAppWebTest {
 
     @Test
     fun disablingDevMode_normalizesOFingidorDebatePairAndRequiresConversationReset() {
-        val result = devModeDisabledState(
-            selectedPersona = Persona.FERNANDO_PESSOA,
-            debatePair = DebatePair(Persona.O_FINGIDOR, Persona.ALBERTO_CAEIRO),
-        )
+        val result =
+            devModeDisabledState(
+                selectedPersona = Persona.FERNANDO_PESSOA,
+                debatePair = DebatePair(Persona.O_FINGIDOR, Persona.ALBERTO_CAEIRO),
+            )
 
         assertEquals(Persona.FERNANDO_PESSOA, result.selectedPersona)
         assertEquals(DebatePair(Persona.FERNANDO_PESSOA, Persona.ALBERTO_CAEIRO), result.debatePair)
@@ -234,10 +240,11 @@ class ComposeAppWebTest {
 
     @Test
     fun disablingDevMode_normalizesOFingidorSelectedPersonaAndRequiresConversationReset() {
-        val result = devModeDisabledState(
-            selectedPersona = Persona.O_FINGIDOR,
-            debatePair = DebatePair(Persona.FERNANDO_PESSOA, Persona.ALBERTO_CAEIRO),
-        )
+        val result =
+            devModeDisabledState(
+                selectedPersona = Persona.O_FINGIDOR,
+                debatePair = DebatePair(Persona.FERNANDO_PESSOA, Persona.ALBERTO_CAEIRO),
+            )
 
         assertEquals(Persona.FERNANDO_PESSOA, result.selectedPersona)
         assertEquals(DebatePair(Persona.FERNANDO_PESSOA, Persona.ALBERTO_CAEIRO), result.debatePair)
@@ -246,13 +253,14 @@ class ComposeAppWebTest {
 
     @Test
     fun debateFeedItemCount_countsQuestionTurnAndErrorExplicitly() {
-        val count = debateFeedItemCount(
-            questionCount = 2,
-            debateTurnCount = 3,
-            hasOngoingQuestion = true,
-            hasOngoingTurn = true,
-            hasDebateError = true,
-        )
+        val count =
+            debateFeedItemCount(
+                questionCount = 2,
+                debateTurnCount = 3,
+                hasOngoingQuestion = true,
+                hasOngoingTurn = true,
+                hasDebateError = true,
+            )
 
         assertEquals(8, count)
     }
@@ -276,52 +284,65 @@ class ComposeAppWebTest {
     }
 
     @Test
-    fun processDebateEvents_returnsFailureAndCleansUpWhenEventHandlerThrows() = runTest {
-        var cleanupCalls = 0
-        var failures = 0
+    fun processDebateEvents_returnsFailureAndCleansUpWhenEventHandlerThrows() =
+        runTest {
+            var cleanupCalls = 0
+            var failures = 0
 
-        val result = processDebateEvents(
-            events = flowOf(Result.success(DebateEvent.Start("trace-123", "fernando_pessoa", "alberto_caeiro"))),
-            onEvent = { throw IllegalStateException("bad debate event") },
-            onCleanup = { cleanupCalls += 1 },
-            onFailure = { failures += 1 },
-        )
+            val result =
+                processDebateEvents(
+                    events = flowOf(Result.success(DebateEvent.Start("trace-123", "fernando_pessoa", "alberto_caeiro"))),
+                    onEvent = { throw IllegalStateException("bad debate event") },
+                    onCleanup = { cleanupCalls += 1 },
+                    onFailure = { failures += 1 },
+                )
 
-        assertEquals("bad debate event", result.exceptionOrNull()?.message)
-        assertEquals(1, cleanupCalls)
-        assertEquals(1, failures)
-    }
+            assertEquals("bad debate event", result.exceptionOrNull()?.message)
+            assertEquals(1, cleanupCalls)
+            assertEquals(1, failures)
+        }
 
     @Test
-    fun performDebateSubmit_resetsClientConversationWhenDebateRequestFails() = runTest {
-        val thinkAPI = ThinkAPI()
+    fun performDebateSubmit_resetsClientConversationWhenDebateRequestFails() =
+        runTest {
+            val thinkAPI = ThinkAPI()
 
-        thinkAPI.restoreConversation(
-            sessionToken = "session-token",
-            traceparent = "00-traceparent",
-        )
+            thinkAPI.restoreConversation(
+                sessionToken = "session-token",
+                traceparent = "00-traceparent",
+            )
 
-        val result = performDebateSubmit(
-            question = "Debatam isto",
-            pair = DebatePair(Persona.FERNANDO_PESSOA, Persona.ALBERTO_CAEIRO),
-            thinkAPI = thinkAPI,
-            turns = mutableStateListOf(),
-            getOngoingTurn = { null },
-            setOngoingTurn = {},
-            onTraceId = {},
-            submitDebate = { _: String, _: DebatePair, _: ThinkAPI, _: SnapshotStateList<DebateTurn>, _: () -> DebateTurn?, _: (DebateTurn?) -> Unit, _: (String) -> Unit, onFailure: (Throwable) -> Unit ->
-                val failure = IllegalStateException("debate request failed")
-                onFailure(failure)
-                Result.failure(failure)
-            },
-        )
+            val result =
+                performDebateSubmit(
+                    question = "Debatam isto",
+                    pair = DebatePair(Persona.FERNANDO_PESSOA, Persona.ALBERTO_CAEIRO),
+                    thinkAPI = thinkAPI,
+                    turns = mutableStateListOf(),
+                    getOngoingTurn = { null },
+                    setOngoingTurn = {},
+                    onTraceId = {},
+                    submitDebate = {
+                        _: String,
+                        _: DebatePair,
+                        _: ThinkAPI,
+                        _: SnapshotStateList<DebateTurn>,
+                        _: () -> DebateTurn?,
+                        _: (DebateTurn?) -> Unit,
+                        _: (String) -> Unit,
+                        onFailure: (Throwable) -> Unit,
+                        ->
+                        val failure = IllegalStateException("debate request failed")
+                        onFailure(failure)
+                        Result.failure(failure)
+                    },
+                )
 
-        assertEquals("debate request failed", result.exceptionOrNull()?.message)
-        assertEquals(
-            ThinkAPI.ConversationState(sessionToken = null, traceparent = null),
-            thinkAPI.conversationState(),
-        )
-    }
+            assertEquals("debate request failed", result.exceptionOrNull()?.message)
+            assertEquals(
+                ThinkAPI.ConversationState(sessionToken = null, traceparent = null),
+                thinkAPI.conversationState(),
+            )
+        }
 
     @Test
     fun handleDebateEvent_buildsAndCompletesSpeakerTurn() {
@@ -329,20 +350,22 @@ class ComposeAppWebTest {
         var ongoing: DebateTurn? = null
         var traceId = ""
         val pair = DebatePair(Persona.FERNANDO_PESSOA, Persona.ALBERTO_CAEIRO)
-        val eventSource = ChatEvent.Sources.Source(
-            id = 1L,
-            title = "Poema",
-            author = "Alberto Caeiro",
-            category = "Poesia",
-            score = 97,
-        )
+        val eventSource =
+            ChatEvent.Sources.Source(
+                id = 1L,
+                title = "Poema",
+                author = "Alberto Caeiro",
+                category = "Poesia",
+                score = 97,
+            )
 
         handleDebateEvent(
-            event = DebateEvent.Start(
-                traceId = "trace-123",
-                persona = Persona.FERNANDO_PESSOA.codeName,
-                opponentPersona = Persona.ALBERTO_CAEIRO.codeName,
-            ),
+            event =
+                DebateEvent.Start(
+                    traceId = "trace-123",
+                    persona = Persona.FERNANDO_PESSOA.codeName,
+                    opponentPersona = Persona.ALBERTO_CAEIRO.codeName,
+                ),
             pair = pair,
             turns = turns,
             getOngoingTurn = { ongoing },
@@ -359,11 +382,12 @@ class ComposeAppWebTest {
             onTraceId = { traceId = it },
         )
         handleDebateEvent(
-            event = DebateEvent.Token(
-                turnIndex = 0,
-                speaker = Persona.ALBERTO_CAEIRO,
-                value = "Sou ",
-            ),
+            event =
+                DebateEvent.Token(
+                    turnIndex = 0,
+                    speaker = Persona.ALBERTO_CAEIRO,
+                    value = "Sou ",
+                ),
             pair = pair,
             turns = turns,
             getOngoingTurn = { ongoing },
@@ -371,11 +395,12 @@ class ComposeAppWebTest {
             onTraceId = { traceId = it },
         )
         handleDebateEvent(
-            event = DebateEvent.Token(
-                turnIndex = 0,
-                speaker = Persona.ALBERTO_CAEIRO,
-                value = "eu.",
-            ),
+            event =
+                DebateEvent.Token(
+                    turnIndex = 0,
+                    speaker = Persona.ALBERTO_CAEIRO,
+                    value = "eu.",
+                ),
             pair = pair,
             turns = turns,
             getOngoingTurn = { ongoing },
@@ -383,11 +408,12 @@ class ComposeAppWebTest {
             onTraceId = { traceId = it },
         )
         handleDebateEvent(
-            event = DebateEvent.Sources(
-                turnIndex = 0,
-                speaker = Persona.ALBERTO_CAEIRO,
-                sources = ChatEvent.Sources(listOf(eventSource)),
-            ),
+            event =
+                DebateEvent.Sources(
+                    turnIndex = 0,
+                    speaker = Persona.ALBERTO_CAEIRO,
+                    sources = ChatEvent.Sources(listOf(eventSource)),
+                ),
             pair = pair,
             turns = turns,
             getOngoingTurn = { ongoing },
@@ -395,12 +421,13 @@ class ComposeAppWebTest {
             onTraceId = { traceId = it },
         )
         handleDebateEvent(
-            event = DebateEvent.TurnDone(
-                turnIndex = 0,
-                speaker = Persona.ALBERTO_CAEIRO,
-                tokensUsed = 12,
-                timeTaken = "0.4s",
-            ),
+            event =
+                DebateEvent.TurnDone(
+                    turnIndex = 0,
+                    speaker = Persona.ALBERTO_CAEIRO,
+                    tokensUsed = 12,
+                    timeTaken = "0.4s",
+                ),
             pair = pair,
             turns = turns,
             getOngoingTurn = { ongoing },

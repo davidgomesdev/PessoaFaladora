@@ -31,25 +31,26 @@ fun ConversationModeToggle(
     ) {
         ConversationMode.entries.forEach { option ->
             val isSelected = option == mode
-            val label = when (option) {
-                ConversationMode.CHAT -> "Conversa"
-                ConversationMode.DEBATE -> "Debate"
-            }
+            val label =
+                when (option) {
+                    ConversationMode.CHAT -> "Conversa"
+                    ConversationMode.DEBATE -> "Debate"
+                }
 
             Text(
                 text = label,
                 color = if (isSelected) orthonymChipTextColor else Color.White.copy(alpha = 0.55f),
                 fontSize = 11.sp,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(if (isSelected) orthonymChipColor else Color.Transparent)
-                    .border(
-                        width = 1.dp,
-                        color = if (isSelected) orthonymChipBorderColor else focusedIndicatorColor.copy(alpha = 0.35f),
-                        shape = RoundedCornerShape(20.dp),
-                    )
-                    .clickable { onModeSelected(option) }
-                    .padding(horizontal = 12.dp, vertical = 5.dp),
+                modifier =
+                    Modifier
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(if (isSelected) orthonymChipColor else Color.Transparent)
+                        .border(
+                            width = 1.dp,
+                            color = if (isSelected) orthonymChipBorderColor else focusedIndicatorColor.copy(alpha = 0.35f),
+                            shape = RoundedCornerShape(20.dp),
+                        ).clickable { onModeSelected(option) }
+                        .padding(horizontal = 12.dp, vertical = 5.dp),
             )
         }
     }

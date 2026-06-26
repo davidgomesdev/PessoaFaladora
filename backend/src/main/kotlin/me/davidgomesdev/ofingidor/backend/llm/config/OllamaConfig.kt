@@ -6,13 +6,18 @@ import java.time.Duration
 @ConfigMapping(prefix = "model.ollama")
 interface OllamaConfig {
     fun baseUrl(): String
+
     fun timeout(): Duration
+
     fun chatModel(): ChatModelConfig
+
     fun embeddingModel(): EmbeddingModelConfig
 
     interface ChatModelConfig {
         fun modelId(): String
+
         fun temperature(): Double
+
         fun thinking(): Boolean
     }
 
@@ -21,4 +26,3 @@ interface OllamaConfig {
         fun modelId(): String
     }
 }
-

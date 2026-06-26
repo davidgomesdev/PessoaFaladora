@@ -11,11 +11,12 @@ class DebatePromptBuilderTest {
 
     @Test
     fun `opening prompt includes speaker, opponent and user input`() {
-        val prompt = promptBuilder.openingPrompt(
-            "O que é a sinceridade poética?",
-            Persona.FERNANDO_PESSOA,
-            Persona.ALBERTO_CAEIRO
-        )
+        val prompt =
+            promptBuilder.openingPrompt(
+                "O que é a sinceridade poética?",
+                Persona.FERNANDO_PESSOA,
+                Persona.ALBERTO_CAEIRO,
+            )
 
         assertTrue(prompt.contains("Fernando Pessoa"))
         assertTrue(prompt.contains("Alberto Caeiro"))
@@ -25,23 +26,25 @@ class DebatePromptBuilderTest {
 
     @Test
     fun `rebuttal prompt includes prior transcript`() {
-        val transcript = listOf(
-            DebateTurnEntity().apply {
-                entryType = "user_prompt"
-                text = "O que é a sinceridade poética?"
-            },
-            DebateTurnEntity().apply {
-                entryType = "persona_turn"
-                speakerPersonaId = "fernando_pessoa"
-                text = "É uma máscara consciente."
-            },
-        )
+        val transcript =
+            listOf(
+                DebateTurnEntity().apply {
+                    entryType = "user_prompt"
+                    text = "O que é a sinceridade poética?"
+                },
+                DebateTurnEntity().apply {
+                    entryType = "persona_turn"
+                    speakerPersonaId = "fernando_pessoa"
+                    text = "É uma máscara consciente."
+                },
+            )
 
-        val prompt = promptBuilder.rebuttalPrompt(
-            userInput = "O que é a sinceridade poética?",
-            speaker = Persona.ALBERTO_CAEIRO,
-            transcript = transcript,
-        )
+        val prompt =
+            promptBuilder.rebuttalPrompt(
+                userInput = "O que é a sinceridade poética?",
+                speaker = Persona.ALBERTO_CAEIRO,
+                transcript = transcript,
+            )
 
         assertTrue(prompt.contains("Utilizador: O que é a sinceridade poética?"))
         assertTrue(prompt.contains("fernando_pessoa: É uma máscara consciente."))

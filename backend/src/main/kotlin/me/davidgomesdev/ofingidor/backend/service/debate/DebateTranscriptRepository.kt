@@ -11,18 +11,24 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 @ApplicationScoped
-class DebateTranscriptRepository(private val objectMapper: ObjectMapper) {
-
+class DebateTranscriptRepository(
+    private val objectMapper: ObjectMapper,
+) {
     @Transactional
-    fun appendUserPrompt(conversationId: UUID, turnIndex: Int, text: String) {
-        DebateTurnEntity().also { entity ->
-            entity.id = UuidCreator.getTimeOrderedEpoch()
-            entity.conversationId = conversationId
-            entity.turnIndex = turnIndex
-            entity.entryType = DebateConstants.DEBATE_ENTRY_TYPE_USER_PROMPT
-            entity.text = text
-            entity.createdAt = OffsetDateTime.now()
-        }.persist()
+    fun appendUserPrompt(
+        conversationId: UUID,
+        turnIndex: Int,
+        text: String,
+    ) {
+        DebateTurnEntity()
+            .also { entity ->
+                entity.id = UuidCreator.getTimeOrderedEpoch()
+                entity.conversationId = conversationId
+                entity.turnIndex = turnIndex
+                entity.entryType = DebateConstants.DEBATE_ENTRY_TYPE_USER_PROMPT
+                entity.text = text
+                entity.createdAt = OffsetDateTime.now()
+            }.persist()
     }
 
     @Transactional
@@ -33,16 +39,17 @@ class DebateTranscriptRepository(private val objectMapper: ObjectMapper) {
         text: String,
         sources: List<ChatEvent.Sources.Source>,
     ) {
-        DebateTurnEntity().also { entity ->
-            entity.id = UuidCreator.getTimeOrderedEpoch()
-            entity.conversationId = conversationId
-            entity.turnIndex = turnIndex
-            entity.entryType = DebateConstants.DEBATE_ENTRY_TYPE_PERSONA_TURN
-            entity.speakerPersonaId = speaker.codeName
-            entity.text = text
-            entity.sourcesJson = if (sources.isEmpty()) null else objectMapper.writeValueAsString(sources)
-            entity.createdAt = OffsetDateTime.now()
-        }.persist()
+        DebateTurnEntity()
+            .also { entity ->
+                entity.id = UuidCreator.getTimeOrderedEpoch()
+                entity.conversationId = conversationId
+                entity.turnIndex = turnIndex
+                entity.entryType = DebateConstants.DEBATE_ENTRY_TYPE_PERSONA_TURN
+                entity.speakerPersonaId = speaker.codeName
+                entity.text = text
+                entity.sourcesJson = if (sources.isEmpty()) null else objectMapper.writeValueAsString(sources)
+                entity.createdAt = OffsetDateTime.now()
+            }.persist()
     }
 
     @Transactional

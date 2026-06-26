@@ -11,13 +11,16 @@ import me.davidgomesdev.ofingidor.backend.llm.config.OllamaConfig
 import org.jboss.logging.Logger
 
 @ApplicationScoped
-class OllamaLanguageModel(val config: OllamaConfig) : LanguageModel, EmbeddingChatModel {
-
+class OllamaLanguageModel(
+    val config: OllamaConfig,
+) : LanguageModel,
+    EmbeddingChatModel {
     val log: Logger = Logger.getLogger(this::class.java)
 
     override fun chatModel(): ChatModel {
         log.info("Creating Ollama chat model: ${config.chatModel().modelId()}")
-        return OllamaChatModel.builder()
+        return OllamaChatModel
+            .builder()
             .baseUrl(config.baseUrl())
             .modelName(config.chatModel().modelId())
             .temperature(config.chatModel().temperature())
@@ -25,10 +28,11 @@ class OllamaLanguageModel(val config: OllamaConfig) : LanguageModel, EmbeddingCh
             .build()
     }
 
-    override fun streamingChatModel(): StreamingChatModel {
-        return config.chatModel().run {
+    override fun streamingChatModel(): StreamingChatModel =
+        config.chatModel().run {
             log.info("Creating Ollama streaming chat model: ${modelId()}")
-            OllamaStreamingChatModel.builder()
+            OllamaStreamingChatModel
+                .builder()
                 .baseUrl(config.baseUrl())
                 .modelName(modelId())
                 .temperature(temperature())
@@ -37,11 +41,11 @@ class OllamaLanguageModel(val config: OllamaConfig) : LanguageModel, EmbeddingCh
                 .returnThinking(thinking())
                 .build()
         }
-    }
 
     override fun embeddingModel(): EmbeddingModel {
         log.info("Creating Ollama embedding model: ${config.embeddingModel().modelId()}")
-        return OllamaEmbeddingModel.builder()
+        return OllamaEmbeddingModel
+            .builder()
             .baseUrl(config.baseUrl())
             .modelName(config.embeddingModel().modelId())
             .timeout(config.timeout())

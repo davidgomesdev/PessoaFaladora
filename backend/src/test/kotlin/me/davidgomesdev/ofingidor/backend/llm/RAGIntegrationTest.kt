@@ -19,7 +19,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 class RAGIntegrationTest {
-
     @Test
     fun `should use regex splitter when semantic chunking is disabled`() {
         val embeddingModel = mock<EmbeddingModel>()
@@ -31,13 +30,14 @@ class RAGIntegrationTest {
         whenever(config.semanticChunking()).thenReturn(semanticChunkingConfig)
         whenever(semanticChunkingConfig.enabled()).thenReturn(false)
 
-        val rag = RAG(
-            isPreviewOnly = true,
-            recreateEmbeddings = false,
-            config = config,
-            personaContext = personaContext,
-            embeddingModel = embeddingModel
-        )
+        val rag =
+            RAG(
+                isPreviewOnly = true,
+                recreateEmbeddings = false,
+                config = config,
+                personaContext = personaContext,
+                embeddingModel = embeddingModel,
+            )
 
         // Verify that the splitter is an instance of DocumentByRegexSplitter
         assertTrue(rag.splitter is DocumentByRegexSplitter)
@@ -57,13 +57,14 @@ class RAGIntegrationTest {
         whenever(semanticChunkingConfig.maxChunkSize()).thenReturn(900)
         whenever(semanticChunkingConfig.similarityThreshold()).thenReturn(0.7)
 
-        val rag = RAG(
-            isPreviewOnly = true,
-            recreateEmbeddings = false,
-            config = config,
-            personaContext = personaContext,
-            embeddingModel = embeddingModel
-        )
+        val rag =
+            RAG(
+                isPreviewOnly = true,
+                recreateEmbeddings = false,
+                config = config,
+                personaContext = personaContext,
+                embeddingModel = embeddingModel,
+            )
 
         // Verify that the splitter is an instance of SemanticDocumentSplitter
         assertTrue(rag.splitter is SemanticDocumentSplitter)
@@ -88,18 +89,19 @@ class RAGIntegrationTest {
             Response.from(
                 listOf(
                     Embedding.from(floatArrayOf(1.0f, 0.0f, 0.0f)),
-                    Embedding.from(floatArrayOf(1.0f, 0.0f, 0.0f))
-                )
-            )
+                    Embedding.from(floatArrayOf(1.0f, 0.0f, 0.0f)),
+                ),
+            ),
         )
 
-        val rag = RAG(
-            isPreviewOnly = true,
-            recreateEmbeddings = false,
-            config = config,
-            personaContext = personaContext,
-            embeddingModel = embeddingModel
-        )
+        val rag =
+            RAG(
+                isPreviewOnly = true,
+                recreateEmbeddings = false,
+                config = config,
+                personaContext = personaContext,
+                embeddingModel = embeddingModel,
+            )
 
         // Verify semantic splitter is being used
         assertTrue(rag.splitter is SemanticDocumentSplitter)

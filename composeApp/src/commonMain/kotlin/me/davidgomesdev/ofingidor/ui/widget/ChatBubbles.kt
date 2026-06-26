@@ -69,20 +69,21 @@ fun UserBubble(question: String) {
             verticalArrangement = Arrangement.spacedBy(3.dp),
         ) {
             Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 2.dp, bottomStart = 10.dp, bottomEnd = 10.dp))
-                    .background(inputCardBackgroundColor)
-                    .border(
-                        width = 2.dp,
-                        color = userBubbleBorder,
-                        shape = RoundedCornerShape(
-                            topStart = 10.dp,
-                            topEnd = 2.dp,
-                            bottomStart = 10.dp,
-                            bottomEnd = 10.dp
-                        )
-                    )
-                    .padding(horizontal = 13.dp, vertical = 9.dp)
+                modifier =
+                    Modifier
+                        .clip(RoundedCornerShape(topStart = 10.dp, topEnd = 2.dp, bottomStart = 10.dp, bottomEnd = 10.dp))
+                        .background(inputCardBackgroundColor)
+                        .border(
+                            width = 2.dp,
+                            color = userBubbleBorder,
+                            shape =
+                                RoundedCornerShape(
+                                    topStart = 10.dp,
+                                    topEnd = 2.dp,
+                                    bottomStart = 10.dp,
+                                    bottomEnd = 10.dp,
+                                ),
+                        ).padding(horizontal = 13.dp, vertical = 9.dp),
             ) {
                 BubbleText(question = question)
             }
@@ -97,12 +98,13 @@ fun CenteredUserBubble(question: String) {
         horizontalArrangement = Arrangement.Center,
     ) {
         Box(
-            modifier = Modifier
-                .widthIn(max = 460.dp)
-                .clip(RoundedCornerShape(10.dp))
-                .background(inputCardBackgroundColor)
-                .border(2.dp, userBubbleBorder, RoundedCornerShape(10.dp))
-                .padding(horizontal = 13.dp, vertical = 9.dp),
+            modifier =
+                Modifier
+                    .widthIn(max = 460.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(inputCardBackgroundColor)
+                    .border(2.dp, userBubbleBorder, RoundedCornerShape(10.dp))
+                    .padding(horizontal = 13.dp, vertical = 9.dp),
         ) {
             BubbleText(question = question)
         }
@@ -118,20 +120,23 @@ fun AiBubble(
     isLoading: Boolean,
 ) {
     val identity = chatPortraitIdentity(persona)
-    val inlineContent = if (isLoading) {
-        mapOf(
-            "cursor" to InlineTextContent(
-                placeholder = Placeholder(2.sp, 14.sp, PlaceholderVerticalAlign.TextCenter)
-            ) { BlinkingCursor() }
-        )
-    } else {
-        emptyMap()
-    }
+    val inlineContent =
+        if (isLoading) {
+            mapOf(
+                "cursor" to
+                    InlineTextContent(
+                        placeholder = Placeholder(2.sp, 14.sp, PlaceholderVerticalAlign.TextCenter),
+                    ) { BlinkingCursor() },
+            )
+        } else {
+            emptyMap()
+        }
 
-    val annotatedText = buildAnnotatedString {
-        append(message)
-        if (isLoading) appendInlineContent("cursor", "|")
-    }
+    val annotatedText =
+        buildAnnotatedString {
+            append(message)
+            if (isLoading) appendInlineContent("cursor", "|")
+        }
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -145,21 +150,22 @@ fun AiBubble(
         )
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Column(
-                modifier = Modifier
-                    .widthIn(max = 560.dp)
-                    .clip(RoundedCornerShape(topStart = 2.dp, topEnd = 10.dp, bottomStart = 10.dp, bottomEnd = 10.dp))
-                    .background(aiBubbleBackgroundColor)
-                    .border(
-                        width = 2.dp,
-                        color = aiBubbleBorder,
-                        shape = RoundedCornerShape(
-                            topStart = 2.dp,
-                            topEnd = 10.dp,
-                            bottomStart = 10.dp,
-                            bottomEnd = 10.dp
-                        )
-                    )
-                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                modifier =
+                    Modifier
+                        .widthIn(max = 560.dp)
+                        .clip(RoundedCornerShape(topStart = 2.dp, topEnd = 10.dp, bottomStart = 10.dp, bottomEnd = 10.dp))
+                        .background(aiBubbleBackgroundColor)
+                        .border(
+                            width = 2.dp,
+                            color = aiBubbleBorder,
+                            shape =
+                                RoundedCornerShape(
+                                    topStart = 2.dp,
+                                    topEnd = 10.dp,
+                                    bottomStart = 10.dp,
+                                    bottomEnd = 10.dp,
+                                ),
+                        ).padding(horizontal = 16.dp, vertical = 14.dp),
             ) {
                 BubbleMessageText(text = annotatedText, inlineContent = inlineContent)
             }
@@ -177,10 +183,11 @@ fun DebatePersonaBubble(
     isLoading: Boolean,
 ) {
     val palette = debateBubblePalette(speaker)
-    val shape = when (side) {
-        DebateSide.LEFT -> RoundedCornerShape(topStart = 2.dp, topEnd = 10.dp, bottomStart = 10.dp, bottomEnd = 10.dp)
-        DebateSide.RIGHT -> RoundedCornerShape(topStart = 10.dp, topEnd = 2.dp, bottomStart = 10.dp, bottomEnd = 10.dp)
-    }
+    val shape =
+        when (side) {
+            DebateSide.LEFT -> RoundedCornerShape(topStart = 2.dp, topEnd = 10.dp, bottomStart = 10.dp, bottomEnd = 10.dp)
+            DebateSide.RIGHT -> RoundedCornerShape(topStart = 10.dp, topEnd = 2.dp, bottomStart = 10.dp, bottomEnd = 10.dp)
+        }
     val inlineContent = loadingInlineContent(isLoading)
     val annotatedText = loadingAnnotatedText(message, isLoading)
 
@@ -210,12 +217,13 @@ fun DebatePersonaBubble(
             verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             Column(
-                modifier = Modifier
-                    .widthIn(max = 560.dp)
-                    .clip(shape)
-                    .background(palette.background)
-                    .border(2.dp, palette.border, shape)
-                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                modifier =
+                    Modifier
+                        .widthIn(max = 560.dp)
+                        .clip(shape)
+                        .background(palette.background)
+                        .border(2.dp, palette.border, shape)
+                        .padding(horizontal = 16.dp, vertical = 14.dp),
             ) {
                 BubbleMessageText(text = annotatedText, inlineContent = inlineContent)
             }
@@ -225,19 +233,24 @@ fun DebatePersonaBubble(
 }
 
 @Composable
-private fun ExpandToggleChip(expanded: Boolean, hiddenCount: Int, onClick: () -> Unit) {
+private fun ExpandToggleChip(
+    expanded: Boolean,
+    hiddenCount: Int,
+    onClick: () -> Unit,
+) {
     val label = if (expanded) "− menos" else "+$hiddenCount mais"
     DisableSelection {
         Text(
             label,
             color = accentColorLight.copy(alpha = 0.8f),
             fontSize = 11.sp,
-            modifier = Modifier
-                .clip(RoundedCornerShape(4.dp))
-                .background(accentColorLight.copy(alpha = 0.10f))
-                .border(1.dp, accentColorLight.copy(alpha = 0.35f), RoundedCornerShape(4.dp))
-                .padding(horizontal = 8.dp, vertical = 3.dp)
-                .clickable(onClick = onClick),
+            modifier =
+                Modifier
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(accentColorLight.copy(alpha = 0.10f))
+                    .border(1.dp, accentColorLight.copy(alpha = 0.35f), RoundedCornerShape(4.dp))
+                    .padding(horizontal = 8.dp, vertical = 3.dp)
+                    .clickable(onClick = onClick),
         )
     }
 }
@@ -301,15 +314,19 @@ private fun BubbleSources(sources: List<Source>) {
 private fun loadingInlineContent(isLoading: Boolean): Map<String, InlineTextContent> =
     if (isLoading) {
         mapOf(
-            "cursor" to InlineTextContent(
-                placeholder = Placeholder(2.sp, 14.sp, PlaceholderVerticalAlign.TextCenter)
-            ) { BlinkingCursor() }
+            "cursor" to
+                InlineTextContent(
+                    placeholder = Placeholder(2.sp, 14.sp, PlaceholderVerticalAlign.TextCenter),
+                ) { BlinkingCursor() },
         )
     } else {
         emptyMap()
     }
 
-private fun loadingAnnotatedText(message: String, isLoading: Boolean) = buildAnnotatedString {
+private fun loadingAnnotatedText(
+    message: String,
+    isLoading: Boolean,
+) = buildAnnotatedString {
     append(message)
     if (isLoading) appendInlineContent("cursor", "|")
 }
@@ -320,38 +337,41 @@ private fun BlinkingCursor() {
     val cursorAlpha by infiniteTransition.animateFloat(
         initialValue = 1f,
         targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = keyframes {
-                durationMillis = 1000
-                1f at 0
-                1f at 499
-                0f at 500
-                0f at 999
-            },
-            repeatMode = RepeatMode.Restart,
-        )
+        animationSpec =
+            infiniteRepeatable(
+                animation =
+                    keyframes {
+                        durationMillis = 1000
+                        1f at 0
+                        1f at 499
+                        0f at 500
+                        0f at 999
+                    },
+                repeatMode = RepeatMode.Restart,
+            ),
     )
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .alpha(cursorAlpha)
-            .background(personaLabelColor)
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .alpha(cursorAlpha)
+                .background(personaLabelColor),
     )
 }
 
 @Composable
 fun ErrorBubble(errorDetail: String? = null) {
     Column(
-        modifier = Modifier
-            .widthIn(max = 560.dp)
-            .clip(RoundedCornerShape(topStart = 2.dp, topEnd = 10.dp, bottomStart = 10.dp, bottomEnd = 10.dp))
-            .background(errorBubbleBackgroundColor)
-            .border(
-                width = 1.dp,
-                color = errorBubbleBorderColor,
-                shape = RoundedCornerShape(topStart = 2.dp, topEnd = 10.dp, bottomStart = 10.dp, bottomEnd = 10.dp)
-            )
-            .padding(horizontal = 14.dp, vertical = 10.dp),
+        modifier =
+            Modifier
+                .widthIn(max = 560.dp)
+                .clip(RoundedCornerShape(topStart = 2.dp, topEnd = 10.dp, bottomStart = 10.dp, bottomEnd = 10.dp))
+                .background(errorBubbleBackgroundColor)
+                .border(
+                    width = 1.dp,
+                    color = errorBubbleBorderColor,
+                    shape = RoundedCornerShape(topStart = 2.dp, topEnd = 10.dp, bottomStart = 10.dp, bottomEnd = 10.dp),
+                ).padding(horizontal = 14.dp, vertical = 10.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         Text(

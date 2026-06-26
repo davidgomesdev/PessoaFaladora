@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test
 @QuarkusTest
 @TestProfile(SessionServiceTestProfile::class)
 class ConversationContextTest {
-
     @Inject
     lateinit var context: ConversationContext
 

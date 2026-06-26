@@ -1,5 +1,6 @@
 package me.davidgomesdev.ofingidor.backend.llm
 
+import dev.langchain4j.agent.tool.Tool
 import dev.langchain4j.memory.chat.MessageWindowChatMemory
 import dev.langchain4j.model.chat.StreamingChatModel
 import dev.langchain4j.rag.RetrievalAugmentor
@@ -22,25 +23,28 @@ class AiAssistant(
     val postgresConversationStore: PostgresConversationStore,
     val sessionConfig: SessionConfig,
 ) {
-
     val log: Logger = Logger.getLogger(this::class.java)
     private val systemMessages: Map<String, String> = getPersonaSystemMessages()
 
     @Singleton
     @Suppress("unused")
-    fun assistant(chatModel: StreamingChatModel, retrievalAugmentor: RetrievalAugmentor): Assistant {
+    fun assistant(
+        chatModel: StreamingChatModel,
+        retrievalAugmentor: RetrievalAugmentor,
+    ): Assistant {
         log.info("Creating assistant")
 
-        return AiServices.builder(Assistant::class.java)
+        return AiServices
+            .builder(Assistant::class.java)
             .systemMessageProvider { _ -> resolveSystemMessage() }
             .chatMemoryProvider { memoryId ->
-                MessageWindowChatMemory.builder()
+                MessageWindowChatMemory
+                    .builder()
                     .id(memoryId)
                     .maxMessages(sessionConfig.memory().maxMessages())
                     .chatMemoryStore(postgresConversationStore)
                     .build()
-            }
-            .streamingChatModel(chatModel)
+            }.streamingChatModel(chatModel)
             .retrievalAugmentor(retrievalAugmentor)
             .build()
     }
@@ -50,22 +54,31 @@ class AiAssistant(
     fun debateAssistant(
         streamingChatModel: StreamingChatModel,
         retrievalAugmentor: RetrievalAugmentor,
-    ): DebateAssistant = AiServices.builder(DebateAssistant::class.java)
-        .systemMessageProvider { _ -> resolveSystemMessage() }
-        .streamingChatModel(streamingChatModel)
-        .retrievalAugmentor(retrievalAugmentor)
-        .build()
+    ): DebateAssistant =
+        AiServices
+            .builder(DebateAssistant::class.java)
+            .systemMessageProvider { _ -> resolveSystemMessage() }
+            .streamingChatModel(streamingChatModel)
+            .retrievalAugmentor(retrievalAugmentor)
+            .build()
 
-    private fun getPersonaSystemMessages(): Map<String, String> = buildMap {
-        val allFiles = Persona.entries.map(Persona::getSystemPromptFileName)
-
-        allFiles.forEach { fileName ->
-            val stream = Thread.currentThread().contextClassLoader.getResourceAsStream("prompts/$fileName")
-                ?: throw IllegalStateException("Prompt '$fileName' not found")
-
-            stream.reader().readText().let { put(fileName, it) }
-        }
+    @Tool("Fetch text")
+    fun fetchText(textId: Int) {
+        log.info("Fetching text with ID: $textId")
     }
+
+    private fun getPersonaSystemMessages(): Map<String, String> =
+        buildMap {
+            val allFiles = Persona.entries.map(Persona::getSystemPromptFileName)
+
+            allFiles.forEach { fileName ->
+                val stream =
+                    Thread.currentThread().contextClassLoader.getResourceAsStream("prompts/$fileName")
+                        ?: throw IllegalStateException("Prompt '$fileName' not found")
+
+                stream.reader().readText().let { put(fileName, it) }
+            }
+        }
 
     private fun resolveSystemMessage(): String {
         val persona = personaContext.persona ?: throw IllegalStateException("Persona not set")

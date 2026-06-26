@@ -14,8 +14,8 @@ import io.smallrye.mutiny.Multi
 import io.smallrye.mutiny.subscription.MultiEmitter
 import jakarta.enterprise.context.ApplicationScoped
 import me.davidgomesdev.ofingidor.backend.constants.DebateApiConstants
-import me.davidgomesdev.ofingidor.backend.web.PersonaContext
 import me.davidgomesdev.ofingidor.backend.llm.rag.TextAttributes
+import me.davidgomesdev.ofingidor.backend.web.PersonaContext
 import me.davidgomesdev.ofingidor.shared.dto.ChatEvent
 import me.davidgomesdev.ofingidor.shared.dto.DebateEvent
 import me.davidgomesdev.ofingidor.shared.dto.Persona
@@ -26,7 +26,9 @@ import kotlin.time.DurationUnit
 import kotlin.time.TimeSource
 
 fun interface DebateAssistant {
-    fun chat(@UserMessage message: String): TokenStream
+    fun chat(
+        @UserMessage message: String,
+    ): TokenStream
 }
 
 @ApplicationScoped
@@ -36,7 +38,6 @@ class DebateService(
     private val promptBuilder: DebatePromptBuilder,
     private val transcriptRepository: DebateTranscriptRepository,
 ) {
-
     private val log: Logger = Logger.getLogger(this::class.java)
     private val tracer = GlobalOpenTelemetry.getTracer(this::class.java.name)
 
@@ -70,7 +71,10 @@ class DebateService(
         }
     }
 
-    private fun processTurn(ctx: DebateContext, turnIndex: Int) {
+    private fun processTurn(
+        ctx: DebateContext,
+        turnIndex: Int,
+    ) {
         if (turnIndex > ctx.speakerPlan.lastIndex) {
             finishSuccessfully(ctx)
             return
@@ -85,32 +89,36 @@ class DebateService(
 
         personaContext.persona = speaker
 
-        val prompt = try {
-            buildPrompt(ctx, newTurnIndex, speaker)
-        } catch (error: Throwable) {
-            requestContext.terminate()
-            failStream(ctx, error)
-            return
-        }
+        val prompt =
+            try {
+                buildPrompt(ctx, newTurnIndex, speaker)
+            } catch (error: Throwable) {
+                requestContext.terminate()
+                failStream(ctx, error)
+                return
+            }
 
-        val turnSpan = tracer.spanBuilder(DebateApiConstants.SPAN_NAME_DEBATE_TURN)
-            .setSpanKind(SpanKind.INTERNAL)
-            .setAttribute("conversationId", ctx.conversationId.toString())
-            .setAttribute("speaker", speaker.codeName)
-            .setAttribute("turnIndex", newTurnIndex.toLong())
-            .startSpan()
+        val turnSpan =
+            tracer
+                .spanBuilder(DebateApiConstants.SPAN_NAME_DEBATE_TURN)
+                .setSpanKind(SpanKind.INTERNAL)
+                .setAttribute("conversationId", ctx.conversationId.toString())
+                .setAttribute("speaker", speaker.codeName)
+                .setAttribute("turnIndex", newTurnIndex.toLong())
+                .startSpan()
         val turnScope = turnSpan.makeCurrent()
 
         ctx.emitter.emit(DebateEvent.TurnStart(newTurnIndex, speaker))
 
-        val stream = try {
-            debateAssistant.chat(prompt)
-        } catch (error: Throwable) {
-            requestContext.terminate()
-            endTurnSpanWithError(error, turnSpan, turnScope)
-            failStream(ctx, error)
-            return
-        }
+        val stream =
+            try {
+                debateAssistant.chat(prompt)
+            } catch (error: Throwable) {
+                requestContext.terminate()
+                endTurnSpanWithError(error, turnSpan, turnScope)
+                failStream(ctx, error)
+                return
+            }
 
         attachStreamHandlers(stream, ctx, newTurnIndex, speaker) {
             it.onFailure { error ->
@@ -127,7 +135,11 @@ class DebateService(
         }
     }
 
-    private fun buildPrompt(ctx: DebateContext, persistedTurnIndex: Int, speaker: Persona): String =
+    private fun buildPrompt(
+        ctx: DebateContext,
+        persistedTurnIndex: Int,
+        speaker: Persona,
+    ): String =
         if (persistedTurnIndex == 1) {
             val opponent = ctx.speakerPlan[1]
             promptBuilder.openingPrompt(ctx.input, speaker, opponent)
@@ -156,12 +168,10 @@ class DebateService(
                 capturedSources.clear()
                 capturedSources.addAll(items)
                 ctx.emitter.emit(DebateEvent.Sources(turnIndex, speaker, ChatEvent.Sources(items)))
-            }
-            .onPartialResponse { partialResponse ->
+            }.onPartialResponse { partialResponse ->
                 responseText.append(partialResponse)
                 ctx.emitter.emit(DebateEvent.Token(turnIndex, speaker, partialResponse))
-            }
-            .onCompleteResponse { response ->
+            }.onCompleteResponse { response ->
                 try {
                     val finalText = response.aiMessage().text() ?: responseText.toString()
                     transcriptRepository.appendPersonaTurn(ctx.conversationId, turnIndex, speaker, finalText, capturedSources)
@@ -171,17 +181,14 @@ class DebateService(
 
                     ctx.emitter.emit(DebateEvent.TurnDone(turnIndex, speaker, totalTokensUsed, timeTaken))
                     onFinish(Result.success(Unit))
-
                 } catch (error: Throwable) {
                     log.error("Debate completion failed for ${speaker.codeName}", error)
                     onFinish(Result.failure(error))
                 }
-            }
-            .onError { error ->
+            }.onError { error ->
                 log.error("Debate turn failed for ${speaker.codeName}", error)
                 onFinish(Result.failure(error))
-            }
-            .start()
+            }.start()
     }
 
     private fun finishSuccessfully(ctx: DebateContext) {
@@ -191,7 +198,10 @@ class DebateService(
         ctx.callerSpan.end()
     }
 
-    private fun failStream(ctx: DebateContext, error: Throwable) {
+    private fun failStream(
+        ctx: DebateContext,
+        error: Throwable,
+    ) {
         ctx.emitter.fail(error)
         ctx.callerSpan.recordException(error)
         ctx.callerSpan.setStatus(StatusCode.ERROR)
@@ -199,7 +209,11 @@ class DebateService(
         ctx.callerSpan.end()
     }
 
-    private fun endTurnSpanWithError(error: Throwable, span: Span, scope: Scope) {
+    private fun endTurnSpanWithError(
+        error: Throwable,
+        span: Span,
+        scope: Scope,
+    ) {
         span.recordException(error)
         span.setStatus(StatusCode.ERROR)
         scope.close()

@@ -10,4 +10,4 @@ import androidx.compose.ui.input.key.type
 
 fun isActionInputType(keyEvent: KeyEvent): Boolean =
     (keyEvent.isCtrlPressed || keyEvent.isMetaPressed) &&
-            keyEvent.key == Key.Enter && keyEvent.type == KeyEventType.KeyDown
+        keyEvent.key == Key.Enter && keyEvent.type == KeyEventType.KeyDown

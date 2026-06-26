@@ -41,7 +41,6 @@ class ThinkingAPI(
     val conversationContext: ConversationContext,
     val sessionService: SessionService,
 ) {
-
     private val tracer = GlobalOpenTelemetry.getTracer(this::class.java.name)
     val log: Logger = Logger.getLogger(this::class.java)
 
@@ -55,8 +54,9 @@ class ThinkingAPI(
     ): RestMulti<ChatEvent> {
         if (body.persona.isBlank()) throw BadRequestException("persona must be present")
 
-        val requestedPersona = Persona.entries.firstOrNull { it.codeName == body.persona }
-            ?: throw NotFoundException("persona not found")
+        val requestedPersona =
+            Persona.entries.firstOrNull { it.codeName == body.persona }
+                ?: throw NotFoundException("persona not found")
 
         var sessionToken: String? = null
 
@@ -70,10 +70,11 @@ class ThinkingAPI(
             val token = authorization.removePrefix("Bearer ").trim()
             val conversationId = extractConversationId(token)
 
-            val participants = when (val result = sessionService.getConversationParticipants(conversationId)) {
-                is Either.Left -> throw WebApplicationException(Response.status(result.value.httpStatus).build())
-                is Either.Right -> result.value
-            }
+            val participants =
+                when (val result = sessionService.getConversationParticipants(conversationId)) {
+                    is Either.Left -> throw WebApplicationException(Response.status(result.value.httpStatus).build())
+                    is Either.Right -> result.value
+                }
 
             if (participants !is ConversationParticipants.Single) {
                 throw WebApplicationException(Response.status(SessionError.SESSION_MODE_MISMATCH.httpStatus).build())
@@ -81,7 +82,7 @@ class ThinkingAPI(
 
             if (participants.persona != requestedPersona) {
                 log.warn(
-                    "Persona mismatch: session=$conversationId stored=${participants.persona.codeName} requested=${requestedPersona.codeName}"
+                    "Persona mismatch: session=$conversationId stored=${participants.persona.codeName} requested=${requestedPersona.codeName}",
                 )
                 throw WebApplicationException(Response.status(SessionError.PERSONA_MISMATCH.httpStatus).build())
             }
@@ -92,26 +93,29 @@ class ThinkingAPI(
             log.debug("Continuing session: conversationId=$conversationId persona=${participants.persona.codeName}")
         }
 
-        val span = tracer.spanBuilder(DebateApiConstants.SPAN_NAME_QUERY_MODEL).apply {
-            personaContext.persona!!.also { persona ->
-                log.info("Using persona: ${persona.displayName}")
-                setAttribute("persona", persona.codeName)
-            }
-            setAttribute("conversationId", conversationContext.conversationId!!)
-        }
-            .setSpanKind(SpanKind.INTERNAL)
-            .startSpan()
+        val span =
+            tracer
+                .spanBuilder(DebateApiConstants.SPAN_NAME_QUERY_MODEL)
+                .apply {
+                    personaContext.persona!!.also { persona ->
+                        log.info("Using persona: ${persona.displayName}")
+                        setAttribute("persona", persona.codeName)
+                    }
+                    setAttribute("conversationId", conversationContext.conversationId!!)
+                }.setSpanKind(SpanKind.INTERNAL)
+                .startSpan()
 
         val traceId = span.spanContext.traceId
         val spanId = span.spanContext.spanId
         log.info("Querying model with trace ID: $traceId")
 
-        val responseStream = try {
-            chatService.query(body.input, span)
-        } catch (e: Exception) {
-            log.error("Error in querying model", e)
-            throw InternalServerErrorException("Failed to query model")
-        }
+        val responseStream =
+            try {
+                chatService.query(body.input, span)
+            } catch (e: Exception) {
+                log.error("Error in querying model", e)
+                throw InternalServerErrorException("Failed to query model")
+            }
 
         return buildResponse(responseStream, traceId, spanId, sessionToken)
     }
@@ -127,68 +131,75 @@ class ThinkingAPI(
         if (body.persona.isBlank()) throw BadRequestException("personaA must be present")
         if (body.opponentPersona.isBlank()) throw BadRequestException("personaB must be present")
 
-        val requestedPersonaA = Persona.entries.firstOrNull { it.codeName == body.persona }
-            ?: throw NotFoundException("personaA not found")
-        val requestedPersonaB = Persona.entries.firstOrNull { it.codeName == body.opponentPersona }
-            ?: throw NotFoundException("personaB not found")
+        val requestedPersonaA =
+            Persona.entries.firstOrNull { it.codeName == body.persona }
+                ?: throw NotFoundException("personaA not found")
+        val requestedPersonaB =
+            Persona.entries.firstOrNull { it.codeName == body.opponentPersona }
+                ?: throw NotFoundException("personaB not found")
 
         if (requestedPersonaA == requestedPersonaB) {
             throw BadRequestException("personaA and personaB must be different")
         }
 
         var sessionToken: String? = null
-        val conversationId = if (authorization == null) {
-            val session = sessionService.createDebateSession(requestedPersonaA, requestedPersonaB)
-            sessionToken = session.token
-            session.conversationId
-        } else {
-            val token = authorization.removePrefix("Bearer ").trim()
-            val storedConversationId = extractConversationId(token)
+        val conversationId =
+            if (authorization == null) {
+                val session = sessionService.createDebateSession(requestedPersonaA, requestedPersonaB)
+                sessionToken = session.token
+                session.conversationId
+            } else {
+                val token = authorization.removePrefix("Bearer ").trim()
+                val storedConversationId = extractConversationId(token)
 
-            val participants = when (val result = sessionService.getConversationParticipants(storedConversationId)) {
-                is Either.Left -> throw WebApplicationException(Response.status(result.value.httpStatus).build())
-                is Either.Right -> result.value
+                val participants =
+                    when (val result = sessionService.getConversationParticipants(storedConversationId)) {
+                        is Either.Left -> throw WebApplicationException(Response.status(result.value.httpStatus).build())
+                        is Either.Right -> result.value
+                    }
+
+                if (participants !is ConversationParticipants.Debate) {
+                    throw WebApplicationException(Response.status(SessionError.SESSION_MODE_MISMATCH.httpStatus).build())
+                }
+
+                if (participants.persona != requestedPersonaA || participants.opponentPersona != requestedPersonaB) {
+                    throw WebApplicationException(Response.status(SessionError.PERSONA_PAIR_MISMATCH.httpStatus).build())
+                }
+
+                storedConversationId
             }
-
-            if (participants !is ConversationParticipants.Debate) {
-                throw WebApplicationException(Response.status(SessionError.SESSION_MODE_MISMATCH.httpStatus).build())
-            }
-
-            if (participants.persona != requestedPersonaA || participants.opponentPersona != requestedPersonaB) {
-                throw WebApplicationException(Response.status(SessionError.PERSONA_PAIR_MISMATCH.httpStatus).build())
-            }
-
-            storedConversationId
-        }
 
         conversationContext.conversationId = conversationId
 
-        val span = tracer.spanBuilder(DebateApiConstants.SPAN_NAME_QUERY_DEBATE).apply {
-            setAttribute("persona", requestedPersonaA.codeName)
-            setAttribute("opponentPersona", requestedPersonaB.codeName)
-            setAttribute("conversationId", conversationId)
-        }
-            .setSpanKind(SpanKind.INTERNAL)
-            .startSpan()
+        val span =
+            tracer
+                .spanBuilder(DebateApiConstants.SPAN_NAME_QUERY_DEBATE)
+                .apply {
+                    setAttribute("persona", requestedPersonaA.codeName)
+                    setAttribute("opponentPersona", requestedPersonaB.codeName)
+                    setAttribute("conversationId", conversationId)
+                }.setSpanKind(SpanKind.INTERNAL)
+                .startSpan()
 
         val traceId = span.spanContext.traceId
         val spanId = span.spanContext.spanId
 
-        val responseStream = try {
-            debateService.query(
-                input = body.input,
-                conversationId = UUID.fromString(conversationId),
-                personaA = requestedPersonaA,
-                personaB = requestedPersonaB,
-                callerSpan = span,
-            )
-        } catch (e: Exception) {
-            log.error("Error in querying debate", e)
-            span.recordException(e)
-            span.setStatus(StatusCode.ERROR)
-            span.end()
-            throw InternalServerErrorException("Failed to query debate")
-        }
+        val responseStream =
+            try {
+                debateService.query(
+                    input = body.input,
+                    conversationId = UUID.fromString(conversationId),
+                    personaA = requestedPersonaA,
+                    personaB = requestedPersonaB,
+                    callerSpan = span,
+                )
+            } catch (e: Exception) {
+                log.error("Error in querying debate", e)
+                span.recordException(e)
+                span.setStatus(StatusCode.ERROR)
+                span.end()
+                throw InternalServerErrorException("Failed to query debate")
+            }
 
         return buildResponse(responseStream, traceId, spanId, sessionToken)
     }
@@ -197,12 +208,13 @@ class ThinkingAPI(
         responseStream: Multi<T>,
         traceId: String,
         spanId: String,
-        sessionToken: String?
+        sessionToken: String?,
     ): RestMulti<T> {
-        val multi = RestMulti
-            .fromMultiData(responseStream)
-            .header("X-Trace-Id", traceId)
-            .header(HttpConstants.HEADER_TRACEPARENT, "00-$traceId-$spanId-01")
+        val multi =
+            RestMulti
+                .fromMultiData(responseStream)
+                .header("X-Trace-Id", traceId)
+                .header(HttpConstants.HEADER_TRACEPARENT, "00-$traceId-$spanId-01")
 
         if (sessionToken != null) {
             multi.header(HttpConstants.HEADER_SESSION_TOKEN, sessionToken)
@@ -216,10 +228,12 @@ class ThinkingAPI(
             is Either.Left -> throw WebApplicationException(Response.status(result.value.httpStatus).build())
             is Either.Right -> result.value
         }
-
 }
 
-data class QueryPayload(val input: String, val persona: String)
+data class QueryPayload(
+    val input: String,
+    val persona: String,
+)
 
 data class DebateQueryPayload(
     val input: String,

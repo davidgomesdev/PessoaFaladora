@@ -33,9 +33,8 @@ class SemanticDocumentSplitter(
     private val embeddingModel: EmbeddingModel,
     private val minChunkSize: Int,
     private val maxChunkSize: Int,
-    private val similarityThreshold: Double
+    private val similarityThreshold: Double,
 ) : DocumentSplitter {
-
     private val tracer = GlobalOpenTelemetry.getTracer(this::class.java.name)
     private val log: Logger = Logger.getLogger(this::class.java)
     private val sentenceSplitter = DocumentBySentenceSplitter(maxChunkSize, 0)
@@ -52,17 +51,19 @@ class SemanticDocumentSplitter(
         }
     }
 
-    override fun split(document: Document): List<TextSegment> {
-        return splitAll(listOf(document))
-    }
+    override fun split(document: Document): List<TextSegment> = splitAll(listOf(document))
 
     override fun splitAll(documents: List<Document>): List<TextSegment> {
-        val span = tracer.spanBuilder("rag.semantic_chunking").setSpanKind(SpanKind.INTERNAL).apply {
-            setAttribute("document_count", documents.size.toLong())
-            setAttribute("min_chunk_size", minChunkSize.toLong())
-            setAttribute("max_chunk_size", maxChunkSize.toLong())
-            setAttribute("similarity_threshold", similarityThreshold)
-        }.startSpan()
+        val span =
+            tracer
+                .spanBuilder("rag.semantic_chunking")
+                .setSpanKind(SpanKind.INTERNAL)
+                .apply {
+                    setAttribute("document_count", documents.size.toLong())
+                    setAttribute("min_chunk_size", minChunkSize.toLong())
+                    setAttribute("max_chunk_size", maxChunkSize.toLong())
+                    setAttribute("similarity_threshold", similarityThreshold)
+                }.startSpan()
         val scope = span.makeCurrent()
 
         return try {
@@ -73,7 +74,12 @@ class SemanticDocumentSplitter(
             val allSegments = mutableListOf<TextSegment>()
 
             for (document in documents) {
-                val initialSegments = document.text().split("\n\n").map { it.trim() }.filter { it.isNotBlank() }
+                val initialSegments =
+                    document
+                        .text()
+                        .split("\n\n")
+                        .map { it.trim() }
+                        .filter { it.isNotBlank() }
 
                 if (initialSegments.isEmpty()) {
                     span.addEvent("Empty document skipped")
@@ -136,7 +142,10 @@ class SemanticDocumentSplitter(
     }
 
     private fun handleSizeConstraints(
-        mergedChunks: List<String>, fallbackCount: Int, document: Document, allSegments: MutableList<TextSegment>
+        mergedChunks: List<String>,
+        fallbackCount: Int,
+        document: Document,
+        allSegments: MutableList<TextSegment>,
     ): Int {
         val span = Span.current()
         var currentChunkFallbackCount = fallbackCount
@@ -173,7 +182,10 @@ class SemanticDocumentSplitter(
     }
 
     private fun mergeEmbeddingsBySimilarity(
-        initialSegments: List<String>, embeddings: List<FloatArray>, totalSimilarity: Double, mergeCount: Int
+        initialSegments: List<String>,
+        embeddings: List<FloatArray>,
+        totalSimilarity: Double,
+        mergeCount: Int,
     ): Triple<MutableList<String>, Int, Double> {
         var totalSimilarity1 = totalSimilarity
         var mergeCount1 = mergeCount
@@ -204,7 +216,10 @@ class SemanticDocumentSplitter(
      * @param embedding2 Second embedding vector
      * @return Cosine similarity value between 0.0 and 1.0
      */
-    private fun cosineSimilarity(embedding1: FloatArray, embedding2: FloatArray): Double {
+    private fun cosineSimilarity(
+        embedding1: FloatArray,
+        embedding2: FloatArray,
+    ): Double {
         require(embedding1.size == embedding2.size) {
             "Embeddings must have the same dimension"
         }

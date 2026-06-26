@@ -12,7 +12,6 @@ import jakarta.persistence.Table
 @Entity
 @Table(name = "personas")
 class PersonaEntity : PanacheEntityBase {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Int = 0
@@ -21,7 +20,6 @@ class PersonaEntity : PanacheEntityBase {
     lateinit var codeName: String
 
     companion object : PanacheCompanionBase<PersonaEntity, Int> {
-        fun findByCodeName(codeName: String): PersonaEntity? =
-            find("codeName", codeName).firstResult()
+        fun findByCodeName(codeName: String): PersonaEntity? = find("codeName", codeName).firstResult()
     }
 }

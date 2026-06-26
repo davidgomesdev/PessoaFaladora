@@ -12,7 +12,6 @@ import java.util.UUID
 @Entity
 @Table(name = "debate_turns")
 class DebateTurnEntity : PanacheEntityBase {
-
     @Id
     lateinit var id: UUID
 

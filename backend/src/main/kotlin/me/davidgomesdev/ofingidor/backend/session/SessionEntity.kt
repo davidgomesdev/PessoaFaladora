@@ -16,7 +16,6 @@ import java.util.UUID
 @Entity
 @Table(name = "sessions")
 class SessionEntity : PanacheEntityBase {
-
     @Id
     @Column(name = "conversation_id", nullable = false)
     lateinit var conversationId: UUID

@@ -22,8 +22,9 @@ import java.util.UUID
 
 @ApplicationScoped
 @Startup
-class SessionService(private val config: SessionConfig) {
-
+class SessionService(
+    private val config: SessionConfig,
+) {
     private val log: Logger = Logger.getLogger(this::class.java)
 
     private val signer: MACSigner by lazy {
@@ -46,14 +47,15 @@ class SessionService(private val config: SessionConfig) {
         log.info(
             "SessionService initialized (JWT TTL: ${config.jwt().ttl()}, memory max: ${
                 config.memory().maxMessages()
-            })"
+            })",
         )
     }
 
     @Transactional
     fun createSession(persona: Persona): ConversationSession {
-        val personaEntity = PersonaEntity.findByCodeName(persona.codeName)
-            ?: error("Persona '${persona.codeName}' not found in database")
+        val personaEntity =
+            PersonaEntity.findByCodeName(persona.codeName)
+                ?: error("Persona '${persona.codeName}' not found in database")
         val conversationId = UuidCreator.getTimeOrderedEpoch()
         val session = SessionEntity()
 
@@ -72,13 +74,18 @@ class SessionService(private val config: SessionConfig) {
     }
 
     @Transactional
-    fun createDebateSession(personaA: Persona, personaB: Persona): ConversationSession {
+    fun createDebateSession(
+        personaA: Persona,
+        personaB: Persona,
+    ): ConversationSession {
         require(personaA != personaB) { "debate personas must be different" }
 
-        val personaEntity = PersonaEntity.findByCodeName(personaA.codeName)
-            ?: error("Persona '${personaA.codeName}' not found in database")
-        val opponentEntity = PersonaEntity.findByCodeName(personaB.codeName)
-            ?: error("Persona '${personaB.codeName}' not found in database")
+        val personaEntity =
+            PersonaEntity.findByCodeName(personaA.codeName)
+                ?: error("Persona '${personaA.codeName}' not found in database")
+        val opponentEntity =
+            PersonaEntity.findByCodeName(personaB.codeName)
+                ?: error("Persona '${personaB.codeName}' not found in database")
 
         val conversationId = UuidCreator.getTimeOrderedEpoch()
 
@@ -105,8 +112,9 @@ class SessionService(private val config: SessionConfig) {
                 log.warn("JWT rejected: token expired at $expiry")
                 return SessionError.INVALID_TOKEN.left()
             }
-            val conversationId = jwt.jwtClaimsSet.getStringClaim("conversationId")
-                ?: return SessionError.INVALID_TOKEN.left()
+            val conversationId =
+                jwt.jwtClaimsSet.getStringClaim("conversationId")
+                    ?: return SessionError.INVALID_TOKEN.left()
             conversationId.right()
         } catch (e: Exception) {
             log.warn("JWT rejected: malformed token (${e.message})")
@@ -116,29 +124,33 @@ class SessionService(private val config: SessionConfig) {
 
     @Transactional
     fun getPersona(conversationId: String): Either<SessionError, Persona> {
-        val uuid = try {
-            UUID.fromString(conversationId)
-        } catch (_: IllegalArgumentException) {
-            log.warn("Session lookup failed: invalid UUID format '$conversationId'")
-            return SessionError.SESSION_NOT_FOUND.left()
-        }
-        val session = SessionEntity.findById(uuid)
-            ?: run {
-                log.warn("Session not found: conversationId=$conversationId")
+        val uuid =
+            try {
+                UUID.fromString(conversationId)
+            } catch (_: IllegalArgumentException) {
+                log.warn("Session lookup failed: invalid UUID format '$conversationId'")
                 return SessionError.SESSION_NOT_FOUND.left()
             }
-        val persona = Persona.entries.firstOrNull { it.codeName == session.persona.codeName }
-            ?: error("Unknown persona code '${session.persona.codeName}' in database")
+        val session =
+            SessionEntity.findById(uuid)
+                ?: run {
+                    log.warn("Session not found: conversationId=$conversationId")
+                    return SessionError.SESSION_NOT_FOUND.left()
+                }
+        val persona =
+            Persona.entries.firstOrNull { it.codeName == session.persona.codeName }
+                ?: error("Unknown persona code '${session.persona.codeName}' in database")
         return persona.right()
     }
 
     @Transactional
     fun getConversationParticipants(conversationId: String): Either<SessionError, ConversationParticipants> {
-        val uuid = try {
-            UUID.fromString(conversationId)
-        } catch (_: IllegalArgumentException) {
-            return SessionError.SESSION_NOT_FOUND.left()
-        }
+        val uuid =
+            try {
+                UUID.fromString(conversationId)
+            } catch (_: IllegalArgumentException) {
+                return SessionError.SESSION_NOT_FOUND.left()
+            }
 
         val session = SessionEntity.findById(uuid) ?: return SessionError.SESSION_NOT_FOUND.left()
 
@@ -149,40 +161,44 @@ class SessionService(private val config: SessionConfig) {
                 if (session.opponentPersona != null) {
                     SessionError.SESSION_MODE_MISMATCH.left()
                 } else {
-                    ConversationParticipants.Single(
-                        persona = primary,
-                    ).right()
+                    ConversationParticipants
+                        .Single(
+                            persona = primary,
+                        ).right()
                 }
             }
 
             ConversationType.DEBATE -> {
                 val opponent = session.opponentPersona ?: return SessionError.SESSION_MODE_MISMATCH.left()
-                val resolvedOpponent = resolvePersona(opponent.codeName)
-                    ?: return SessionError.PERSONA_PAIR_MISMATCH.left()
+                val resolvedOpponent =
+                    resolvePersona(opponent.codeName)
+                        ?: return SessionError.PERSONA_PAIR_MISMATCH.left()
 
                 if (resolvedOpponent == primary) {
                     SessionError.PERSONA_PAIR_MISMATCH.left()
                 } else {
-                    ConversationParticipants.Debate(
-                        persona = primary,
-                        opponentPersona = resolvedOpponent,
-                    ).right()
+                    ConversationParticipants
+                        .Debate(
+                            persona = primary,
+                            opponentPersona = resolvedOpponent,
+                        ).right()
                 }
             }
         }
     }
 
-    private fun resolvePersona(codeName: String): Persona? =
-        Persona.entries.firstOrNull { it.codeName == codeName }
+    private fun resolvePersona(codeName: String): Persona? = Persona.entries.firstOrNull { it.codeName == codeName }
 
     private fun buildJwt(conversationId: String): String {
         val now = Instant.now()
         val expiry = now.plus(config.jwt().ttl())
-        val claims = JWTClaimsSet.Builder()
-            .claim("conversationId", conversationId)
-            .issueTime(Date.from(now))
-            .expirationTime(Date.from(expiry))
-            .build()
+        val claims =
+            JWTClaimsSet
+                .Builder()
+                .claim("conversationId", conversationId)
+                .issueTime(Date.from(now))
+                .expirationTime(Date.from(expiry))
+                .build()
         val header = JWSHeader(JWSAlgorithm.HS256)
         val jwt = SignedJWT(header, claims)
         jwt.sign(signer)

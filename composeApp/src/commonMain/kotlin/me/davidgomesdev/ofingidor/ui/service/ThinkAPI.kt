@@ -34,26 +34,29 @@ const val DEFAULT_HOST = "127.0.0.1"
 @Suppress("HttpUrlsUsage")
 val apiUrl = "http://${getHost()}:8080"
 
-
 class ThinkAPI {
-    private val client = HttpClient {
-        install(HttpTimeout) {
-            socketTimeoutMillis = 60_000
-        }
-        install(Logging) {
-            logger = object : Logger {
-                override fun log(message: String) {
-                    Napier.v("HTTP Client", null, message)
-                }
+    private val client =
+        HttpClient {
+            install(HttpTimeout) {
+                socketTimeoutMillis = 60_000
             }
-            level = LogLevel.ALL
-        }
-        install(ContentNegotiation) {
-            json(Json {
-                prettyPrint = true
-            })
-        }
-    }.also { Napier.base(DebugAntilog()) }
+            install(Logging) {
+                logger =
+                    object : Logger {
+                        override fun log(message: String) {
+                            Napier.v("HTTP Client", null, message)
+                        }
+                    }
+                level = LogLevel.ALL
+            }
+            install(ContentNegotiation) {
+                json(
+                    Json {
+                        prettyPrint = true
+                    },
+                )
+            }
+        }.also { Napier.base(DebugAntilog()) }
 
     private var sessionToken: String? = null
     private var traceparent: String? = null
@@ -75,10 +78,11 @@ class ThinkAPI {
         this.traceparent = traceparent
     }
 
-    internal fun conversationState(): ConversationState = ConversationState(
-        sessionToken = sessionToken,
-        traceparent = traceparent,
-    )
+    internal fun conversationState(): ConversationState =
+        ConversationState(
+            sessionToken = sessionToken,
+            traceparent = traceparent,
+        )
 
     private fun updateConversation(
         sessionToken: String?,
@@ -92,77 +96,88 @@ class ThinkAPI {
 
     fun sendThinkRequest(
         query: String,
-        persona: Persona
-    ): Flow<Result<ChatEvent>> = channelFlow {
-        try {
-            client.preparePut("$apiUrl${ApiConstants.ENDPOINT_CONVERSATION}") {
-                accept(ContentType.Any)
-                contentType(ContentType.Application.Json)
-                setBody(ThinkPayload(query, persona.codeName))
+        persona: Persona,
+    ): Flow<Result<ChatEvent>> =
+        channelFlow {
+            try {
+                client
+                    .preparePut("$apiUrl${ApiConstants.ENDPOINT_CONVERSATION}") {
+                        accept(ContentType.Any)
+                        contentType(ContentType.Application.Json)
+                        setBody(ThinkPayload(query, persona.codeName))
 
-                sessionToken?.let { header(HttpHeaders.Authorization, "${HttpHeaderConstants.AUTH_SCHEME_BEARER}$it") }
-                traceparent?.let { header(HttpHeaderConstants.HEADER_TRACEPARENT_ALT, it) }
-            }.execute { httpResponse ->
-                updateConversation(
-                    sessionToken = httpResponse.headers[HttpHeaderConstants.HEADER_SESSION_TOKEN],
-                    traceparent = httpResponse.headers[HttpHeaderConstants.HEADER_TRACEPARENT],
-                )
+                        sessionToken?.let { header(HttpHeaders.Authorization, "${HttpHeaderConstants.AUTH_SCHEME_BEARER}$it") }
+                        traceparent?.let { header(HttpHeaderConstants.HEADER_TRACEPARENT_ALT, it) }
+                    }.execute { httpResponse ->
+                        updateConversation(
+                            sessionToken = httpResponse.headers[HttpHeaderConstants.HEADER_SESSION_TOKEN],
+                            traceparent = httpResponse.headers[HttpHeaderConstants.HEADER_TRACEPARENT],
+                        )
 
-                val channel: ByteReadChannel = httpResponse.body()
+                        val channel: ByteReadChannel = httpResponse.body()
 
-                while (!channel.isClosedForRead) {
-                    val line = channel.readLine() ?: break
+                        while (!channel.isClosedForRead) {
+                            val line = channel.readLine() ?: break
 
-                    if (line.isBlank()) continue
+                            if (line.isBlank()) continue
 
-                    Napier.d("ChatEvent received: $line")
+                            Napier.d("ChatEvent received: $line")
 
-                    val event = json.decodeFromString<ChatEvent>(line)
+                            val event = json.decodeFromString<ChatEvent>(line)
 
-                    send(Result.success(event))
-                }
+                            send(Result.success(event))
+                        }
+                    }
+            } catch (e: Throwable) {
+                if (!isNetworkException(e)) throw e
+                Napier.e("Request failed", e)
+                send(Result.failure(e))
             }
-        } catch (e: Throwable) {
-            if (!isNetworkException(e)) throw e
-            Napier.e("Request failed", e)
-            send(Result.failure(e))
         }
-    }
 
     fun sendDebateRequest(
         query: String,
         pair: DebatePair,
-    ): Flow<Result<DebateEvent>> = channelFlow {
-        try {
-            client.preparePut("$apiUrl${ApiConstants.ENDPOINT_DEBATE}") {
-                accept(ContentType.Any)
-                contentType(ContentType.Application.Json)
-                setBody(DebatePayload(query, pair.left.codeName, pair.right.codeName))
+    ): Flow<Result<DebateEvent>> =
+        channelFlow {
+            try {
+                client
+                    .preparePut("$apiUrl${ApiConstants.ENDPOINT_DEBATE}") {
+                        accept(ContentType.Any)
+                        contentType(ContentType.Application.Json)
+                        setBody(DebatePayload(query, pair.left.codeName, pair.right.codeName))
 
-                sessionToken?.let { header(HttpHeaders.Authorization, "Bearer $it") }
-                traceparent?.let { header(HttpHeaderConstants.HEADER_TRACEPARENT_ALT, it) }
-            }.execute { httpResponse ->
-                updateConversation(
-                    sessionToken = httpResponse.headers[HttpHeaderConstants.HEADER_SESSION_TOKEN],
-                    traceparent = httpResponse.headers[HttpHeaderConstants.HEADER_TRACEPARENT],
-                )
+                        sessionToken?.let { header(HttpHeaders.Authorization, "Bearer $it") }
+                        traceparent?.let { header(HttpHeaderConstants.HEADER_TRACEPARENT_ALT, it) }
+                    }.execute { httpResponse ->
+                        updateConversation(
+                            sessionToken = httpResponse.headers[HttpHeaderConstants.HEADER_SESSION_TOKEN],
+                            traceparent = httpResponse.headers[HttpHeaderConstants.HEADER_TRACEPARENT],
+                        )
 
-                val channel: ByteReadChannel = httpResponse.body()
-                while (!channel.isClosedForRead) {
-                    val line = channel.readLine() ?: break
-                    if (line.isBlank()) continue
-                    send(Result.success(json.decodeFromString<DebateEvent>(line)))
-                }
+                        val channel: ByteReadChannel = httpResponse.body()
+                        while (!channel.isClosedForRead) {
+                            val line = channel.readLine() ?: break
+                            if (line.isBlank()) continue
+                            send(Result.success(json.decodeFromString<DebateEvent>(line)))
+                        }
+                    }
+            } catch (e: Throwable) {
+                if (!isNetworkException(e)) throw e
+                send(Result.failure(e))
             }
-        } catch (e: Throwable) {
-            if (!isNetworkException(e)) throw e
-            send(Result.failure(e))
         }
-    }
 }
 
 @Serializable
-data class ThinkPayload(val input: String, val persona: String)
+data class ThinkPayload(
+    val input: String,
+    val persona: String,
+)
 
 @Serializable
-data class DebatePayload(val input: String, val persona: String, val opponentPersona: String)
+data class DebatePayload(
+    val input: String,
+    val persona: String,
+    val opponentPersona: String,
+)
