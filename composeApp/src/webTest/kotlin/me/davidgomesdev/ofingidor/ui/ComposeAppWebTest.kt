@@ -351,7 +351,7 @@ class ComposeAppWebTest {
         )
 
         handleDebateEvent(
-            event = DebateEvent.TurnStart(turnIndex = 0, speaker = Persona.ALBERTO_CAEIRO.codeName),
+            event = DebateEvent.TurnStart(turnIndex = 0, speaker = Persona.ALBERTO_CAEIRO),
             pair = pair,
             turns = turns,
             getOngoingTurn = { ongoing },
@@ -361,7 +361,7 @@ class ComposeAppWebTest {
         handleDebateEvent(
             event = DebateEvent.Token(
                 turnIndex = 0,
-                speaker = Persona.ALBERTO_CAEIRO.codeName,
+                speaker = Persona.ALBERTO_CAEIRO,
                 value = "Sou ",
             ),
             pair = pair,
@@ -373,7 +373,7 @@ class ComposeAppWebTest {
         handleDebateEvent(
             event = DebateEvent.Token(
                 turnIndex = 0,
-                speaker = Persona.ALBERTO_CAEIRO.codeName,
+                speaker = Persona.ALBERTO_CAEIRO,
                 value = "eu.",
             ),
             pair = pair,
@@ -385,8 +385,8 @@ class ComposeAppWebTest {
         handleDebateEvent(
             event = DebateEvent.Sources(
                 turnIndex = 0,
-                speaker = Persona.ALBERTO_CAEIRO.codeName,
-                sources = listOf(eventSource),
+                speaker = Persona.ALBERTO_CAEIRO,
+                sources = ChatEvent.Sources(listOf(eventSource)),
             ),
             pair = pair,
             turns = turns,
@@ -397,7 +397,7 @@ class ComposeAppWebTest {
         handleDebateEvent(
             event = DebateEvent.TurnDone(
                 turnIndex = 0,
-                speaker = Persona.ALBERTO_CAEIRO.codeName,
+                speaker = Persona.ALBERTO_CAEIRO,
                 tokensUsed = 12,
                 timeTaken = "0.4s",
             ),
