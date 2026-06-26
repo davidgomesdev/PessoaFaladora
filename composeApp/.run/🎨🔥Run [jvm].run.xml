@@ -1,29 +1,29 @@
 <component name="ProjectRunConfigurationManager">
-    <configuration default="false" name="🎨🔥Run [jvm]" type="GradleRunConfiguration" factoryName="Gradle" folderName="🎨">
-        <ExternalSystemSettings>
-            <option name="executionName"/>
-            <option name="externalProjectPath" value="$PROJECT_DIR$/composeApp"/>
-            <option name="externalSystemIdString" value="GRADLE"/>
-            <option name="scriptParameters" value="--quiet"/>
-            <option name="taskDescriptions">
-                <list/>
-            </option>
-            <option name="taskNames">
-                <list>
-                    <option value="hotRunJvm"/>
-                    <option value="--mainClass"/>
-                    <option value="&quot;me.davidgomesdev.ofingidor.ui.MainKt&quot;"/>
-                </list>
-            </option>
-            <option name="vmOptions" value="-Dcompose.reload.build.warmup=true"/>
-        </ExternalSystemSettings>
-        <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
-        <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-        <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
-        <DebugAllEnabled>false</DebugAllEnabled>
-        <RunAsTest>false</RunAsTest>
-        <GradleProfilingDisabled>false</GradleProfilingDisabled>
-        <GradleCoverageDisabled>false</GradleCoverageDisabled>
-        <method v="2"/>
-    </configuration>
+  <configuration default="false" name="🎨🔥Run [jvm]" type="GradleRunConfiguration" factoryName="Gradle" folderName="🎨">
+    <ExternalSystemSettings>
+      <option name="executionName" />
+      <option name="externalProjectPath" value="$PROJECT_DIR$/composeApp" />
+      <option name="externalSystemIdString" value="GRADLE" />
+      <option name="scriptParameters" value="--quiet -PskipUi=true" />
+      <option name="taskDescriptions">
+        <list />
+      </option>
+      <option name="taskNames">
+        <list>
+          <option value="hotRunJvm" />
+          <option value="--mainClass" />
+          <option value="&quot;me.davidgomesdev.ofingidor.ui.MainKt&quot;" />
+        </list>
+      </option>
+      <option name="vmOptions" value="-Dcompose.reload.build.warmup=true" />
+    </ExternalSystemSettings>
+    <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+    <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+    <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
+    <DebugAllEnabled>false</DebugAllEnabled>
+    <RunAsTest>false</RunAsTest>
+    <GradleProfilingDisabled>false</GradleProfilingDisabled>
+    <GradleCoverageDisabled>false</GradleCoverageDisabled>
+    <method v="2" />
+  </configuration>
 </component>

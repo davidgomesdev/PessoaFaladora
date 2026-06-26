@@ -1,5 +1,6 @@
 package me.davidgomesdev.ofingidor.backend.session
 
+import arrow.core.right
 import io.quarkus.test.junit.QuarkusTest
 import io.quarkus.test.junit.TestProfile
 import jakarta.inject.Inject
@@ -34,12 +35,10 @@ class SessionServiceTest {
     @Test
     fun `createSession participants metadata is single with no opponent`() {
         val session = sessionService.createSession(Persona.ALBERTO_CAEIRO)
-        val metadata = sessionService.getConversationParticipants(session.conversationId)
+        val participants = sessionService.getConversationParticipants(session.conversationId).getOrNull() as ConversationParticipants.Single
 
-        assertTrue(metadata.isRight())
-        assertEquals(ConversationType.SINGLE, metadata.getOrNull()!!.type)
-        assertEquals(Persona.ALBERTO_CAEIRO, metadata.getOrNull()!!.persona)
-        assertNull(metadata.getOrNull()!!.opponentPersona)
+        assertEquals(ConversationType.SINGLE, participants.type)
+        assertEquals(Persona.ALBERTO_CAEIRO, participants.persona)
     }
 
     @Test
@@ -85,9 +84,10 @@ class SessionServiceTest {
         val metadata = sessionService.getConversationParticipants(session.conversationId)
 
         assertTrue(metadata.isRight())
-        assertEquals(ConversationType.DEBATE, metadata.getOrNull()!!.type)
-        assertEquals(Persona.FERNANDO_PESSOA, metadata.getOrNull()!!.persona)
-        assertEquals(Persona.ALBERTO_CAEIRO, metadata.getOrNull()!!.opponentPersona)
+        val participants = metadata.getOrNull() as ConversationParticipants.Debate
+        assertEquals(ConversationType.DEBATE, participants.type)
+        assertEquals(Persona.FERNANDO_PESSOA, participants.persona)
+        assertEquals(Persona.ALBERTO_CAEIRO, participants.opponentPersona)
     }
 
     @Test
